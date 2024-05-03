@@ -1,5 +1,5 @@
 import { Patient } from '../schemas/patient.schema';
-import { Category } from 'src/shared/global';
+import { Category } from 'src/shared';
 import { CreatePatientType } from '../interface/patient.interface';
 import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
 import { Injectable } from '@nestjs/common';

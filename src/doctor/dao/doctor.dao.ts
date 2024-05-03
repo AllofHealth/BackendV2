@@ -6,7 +6,7 @@ import {
   UpdateDoctorType,
 } from '../interface/doctor.interface';
 import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
-import { ApprovalStatus, Category } from 'src/shared/global';
+import { ApprovalStatus, Category } from 'src/shared';
 import { encrypt } from 'src/shared/utils/encrypt.utils';
 
 export class DoctorDao {

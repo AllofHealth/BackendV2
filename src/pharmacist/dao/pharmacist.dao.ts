@@ -6,7 +6,7 @@ import {
   UpdatePharmacistType,
 } from '../interface/pharmacist.interface';
 import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
-import { ApprovalStatus } from 'src/shared/global';
+import { ApprovalStatus } from 'src/shared';
 import { encrypt } from 'src/shared/utils/encrypt.utils';
 
 export class PharmacistDao {

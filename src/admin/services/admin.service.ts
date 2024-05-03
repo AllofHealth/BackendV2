@@ -3,7 +3,7 @@ import { Admin } from '../schema/admin.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateAdminType, RemoveAdminType } from '../interface/admin.interface';
 import { Model } from 'mongoose';
-import { AdminError, ErrorCodes } from 'src/shared/global';
+import { AdminError, ErrorCodes } from 'src/shared';
 import { MyLoggerService } from 'src/my-logger/my-logger.service';
 import { AdminDao } from '../dao/admin.dao';
 

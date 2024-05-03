@@ -4,7 +4,7 @@ import { Doctor } from '../schema/doctor.schema';
 import { Model, MongooseError } from 'mongoose';
 import { DoctorDao } from '../dao/doctor.dao';
 import { CreateDoctorType } from '../interface/doctor.interface';
-import { DoctorError, ErrorCodes } from 'src/shared/global';
+import { DoctorError, ErrorCodes } from 'src/shared';
 import { DoctorGuard } from '../guards/doctor.guard';
 import { HospitalDao } from 'src/hospital/dao/hospital.dao';
 import { PreviewType } from 'src/hospital/interface/hospital.interface';

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Patient } from '../schemas/patient.schema';
 import { CreatePatientType } from '../interface/patient.interface';
-import { ErrorCodes, PatientError } from 'src/shared/global';
+import { ErrorCodes, PatientError } from 'src/shared';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PatientDao } from '../dao/patient.dao';

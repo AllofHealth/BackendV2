@@ -7,7 +7,7 @@ import {
   HospitalType,
   PreviewType,
 } from '../interface/hospital.interface';
-import { ApprovalStatus, ErrorCodes, HospitalError } from 'src/shared/global';
+import { ApprovalStatus, ErrorCodes, HospitalError } from 'src/shared';
 import { MyLoggerService } from 'src/my-logger/my-logger.service';
 import { HospitalDao } from '../dao/hospital.dao';
 import { decrypt } from 'src/shared/utils/encrypt.utils';
@@ -126,8 +126,7 @@ export class HospitalService {
     hospitals: HospitalType[];
   }> {
     try {
-      const hospitals =
-        await this.hospitalDao.fetchHospitalWithApprovedStatus();
+      const hospitals = await this.hospitalDao.fetchHospitalWithApprovedStatus();
       if (!hospitals) {
         console.log('No approved hospitals');
         throw new HospitalError('No approved hospitals found');
@@ -222,7 +221,9 @@ export class HospitalService {
     }
   }
 
-  async fetchPendingDoctors(hospitalId: Types.ObjectId): Promise<{
+  async fetchPendingDoctors(
+    hospitalId: Types.ObjectId,
+  ): Promise<{
     success: number;
     doctors: PreviewType[];
     message: string;
@@ -260,7 +261,9 @@ export class HospitalService {
     }
   }
 
-  async fetchPendingPharmacists(hospitalId: Types.ObjectId): Promise<{
+  async fetchPendingPharmacists(
+    hospitalId: Types.ObjectId,
+  ): Promise<{
     success: number;
     pharmacists: PreviewType[];
     message: string;
@@ -300,7 +303,9 @@ export class HospitalService {
     }
   }
 
-  async fetchApprovedDoctors(hospitalId: Types.ObjectId): Promise<{
+  async fetchApprovedDoctors(
+    hospitalId: Types.ObjectId,
+  ): Promise<{
     success: number;
     doctors: PreviewType[];
     message: string;
@@ -340,7 +345,9 @@ export class HospitalService {
     }
   }
 
-  async fetchApprovedPharmacists(hospitalId: Types.ObjectId): Promise<{
+  async fetchApprovedPharmacists(
+    hospitalId: Types.ObjectId,
+  ): Promise<{
     success: number;
     pharmacists: PreviewType[];
     message: string;

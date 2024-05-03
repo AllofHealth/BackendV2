@@ -7,7 +7,7 @@ import {
   PreviewType,
 } from '../interface/hospital.interface';
 import { HOSPITAL_PLACEHOLDER } from 'src/shared/constants';
-import { ApprovalStatus, Category, HospitalError } from 'src/shared/global';
+import { ApprovalStatus, Category, HospitalError } from 'src/shared';
 import { encrypt } from 'src/shared/utils/encrypt.utils';
 
 export class HospitalDao {

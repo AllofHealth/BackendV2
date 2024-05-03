@@ -2,7 +2,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Admin } from '../schema/admin.schema';
 import { Model } from 'mongoose';
 import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
-import { AdminError, Category } from 'src/shared/global';
+import { AdminError, Category } from 'src/shared';
 import { CreateAdminType } from '../interface/admin.interface';
 
 export class AdminDao {

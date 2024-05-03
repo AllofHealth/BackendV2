@@ -5,7 +5,7 @@ import {
   UpdatePharmacistType,
 } from '../interface/pharmacist.interface';
 import { PharmacistGuard } from '../guards/pharmacist.guard';
-import { ErrorCodes, PharmacistError } from 'src/shared/global';
+import { ErrorCodes, PharmacistError } from 'src/shared';
 import { HospitalDao } from 'src/hospital/dao/hospital.dao';
 import { MongooseError } from 'mongoose';
 import { decrypt } from 'src/shared/utils/encrypt.utils';
@@ -95,8 +95,7 @@ export class PharmacistService {
 
   async getPendingPharmacists() {
     try {
-      const pharmacist =
-        await this.pharmacistDao.fetchPharmacistWithPendingStatus();
+      const pharmacist = await this.pharmacistDao.fetchPharmacistWithPendingStatus();
 
       if (!pharmacist || pharmacist.length === 0) {
         return {
@@ -117,8 +116,7 @@ export class PharmacistService {
 
   async getApprovedPharmacists() {
     try {
-      const pharmacists =
-        await this.pharmacistDao.fetchPharmacistsWithApprovedStatus();
+      const pharmacists = await this.pharmacistDao.fetchPharmacistsWithApprovedStatus();
 
       if (!pharmacists || pharmacists.length === 0) {
         return {
@@ -139,8 +137,9 @@ export class PharmacistService {
 
   async getPharmacistByAddress(address: string) {
     try {
-      const pharmacist =
-        await this.pharmacistDao.fetchPharmacistByAddress(address);
+      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
+        address,
+      );
 
       if (!pharmacist) {
         return {
