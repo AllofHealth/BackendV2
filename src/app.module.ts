@@ -1,16 +1,19 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MONGODB_URI } from './shared/constants';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { MyLoggerModule } from './my-logger/my-logger.module';
+import { PatientModule } from './patient/patient.module';
+import { AdminModule } from './admin/admin.module';
+import { HospitalModule } from './hospital/hospital.module';
+import { DoctorModule } from './doctor/doctor.module';
+import { PharmacistModule } from './pharmacist/pharmacist.module';
 
 @Module({
   imports: [
-    UsersModule,
     ThrottlerModule.forRoot([
       {
         name: 'short',
@@ -23,8 +26,15 @@ import { MyLoggerModule } from './my-logger/my-logger.module';
         limit: 100,
       },
     ]),
-    MongooseModule.forRoot(MONGODB_URI),
+    MongooseModule.forRoot(MONGODB_URI, {
+      dbName: 'Pharmalink',
+    }),
     MyLoggerModule,
+    PatientModule,
+    AdminModule,
+    HospitalModule,
+    DoctorModule,
+    PharmacistModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
