@@ -42,6 +42,10 @@ export class HospitalDao {
     return await this.hospitalModel.findOne({ regNo });
   }
 
+  async fetchHospitalWithId(id: Types.ObjectId) {
+    return await this.hospitalModel.findOne({ _id: id });
+  }
+
   async fetchHospitalWithPendingStatus() {
     return await this.hospitalModel.find({
       status: ApprovalStatus.Pending,
