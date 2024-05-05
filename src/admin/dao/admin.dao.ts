@@ -38,4 +38,12 @@ export class AdminDao {
       throw new AdminError('Error validating admin exists');
     }
   }
+
+  async fetchAdminByAddress(walletAddress: string) {
+    return await this.adminModel.findOne({ walletAddress });
+  }
+
+  async fetchAllAdmins() {
+    return await this.adminModel.find();
+  }
 }
