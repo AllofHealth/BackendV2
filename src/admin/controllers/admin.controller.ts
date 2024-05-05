@@ -8,7 +8,12 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AdminService } from '../services/admin.service';
-import { CreateAdminType, RemoveAdminType } from '../interface/admin.interface';
+import {
+  ApproveHospitalDto,
+  CreateAdminDto,
+  RemoveAdminDto,
+} from '../dto/admin.dto';
+import { Types } from 'mongoose';
 
 @Controller('admin')
 export class AdminController {
@@ -28,12 +33,32 @@ export class AdminController {
   }
 
   @Post('createAdmin')
-  async createAdmin(@Body(ValidationPipe) createAdminDto: CreateAdminType) {
+  async createAdmin(@Body(ValidationPipe) createAdminDto: CreateAdminDto) {
     return await this.adminService.createNewAdmin(createAdminDto);
   }
 
+  @Post('approveHospital')
+  async approveHospital(
+    @Query('hospitalId', new ValidationPipe({ transform: true }))
+    hospitalId: Types.ObjectId,
+    @Query('adminAddress', new ValidationPipe({ transform: true }))
+    adminAddress: string,
+  ) {
+    const approveHospitalDto: ApproveHospitalDto = { hospitalId, adminAddress };
+    return await this.adminService.approveHospital(approveHospitalDto);
+  }
+
   @Delete('deleteAdmin')
-  async deleteAdmin(@Body(ValidationPipe) deleteAdminDto: RemoveAdminType) {
+  async deleteAdmin(
+    @Query('adminAddressToAuthorize', new ValidationPipe({ transform: true }))
+    adminAddressToAuthorize: string,
+    @Query('adminAddressToRemove', new ValidationPipe({ transform: true }))
+    adminAddressToRemove: string,
+  ) {
+    const deleteAdminDto: RemoveAdminDto = {
+      adminAddressToAuthorize,
+      adminAddressToRemove,
+    };
     return await this.adminService.removeAdmin(deleteAdminDto);
   }
 }
