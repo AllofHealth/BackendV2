@@ -126,7 +126,8 @@ export class HospitalService {
     hospitals: HospitalType[];
   }> {
     try {
-      const hospitals = await this.hospitalDao.fetchHospitalWithApprovedStatus();
+      const hospitals =
+        await this.hospitalDao.fetchHospitalWithApprovedStatus();
       if (!hospitals) {
         console.log('No approved hospitals');
         throw new HospitalError('No approved hospitals found');
@@ -200,7 +201,7 @@ export class HospitalService {
 
   async fetchHospitalById(id: Types.ObjectId) {
     try {
-      const hospital = await this.hospitalModel.findById(id);
+      const hospital = await this.hospitalDao.fetchHospitalWithId(id);
       if (!hospital) {
         throw new HospitalError('Hospital not found');
       }
@@ -215,15 +216,14 @@ export class HospitalService {
         hospital: decryptedHospital,
       };
     } catch (error) {
+      console.error(error);
       if (error instanceof MongooseError)
         throw new MongooseError(error.message);
       throw new InternalServerErrorException('Error fetching hospital');
     }
   }
 
-  async fetchPendingDoctors(
-    hospitalId: Types.ObjectId,
-  ): Promise<{
+  async fetchPendingDoctors(hospitalId: Types.ObjectId): Promise<{
     success: number;
     doctors: PreviewType[];
     message: string;
@@ -261,9 +261,7 @@ export class HospitalService {
     }
   }
 
-  async fetchPendingPharmacists(
-    hospitalId: Types.ObjectId,
-  ): Promise<{
+  async fetchPendingPharmacists(hospitalId: Types.ObjectId): Promise<{
     success: number;
     pharmacists: PreviewType[];
     message: string;
@@ -303,9 +301,7 @@ export class HospitalService {
     }
   }
 
-  async fetchApprovedDoctors(
-    hospitalId: Types.ObjectId,
-  ): Promise<{
+  async fetchApprovedDoctors(hospitalId: Types.ObjectId): Promise<{
     success: number;
     doctors: PreviewType[];
     message: string;
@@ -345,9 +341,7 @@ export class HospitalService {
     }
   }
 
-  async fetchApprovedPharmacists(
-    hospitalId: Types.ObjectId,
-  ): Promise<{
+  async fetchApprovedPharmacists(hospitalId: Types.ObjectId): Promise<{
     success: number;
     pharmacists: PreviewType[];
     message: string;
