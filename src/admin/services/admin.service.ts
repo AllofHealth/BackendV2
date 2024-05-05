@@ -2,10 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { Admin } from '../schema/admin.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateAdminType, RemoveAdminType } from '../interface/admin.interface';
-import { Model } from 'mongoose';
-import { AdminError, ErrorCodes } from 'src/shared';
+import { Model, Types } from 'mongoose';
+import { AdminError, ApprovalStatus, ErrorCodes } from 'src/shared';
 import { MyLoggerService } from 'src/my-logger/my-logger.service';
 import { AdminDao } from '../dao/admin.dao';
+import { AdminGuard } from '../guards/admin.guard';
+import { HospitalDao } from 'src/hospital/dao/hospital.dao';
 
 @Injectable()
 export class AdminService {
@@ -13,6 +15,8 @@ export class AdminService {
   constructor(
     @InjectModel(Admin.name) private adminModel: Model<Admin>,
     private readonly adminDao: AdminDao,
+    private readonly adminGuard: AdminGuard,
+    private readonly hospitalDao: HospitalDao,
   ) {}
 
   async fetchAdminByAddress(walletAddress: string) {
@@ -79,6 +83,49 @@ export class AdminService {
     } catch (error) {
       this.logger.info('Error removing admin');
       throw new AdminError('Error removing admin');
+    }
+  }
+
+  async approveHospital(args: {
+    hospitalId: Types.ObjectId;
+    adminAddress: string;
+  }): Promise<{ success: number; message: string }> {
+    const { hospitalId, adminAddress } = args;
+    if (!hospitalId || !adminAddress || adminAddress.length !== 42) {
+      throw new AdminError('Invalid hospital or admin address');
+    }
+
+    if (!(await this.adminGuard.validateAdmin(adminAddress))) {
+      throw new AdminError('Not Authorized');
+    }
+
+    try {
+      const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
+      if (!hospital) {
+        throw new AdminError('Hospital not found');
+      }
+
+      switch (hospital.status) {
+        case ApprovalStatus.Approved:
+          throw new AdminError('Hospital already approved');
+
+        case ApprovalStatus.Pending:
+          hospital.status = ApprovalStatus.Approved;
+
+          await hospital.save();
+          break;
+
+        default:
+          throw new AdminError('Hospital not pending');
+      }
+
+      return {
+        success: ErrorCodes.Success,
+        message: 'Hospital approved successfully',
+      };
+    } catch (error) {
+      console.error(error);
+      throw new AdminError('Error approving hospital');
     }
   }
 }
