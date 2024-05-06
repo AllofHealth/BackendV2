@@ -22,9 +22,8 @@ export class DoctorGuard {
     let doctorExists: boolean = false;
 
     try {
-      const hospital = await this.hospitalDao.fetchHospitalWithBlockchainId(
-        hospitalId,
-      );
+      const hospital =
+        await this.hospitalDao.fetchHospitalWithBlockchainId(hospitalId);
       if (!hospital) {
         throw new DoctorError('Hospital not found');
       }
@@ -44,11 +43,14 @@ export class DoctorGuard {
   }
 
   async validateDoctorExists(address: string) {
+    let doctorExists: boolean = false;
     try {
       const doctor = await this.doctorDao.fetchDoctorByAddress(address);
 
-      if (!doctor) throw new DoctorError('Doctor not found');
-      return doctor;
+      if (doctor) {
+        doctorExists = true;
+      }
+      return doctorExists;
     } catch (error) {
       console.error(error);
       throw new DoctorError('Error validating doctor exists');

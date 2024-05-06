@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Admin } from '../schema/admin.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateAdminType, RemoveAdminType } from '../interface/admin.interface';
-import { Model, Types } from 'mongoose';
+import { Model, MongooseError, Types } from 'mongoose';
 import { AdminError, ApprovalStatus, ErrorCodes } from 'src/shared';
 import { MyLoggerService } from 'src/my-logger/my-logger.service';
 import { AdminDao } from '../dao/admin.dao';
@@ -20,7 +20,24 @@ export class AdminService {
   ) {}
 
   async fetchAdminByAddress(walletAddress: string) {
-    return await this.adminModel.findOne({ walletAddress });
+    try {
+      const admin = await this.adminDao.fetchAdminByAddress(walletAddress);
+      if (!admin) {
+        return {
+          success: ErrorCodes.NotFound,
+          message: 'Admin not found',
+        };
+      }
+      return admin;
+    } catch (error) {
+      console.error(error);
+      if (error instanceof MongooseError) {
+        throw new MongooseError(error.message);
+      }
+      throw new InternalServerErrorException(
+        'An error occurred while fetching admin',
+      );
+    }
   }
 
   async fetchAllAdmins() {

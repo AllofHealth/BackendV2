@@ -38,6 +38,15 @@ export class PharmacistService {
       throw new Error('Missing required parameter');
     }
 
+    const pharmacistExists =
+      await this.pharmacistGuard.validatePharmacistExists(args.walletAddress);
+    if (pharmacistExists) {
+      return {
+        success: ErrorCodes.Error,
+        message: 'Pharmacist already exists',
+      };
+    }
+
     if (
       await this.pharmacistGuard.validatePharmacistExistsInHospital(
         args.hospitalIds as number,
@@ -95,7 +104,8 @@ export class PharmacistService {
 
   async getPendingPharmacists() {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistWithPendingStatus();
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistWithPendingStatus();
 
       if (!pharmacist || pharmacist.length === 0) {
         return {
@@ -116,7 +126,8 @@ export class PharmacistService {
 
   async getApprovedPharmacists() {
     try {
-      const pharmacists = await this.pharmacistDao.fetchPharmacistsWithApprovedStatus();
+      const pharmacists =
+        await this.pharmacistDao.fetchPharmacistsWithApprovedStatus();
 
       if (!pharmacists || pharmacists.length === 0) {
         return {
@@ -137,14 +148,13 @@ export class PharmacistService {
 
   async getPharmacistByAddress(address: string) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        address,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(address);
 
       if (!pharmacist) {
         return {
           success: ErrorCodes.NotFound,
-          pharmacist: [],
+          message: 'Pharmacist does not exist',
         };
       }
 

@@ -3,14 +3,16 @@ import { Patient } from '../schemas/patient.schema';
 import { CreatePatientType } from '../interface/patient.interface';
 import { ErrorCodes, PatientError } from 'src/shared';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, MongooseError } from 'mongoose';
 import { PatientDao } from '../dao/patient.dao';
+import { PatientGuard } from '../guards/patient.guard';
 
 @Injectable()
 export class PatientService {
   constructor(
     @InjectModel(Patient.name) private patientModel: Model<Patient>,
-    public readonly patientDao: PatientDao,
+    private readonly patientDao: PatientDao,
+    private readonly patientGuard: PatientGuard,
   ) {}
 
   async createNewPatient(args: CreatePatientType) {
@@ -40,6 +42,11 @@ export class PatientService {
       throw new PatientError('Invalid parameter');
     }
     try {
+      const patientExist =
+        await this.patientGuard.validatePatient(walletAddress);
+      if (patientExist) {
+        throw new PatientError('Patient already exist');
+      }
       const patient = await this.patientDao.createNewPatient(args);
       console.info(patient);
       return {
@@ -58,7 +65,28 @@ export class PatientService {
   }
 
   async fetchPatientByWalletAddress(walletAddress: string) {
-    return await this.patientModel.findOne({ walletAddress });
+    try {
+      const patientExist =
+        await this.patientGuard.validatePatient(walletAddress);
+
+      if (!patientExist) {
+        return {
+          success: ErrorCodes.NotFound,
+          message: 'Patient not found',
+        };
+      }
+      const patient =
+        await this.patientDao.fetchPatientByAddress(walletAddress);
+      return {
+        success: ErrorCodes.Success,
+        patient,
+      };
+    } catch (error) {
+      console.error(error);
+      if (error instanceof MongooseError)
+        throw new MongooseError(error.message);
+      throw new PatientError('An error occurred while fetching patient');
+    }
   }
 
   async deletePatientByAddress(walletAddress: string) {

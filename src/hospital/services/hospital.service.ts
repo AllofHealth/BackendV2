@@ -203,7 +203,10 @@ export class HospitalService {
     try {
       const hospital = await this.hospitalDao.fetchHospitalWithId(id);
       if (!hospital) {
-        throw new HospitalError('Hospital not found');
+        return {
+          success: ErrorCodes.NotFound,
+          message: 'Hospital not found',
+        };
       }
 
       const decryptedRegNo = decrypt({ data: hospital.regNo });

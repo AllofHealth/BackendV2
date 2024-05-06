@@ -82,6 +82,16 @@ export class DoctorService {
       throw new DoctorError('Missing required parameter');
     }
 
+    const doctorExist = await this.doctorGuard.validateDoctorExists(
+      args.walletAddress,
+    );
+    if (doctorExist) {
+      return {
+        success: ErrorCodes.Error,
+        message: 'Doctor already exists',
+      };
+    }
+
     if (
       await this.doctorGuard.validateDoctorExistsInHospital(
         args.hospitalIds as number,
@@ -146,7 +156,10 @@ export class DoctorService {
       const doctor = await this.doctorDao.fetchDoctorByAddress(address);
 
       if (!doctor) {
-        throw new DoctorError("Doctor doesn't exist");
+        return {
+          success: ErrorCodes.NotFound,
+          message: "Doctor doesn't exist",
+        };
       }
 
       const decryptedRegNo = decrypt({ data: doctor.regNo });
