@@ -1,13 +1,14 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Post,
   Query,
   ValidationPipe,
 } from '@nestjs/common';
 import { DoctorService } from '../services/doctor.service';
-import { CreateDoctorDto } from '../dto/doctor.dto';
+import { CreateDoctorDto, UpdateDoctorDto } from '../dto/doctor.dto';
 
 @Controller('doctor')
 export class DoctorController {
@@ -16,6 +17,18 @@ export class DoctorController {
   @Post('createDoctor')
   async createDoctor(@Body(ValidationPipe) createDoctorDto: CreateDoctorDto) {
     return await this.doctorService.createDoctor(createDoctorDto);
+  }
+
+  @Post('updateDoctor')
+  async updateDoctor(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+    @Body() updateDoctorDto: UpdateDoctorDto,
+  ) {
+    return await this.doctorService.updateDoctor(
+      walletAddress,
+      updateDoctorDto,
+    );
   }
 
   @Get('doctorByAddress')
@@ -39,5 +52,13 @@ export class DoctorController {
   @Get('pendingDoctors')
   async getPendingDoctors() {
     return await this.doctorService.getPendingDoctors();
+  }
+
+  @Delete('deleteDoctor')
+  async deleteDoctorByAddress(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+  ) {
+    return this.doctorService.deleteDoctorByAddress(walletAddress);
   }
 }
