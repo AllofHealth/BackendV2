@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { PharmacistDao } from '../dao/pharmacist.dao';
 import {
   CreatePharmacistType,
@@ -8,7 +8,7 @@ import { PharmacistGuard } from '../guards/pharmacist.guard';
 import { ErrorCodes, PharmacistError } from 'src/shared';
 import { HospitalDao } from 'src/hospital/dao/hospital.dao';
 import { MongooseError } from 'mongoose';
-import { decrypt } from 'src/shared/utils/encrypt.utils';
+import { decrypt, encrypt } from 'src/shared/utils/encrypt.utils';
 
 @Injectable()
 export class PharmacistService {
@@ -73,6 +73,7 @@ export class PharmacistService {
 
       const pharmacistPreview = {
         walletAddress: pharmacist.walletAddress,
+        hospitalIds: pharmacist.hospitalIds,
         profilePicture: pharmacist.profilePicture,
         name: pharmacist.name,
         regNo: pharmacist.regNo,
@@ -82,7 +83,7 @@ export class PharmacistService {
       try {
         hospital.pharmacists.push(pharmacistPreview);
       } catch (error) {
-        await this.pharmacistDao.removePharmacist(pharmacist.walletAddress);
+        await this.pharmacistDao.deletePharmacist(pharmacist.walletAddress);
         throw new PharmacistError('Error adding pharmacist to hospital');
       }
 
@@ -181,12 +182,62 @@ export class PharmacistService {
 
   async updatePharmacist(walletAddress: string, args: UpdatePharmacistType) {
     try {
-      return await this.pharmacistDao.updatePharmacist(walletAddress, args);
+      const pharmacistExist =
+        await this.pharmacistGuard.validatePharmacistExists(walletAddress);
+      if (!pharmacistExist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'Pharmacist does not exist',
+        };
+      }
+      let updateArgs = { ...args };
+      if (args.regNo) {
+        const encryptedRegNo = encrypt({ data: args.regNo });
+        updateArgs = { ...updateArgs, regNo: encryptedRegNo };
+      }
+
+      const pharmacist = await this.pharmacistDao.updatePharmacist(
+        walletAddress,
+        updateArgs,
+      );
+      return {
+        success: HttpStatus.OK,
+        message: 'Pharmacist updated successfully',
+        pharmacist,
+      };
     } catch (error) {
       console.error(error);
       if (error instanceof MongooseError)
         throw new MongooseError(error.message);
       throw new PharmacistError('Error updating pharmacist');
+    }
+  }
+
+  async deletePharmacist(walletAddress: string) {
+    try {
+      const pharmacistExist =
+        await this.pharmacistGuard.validatePharmacistExists(walletAddress);
+      if (!pharmacistExist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'pharmacist not found',
+        };
+      }
+
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+      const hospitalIds = pharmacist.hospitalIds;
+      await this.hospitalDao.pullManyPharmacists(hospitalIds, walletAddress);
+      await this.pharmacistDao.deletePharmacist(walletAddress);
+      return {
+        success: HttpStatus.OK,
+        message: 'pharmacist deleted successfully',
+      };
+    } catch (error) {
+      console.error(error);
+      if (error instanceof MongooseError)
+        throw new MongooseError(error.message);
+      throw new PharmacistError('Error deleting pharmacist');
     }
   }
 }

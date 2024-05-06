@@ -68,5 +68,9 @@ export class UpdatePharmacistDto {
 
   @IsOptional()
   @IsString()
+  regNo?: string;
+
+  @IsOptional()
+  @IsString()
   phoneNumber?: string;
 }

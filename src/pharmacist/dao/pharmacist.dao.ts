@@ -68,7 +68,7 @@ export class PharmacistDao {
     return result;
   }
 
-  async removePharmacist(address: string) {
+  async deletePharmacist(address: string) {
     return await this.pharmacistModel.deleteOne({ walletAddress: address });
   }
 }

@@ -80,6 +80,10 @@ export class UpdateDoctorDto {
 
   @IsString()
   @IsOptional()
+  regNo: string;
+
+  @IsString()
+  @IsOptional()
   @IsPhoneNumber()
   phoneNumber: string;
 }

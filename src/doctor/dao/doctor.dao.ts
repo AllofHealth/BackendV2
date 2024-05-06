@@ -63,16 +63,18 @@ export class DoctorDao {
     return await this.doctorModel.deleteOne({ walletAddress: address });
   }
 
-  async updateDoctor(walletAddress: string, updateData: UpdateDoctorType) {
+  async updateDoctor(address: string, updateData: UpdateDoctorType) {
     const updates = Object.keys(updateData).reduce((acc, key) => {
       if (updateData[key] !== undefined) {
-        acc[`$set.${key}`] = updateData[key];
+        acc[key] = updateData[key];
       }
       return acc;
     }, {});
 
-    return await this.doctorModel.findOneAndUpdate({ walletAddress }, updates, {
-      new: true,
-    });
+    return await this.doctorModel.findOneAndUpdate(
+      { walletAddress: address },
+      { $set: updates },
+      { new: true, runValidators: true },
+    );
   }
 }

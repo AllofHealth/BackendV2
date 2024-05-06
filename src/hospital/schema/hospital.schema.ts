@@ -9,6 +9,9 @@ export class Doctor {
   @Prop({ required: true, unique: true, sparse: true })
   walletAddress: string;
 
+  @Prop([Number])
+  hospitalIds: number[];
+
   @Prop()
   profilePicture: string;
 
@@ -30,6 +33,9 @@ export type PharmacistDocument = Pharmacist & Document;
 export class Pharmacist {
   @Prop({ required: true, unique: true })
   walletAddress: string;
+
+  @Prop([Number])
+  hospitalIds: number[];
 
   @Prop()
   profilePicture: string;

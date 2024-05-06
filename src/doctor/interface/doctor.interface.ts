@@ -33,6 +33,7 @@ export interface UpdateDoctorType {
   profilePicture?: string;
   specialty?: string;
   location?: string;
+  regNo?: string;
   phoneNumber?: string;
 }
 

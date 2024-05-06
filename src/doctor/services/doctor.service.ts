@@ -1,14 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Doctor } from '../schema/doctor.schema';
 import { Model, MongooseError } from 'mongoose';
 import { DoctorDao } from '../dao/doctor.dao';
-import { CreateDoctorType } from '../interface/doctor.interface';
-import { DoctorError, ErrorCodes } from 'src/shared';
+import {
+  CreateDoctorType,
+  UpdateDoctorType,
+} from '../interface/doctor.interface';
+import { DoctorError } from 'src/shared';
 import { DoctorGuard } from '../guards/doctor.guard';
 import { HospitalDao } from 'src/hospital/dao/hospital.dao';
 import { PreviewType } from 'src/hospital/interface/hospital.interface';
-import { decrypt } from 'src/shared/utils/encrypt.utils';
+import { decrypt, encrypt } from 'src/shared/utils/encrypt.utils';
 
 @Injectable()
 export class DoctorService {
@@ -24,13 +31,13 @@ export class DoctorService {
       const doctors = await this.doctorDao.fetchDoctorWithPendingStatus();
       if (!doctors) {
         return {
-          success: ErrorCodes.NotFound,
+          success: HttpStatus.NOT_FOUND,
           doctors: [],
         };
       }
 
       return {
-        success: ErrorCodes.Success,
+        success: HttpStatus.OK,
         doctors,
       };
     } catch (error) {
@@ -47,13 +54,13 @@ export class DoctorService {
       const doctors = await this.doctorDao.fetchDoctorWithApprovedStatus();
       if (!doctors) {
         return {
-          success: ErrorCodes.NotFound,
+          success: HttpStatus.NOT_FOUND,
           doctors: [],
         };
       }
 
       return {
-        success: ErrorCodes.Success,
+        success: HttpStatus.OK,
         doctors,
       };
     } catch (error) {
@@ -87,7 +94,7 @@ export class DoctorService {
     );
     if (doctorExist) {
       return {
-        success: ErrorCodes.Error,
+        success: HttpStatus.CREATED,
         message: 'Doctor already exists',
       };
     }
@@ -113,10 +120,16 @@ export class DoctorService {
       let doctor = await this.doctorDao.createNewDoctor(args);
       doctor = await this.doctorDao.fetchDoctorByAddress(args.walletAddress);
 
-      doctor.hospitalIds.push(args.hospitalIds);
+      try {
+        doctor.hospitalIds.push(args.hospitalIds);
+      } catch (error) {
+        await this.doctorDao.deleteDoctor(args.walletAddress);
+        throw new Error('Error adding doctor');
+      }
 
       const doctorPreview = {
         walletAddress: doctor.walletAddress,
+        hospitalIds: doctor.hospitalIds,
         profilePicture: doctor.profilePicture,
         name: doctor.name,
         regNo: doctor.regNo,
@@ -134,7 +147,7 @@ export class DoctorService {
       await hospital.save();
 
       return {
-        success: ErrorCodes.Success,
+        success: HttpStatus.OK,
         doctor,
         message: 'Doctor created successfully',
       };
@@ -157,7 +170,7 @@ export class DoctorService {
 
       if (!doctor) {
         return {
-          success: ErrorCodes.NotFound,
+          success: HttpStatus.NOT_FOUND,
           message: "Doctor doesn't exist",
         };
       }
@@ -167,10 +180,8 @@ export class DoctorService {
         ...doctor.toObject(),
         regNo: decryptedRegNo,
       };
-
-      console.log(doctor);
       return {
-        success: ErrorCodes.Success,
+        success: HttpStatus.OK,
         doctor: decryptedDoctor,
       };
     } catch (error) {
@@ -180,6 +191,81 @@ export class DoctorService {
   }
 
   async getAllDoctors() {
-    return await this.doctorDao.fetchAllDoctors();
+    try {
+      const allDoctors = await this.doctorDao.fetchAllDoctors();
+      if (!allDoctors) {
+        return {
+          success: HttpStatus.FOUND,
+          allDoctors: [],
+        };
+      }
+
+      return {
+        success: HttpStatus.OK,
+        allDoctors,
+      };
+    } catch (error) {
+      console.error(error);
+      if (error instanceof MongooseError)
+        throw new MongooseError(error.message);
+      throw new DoctorError('error fetching all doctors');
+    }
+  }
+
+  async updateDoctor(walletAddress: string, args: UpdateDoctorType) {
+    try {
+      const doctorExist =
+        await this.doctorGuard.validateDoctorExists(walletAddress);
+      if (!doctorExist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'Doctor not found',
+        };
+      }
+      let updateArgs = { ...args };
+      if (args.regNo) {
+        const encryptedRegNo = encrypt({ data: args.regNo });
+        updateArgs = { ...updateArgs, regNo: encryptedRegNo };
+      }
+      const doctor = await this.doctorDao.updateDoctor(
+        walletAddress,
+        updateArgs,
+      );
+      return {
+        success: HttpStatus.OK,
+        message: 'Doctor updated successfully',
+        doctor,
+      };
+    } catch (error) {
+      console.error(error);
+      if (error instanceof MongooseError)
+        throw new MongooseError(error.message);
+      throw new DoctorError('Error updating doctor');
+    }
+  }
+
+  async deleteDoctorByAddress(address: string) {
+    try {
+      const doctorExist = await this.doctorGuard.validateDoctorExists(address);
+      if (!doctorExist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'Doctor not found',
+        };
+      }
+      const doctor = await this.doctorDao.fetchDoctorByAddress(address);
+      const hospitalIds = doctor.hospitalIds;
+      await this.hospitalDao.pullManyDoctors(hospitalIds, address);
+      await this.doctorDao.deleteDoctor(address);
+      return {
+        success: HttpStatus.OK,
+        message: 'Doctor deleted successfully',
+      };
+    } catch (error) {
+      console.error(error);
+      if (error instanceof MongooseError)
+        throw new MongooseError(error.message);
+      throw new InternalServerErrorException('Error deleting doctor');
+    }
   }
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Post,
   Query,
@@ -52,5 +53,12 @@ export class PharmacistController {
   @Get('getAllPharmacists')
   async getAllPharmacists() {
     return await this.pharmacistService.getAllPharmacists();
+  }
+
+  @Delete('deletePharmacist')
+  async deletePharmacistByAddress(
+    @Query('walletAddress') walletAddress: string,
+  ) {
+    return await this.pharmacistService.deletePharmacist(walletAddress);
   }
 }

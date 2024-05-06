@@ -34,6 +34,7 @@ export interface UpdatePharmacistType {
   email?: string;
   profilePicture?: string;
   location?: string;
+  regNo?: string;
   phoneNumber?: string;
 }
 
