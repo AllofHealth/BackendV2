@@ -4,6 +4,7 @@ import {
   IsOptional,
   IsEthereumAddress,
   IsNumber,
+  IsMongoId,
 } from 'class-validator';
 
 export class CreateHospitalDto {
@@ -47,4 +48,39 @@ export class CreateHospitalDto {
   @IsOptional()
   @IsString()
   status?: string;
+}
+
+export class UpdateHospitalProfileDto {
+  @IsNotEmpty()
+  @IsMongoId()
+  @IsString()
+  hospitalId: string;
+
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @IsOptional()
+  @IsString()
+  phoneNo?: string;
+
+  @IsOptional()
+  @IsString()
+  regNo?: string;
+
+  @IsOptional()
+  @IsString()
+  location?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  profilePicture?: string;
 }
