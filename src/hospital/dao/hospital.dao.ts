@@ -1,7 +1,10 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Hospital } from '../schema/hospital.schema';
 import { Model, Types } from 'mongoose';
-import { CreateHospitalType } from '../interface/hospital.interface';
+import {
+  CreateHospitalType,
+  UpdateHospitalProfileType,
+} from '../interface/hospital.interface';
 import { HOSPITAL_PLACEHOLDER } from 'src/shared/constants';
 import { ApprovalStatus, Category } from 'src/shared';
 import { encrypt } from 'src/shared/utils/encrypt.utils';
@@ -83,6 +86,24 @@ export class HospitalDao {
     return await this.hospitalModel.updateMany(
       { id: { $in: hospitalIds } },
       { $pull: { doctors: { walletAddress: walletAddress } } },
+    );
+  }
+
+  async updateHospital(
+    hospitalId: Types.ObjectId,
+    updateData: UpdateHospitalProfileType,
+  ) {
+    const updates = Object.keys(updateData).reduce((acc, key) => {
+      if (updateData[key] !== undefined) {
+        acc[key] = updateData[key];
+      }
+      return acc;
+    }, {});
+
+    return await this.hospitalModel.findOneAndUpdate(
+      { _id: hospitalId },
+      { $set: updates },
+      { new: true, runValidators: true },
     );
   }
 }
