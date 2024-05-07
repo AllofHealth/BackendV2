@@ -4,6 +4,7 @@ import { HospitalController } from './controllers/hospital.controller';
 import { HospitalSchema, Hospital } from './schema/hospital.schema';
 import { HospitalDao } from './dao/hospital.dao';
 import { MongooseModule } from '@nestjs/mongoose';
+import { HospitalGuard } from './guard/hospital.guard';
 
 @Module({
   imports: [
@@ -11,7 +12,7 @@ import { MongooseModule } from '@nestjs/mongoose';
       { name: Hospital.name, schema: HospitalSchema },
     ]),
   ],
-  providers: [HospitalService, HospitalDao],
+  providers: [HospitalService, HospitalDao, HospitalGuard],
   controllers: [HospitalController],
   exports: [HospitalService, HospitalDao],
 })
