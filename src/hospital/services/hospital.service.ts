@@ -100,14 +100,11 @@ export class HospitalService {
   }
 
   async removeDoctorFromHospital(
-    hospital: HospitalType,
+    hospitalId: Types.ObjectId,
     doctorAddress: string,
   ) {
     try {
-      hospital.doctors = hospital.doctors.filter(
-        (d: PreviewType) => d.walletAddress !== doctorAddress,
-      );
-      console.info('doctor removed');
+      await this.hospitalDao.pullOneDoctor(hospitalId, doctorAddress);
     } catch (error) {
       console.error(error);
       throw new HospitalError('Error removing doctor');
@@ -115,14 +112,14 @@ export class HospitalService {
   }
 
   async removePharmacistFromHospital(
-    hospital: HospitalType,
+    hospitalId: Types.ObjectId,
     pharmacistAddress: string,
   ) {
     try {
-      hospital.pharmacists = hospital.pharmacists.filter(
-        (d: PreviewType) => d.walletAddress !== pharmacistAddress,
+      return await this.hospitalDao.pullOnePharmacist(
+        hospitalId,
+        pharmacistAddress,
       );
-      console.info('pharmacist removed');
     } catch (error) {
       console.error(error);
       throw new HospitalError('Error removing pharmacist');
@@ -145,7 +142,7 @@ export class HospitalService {
       throw new Error('Missing required parameter');
     }
     try {
-      const hospital = await this.hospitalModel.findById(hospitalId);
+      const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
       if (!hospital) {
         throw new HospitalError("Hospital doesn't exist");
       }
