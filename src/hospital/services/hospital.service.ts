@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Hospital } from '../schema/hospital.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, MongooseError, Types } from 'mongoose';
+import { HospitalGuard } from '../guard/hospital.guard';
 import {
   CreateHospitalType,
   HospitalType,
@@ -24,6 +25,7 @@ export class HospitalService {
   constructor(
     @InjectModel(Hospital.name) private hospitalModel: Model<Hospital>,
     private readonly hospitalDao: HospitalDao,
+    private readonly hospitalGuard: HospitalGuard,
   ) {}
 
   async createNewHospital(args: CreateHospitalType) {
@@ -58,6 +60,75 @@ export class HospitalService {
     }
   }
 
+  async returnDoctorFromHospital(
+    hospital: HospitalType,
+    walletAddress: string,
+  ): Promise<PreviewType | undefined> {
+    try {
+      const Doctor = hospital.doctors.find((d: PreviewType) => {
+        return d.walletAddress === walletAddress;
+      });
+
+      if (!Doctor) {
+        console.info('Doctor not found');
+      }
+
+      return Doctor;
+    } catch (error) {
+      console.error(error);
+      throw new HospitalError('Error finding doctor');
+    }
+  }
+
+  async returnPharmacistFromHospital(
+    hospital: HospitalType,
+    walletAddress: string,
+  ): Promise<PreviewType | undefined> {
+    try {
+      const pharmacists = hospital.pharmacists.find((d: PreviewType) => {
+        return d.walletAddress === walletAddress;
+      });
+      if (!pharmacists) {
+        console.info('pharmacist not found');
+      }
+
+      return pharmacists;
+    } catch (error) {
+      console.error(error);
+      throw new HospitalError('pharmacists not found');
+    }
+  }
+
+  async removeDoctorFromHospital(
+    hospital: HospitalType,
+    doctorAddress: string,
+  ) {
+    try {
+      hospital.doctors = hospital.doctors.filter(
+        (d: PreviewType) => d.walletAddress !== doctorAddress,
+      );
+      console.info('doctor removed');
+    } catch (error) {
+      console.error(error);
+      throw new HospitalError('Error removing doctor');
+    }
+  }
+
+  async removePharmacistFromHospital(
+    hospital: HospitalType,
+    pharmacistAddress: string,
+  ) {
+    try {
+      hospital.pharmacists = hospital.pharmacists.filter(
+        (d: PreviewType) => d.walletAddress !== pharmacistAddress,
+      );
+      console.info('pharmacist removed');
+    } catch (error) {
+      console.error(error);
+      throw new HospitalError('Error removing pharmacist');
+    }
+  }
+
   async delegateAdminPosition(
     newAdminAddress: string,
     adminAddress: string,
@@ -80,20 +151,17 @@ export class HospitalService {
       }
 
       if (
-        !(await this.hospitalDao.validateHospitalAdmin(hospital, adminAddress))
+        !(await this.hospitalGuard.validateHospitalAdmin(
+          hospital,
+          adminAddress,
+        ))
       ) {
         throw new HospitalError('not authorized');
       }
 
       const isAffiliated =
-        (await this.hospitalDao.returnDoctorFromHospital(
-          hospital,
-          newAdminAddress,
-        )) ||
-        (await this.hospitalDao.returnPharmacistFromHospital(
-          hospital,
-          newAdminAddress,
-        ));
+        (await this.returnDoctorFromHospital(hospital, newAdminAddress)) ||
+        (await this.returnPharmacistFromHospital(hospital, newAdminAddress));
       if (
         !isAffiliated ||
         isAffiliated == undefined ||
