@@ -71,3 +71,14 @@ export interface ApprovalInputType {
 export interface FamilyMemberApprovalInputType extends ApprovalInputType {
   familyMemberId: number;
 }
+
+export interface UpdatePatientProfileType {
+  walletAddress: string;
+  name?: string;
+  age?: string;
+  profilePicture?: string;
+  address?: string;
+  city?: string;
+  bloodGroup?: string;
+  genotype?: string;
+}
