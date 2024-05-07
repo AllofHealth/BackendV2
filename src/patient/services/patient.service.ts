@@ -1,6 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { Patient } from '../schemas/patient.schema';
-import { CreatePatientType } from '../interface/patient.interface';
+import {
+  CreatePatientType,
+  UpdatePatientProfileType,
+} from '../interface/patient.interface';
 import { ErrorCodes, PatientError } from 'src/shared';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, MongooseError } from 'mongoose';
@@ -86,6 +89,30 @@ export class PatientService {
       if (error instanceof MongooseError)
         throw new MongooseError(error.message);
       throw new PatientError('An error occurred while fetching patient');
+    }
+  }
+
+  async updatePatient(walletAddress: string, args: UpdatePatientProfileType) {
+    try {
+      const patientExist =
+        await this.patientGuard.validatePatient(walletAddress);
+      if (!patientExist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'Patient not found',
+        };
+      }
+      const patient = await this.patientDao.updatePatient(walletAddress, args);
+      return {
+        success: HttpStatus.OK,
+        message: 'Patient updated successfully',
+        patient,
+      };
+    } catch (error) {
+      console.error(error);
+      if (error instanceof MongooseError)
+        throw new MongooseError(error.message);
+      throw new PatientError('An error occurred while updating patient');
     }
   }
 
