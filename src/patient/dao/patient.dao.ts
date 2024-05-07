@@ -1,6 +1,9 @@
 import { Patient } from '../schemas/patient.schema';
 import { Category } from 'src/shared';
-import { CreatePatientType } from '../interface/patient.interface';
+import {
+  CreatePatientType,
+  UpdatePatientProfileType,
+} from '../interface/patient.interface';
 import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -35,6 +38,24 @@ export class PatientDao {
 
   async fetchAllPatients() {
     return await this.patientModel.find();
+  }
+
+  async updatePatient(
+    walletAddress: string,
+    updateData: UpdatePatientProfileType,
+  ) {
+    const updates = Object.keys(updateData).reduce((acc, key) => {
+      if (updateData[key] !== undefined) {
+        acc[key] = updateData[key];
+      }
+      return acc;
+    }, {});
+
+    return await this.patientModel.updateOne(
+      { walletAddress },
+      { $set: updates },
+      { new: true, runValidators: true },
+    );
   }
 
   async DeletePatient(walletAddress: string) {
