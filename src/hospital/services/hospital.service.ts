@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { Hospital } from '../schema/hospital.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, MongooseError, Types } from 'mongoose';
@@ -7,6 +11,7 @@ import {
   CreateHospitalType,
   HospitalType,
   PreviewType,
+  UpdateHospitalProfileType,
 } from '../interface/hospital.interface';
 import { ApprovalStatus, ErrorCodes, HospitalError } from 'src/shared';
 import { MyLoggerService } from 'src/my-logger/my-logger.service';
@@ -140,6 +145,36 @@ export class HospitalService {
     } catch (error) {
       console.error(error);
       throw new Error('Error delegating admin position');
+    }
+  }
+
+  async updateHospitalProfile(
+    hospitalId: Types.ObjectId,
+    updateData: UpdateHospitalProfileType,
+  ) {
+    try {
+      const hospitalExist =
+        await this.hospitalGuard.validateHospitalExists(hospitalId);
+      if (!hospitalExist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'hospital not found',
+        };
+      }
+      const hospital = await this.hospitalDao.updateHospital(
+        hospitalId,
+        updateData,
+      );
+      return {
+        success: HttpStatus.OK,
+        message: 'hospital successfully updated',
+        hospital,
+      };
+    } catch (error) {
+      console.error(error);
+      if (error instanceof MongooseError)
+        throw new MongooseError(error.message);
+      throw new HospitalError('Error updating hospital profile');
     }
   }
 
