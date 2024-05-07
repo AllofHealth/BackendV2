@@ -18,7 +18,7 @@ export class Doctor {
   @Prop()
   name: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, sparse: true })
   regNo: string;
 
   @Prop()
@@ -31,7 +31,7 @@ export type PharmacistDocument = Pharmacist & Document;
 
 @Schema()
 export class Pharmacist {
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, sparse: true })
   walletAddress: string;
 
   @Prop([Number])
@@ -43,7 +43,7 @@ export class Pharmacist {
   @Prop()
   name: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, sparse: true })
   regNo: string;
 
   @Prop()
@@ -56,7 +56,7 @@ export type HospitalDocument = HydratedDocument<Hospital>;
 
 @Schema()
 export class Hospital {
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, sparse: true })
   id: number;
 
   @Prop({ required: true })
@@ -71,7 +71,7 @@ export class Hospital {
   @Prop({ required: true })
   phoneNo: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, sparse: true })
   regNo: string;
 
   @Prop({ required: true })
