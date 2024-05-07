@@ -60,45 +60,6 @@ export class HospitalService {
     }
   }
 
-  async returnDoctorFromHospital(
-    hospital: HospitalType,
-    walletAddress: string,
-  ): Promise<PreviewType | undefined> {
-    try {
-      const Doctor = hospital.doctors.find((d: PreviewType) => {
-        return d.walletAddress === walletAddress;
-      });
-
-      if (!Doctor) {
-        console.info('Doctor not found');
-      }
-
-      return Doctor;
-    } catch (error) {
-      console.error(error);
-      throw new HospitalError('Error finding doctor');
-    }
-  }
-
-  async returnPharmacistFromHospital(
-    hospital: HospitalType,
-    walletAddress: string,
-  ): Promise<PreviewType | undefined> {
-    try {
-      const pharmacists = hospital.pharmacists.find((d: PreviewType) => {
-        return d.walletAddress === walletAddress;
-      });
-      if (!pharmacists) {
-        console.info('pharmacist not found');
-      }
-
-      return pharmacists;
-    } catch (error) {
-      console.error(error);
-      throw new HospitalError('pharmacists not found');
-    }
-  }
-
   async removeDoctorFromHospital(
     hospitalId: Types.ObjectId,
     doctorAddress: string,
@@ -186,10 +147,7 @@ export class HospitalService {
    * Hospital Read operations
    */
 
-  async fetchApprovedHospitals(): Promise<{
-    success: number;
-    hospitals: HospitalType[];
-  }> {
+  async fetchApprovedHospitals() {
     try {
       const hospitals =
         await this.hospitalDao.fetchHospitalWithApprovedStatus();
@@ -214,10 +172,7 @@ export class HospitalService {
     }
   }
 
-  async fetchPendingHospitals(): Promise<{
-    success: number;
-    hospitals: HospitalType[];
-  }> {
+  async fetchPendingHospitals() {
     try {
       const hospitals = await this.hospitalDao.fetchHospitalWithPendingStatus();
       if (!hospitals) {
@@ -241,10 +196,7 @@ export class HospitalService {
     }
   }
 
-  async fetchAllHospitals(): Promise<{
-    success: number;
-    hospitals: HospitalType[];
-  }> {
+  async fetchAllHospitals() {
     try {
       const hospitals = await this.hospitalModel.find();
       if (!hospitals) {
@@ -291,11 +243,7 @@ export class HospitalService {
     }
   }
 
-  async fetchPendingDoctors(hospitalId: Types.ObjectId): Promise<{
-    success: number;
-    doctors: PreviewType[];
-    message: string;
-  }> {
+  async fetchPendingDoctors(hospitalId: Types.ObjectId) {
     if (!hospitalId) {
       throw new HospitalError('Invalid or missing hospital id');
     }
@@ -329,11 +277,7 @@ export class HospitalService {
     }
   }
 
-  async fetchPendingPharmacists(hospitalId: Types.ObjectId): Promise<{
-    success: number;
-    pharmacists: PreviewType[];
-    message: string;
-  }> {
+  async fetchPendingPharmacists(hospitalId: Types.ObjectId) {
     if (!hospitalId) {
       throw new HospitalError('Invalid or missing hospital id');
     }
@@ -369,11 +313,7 @@ export class HospitalService {
     }
   }
 
-  async fetchApprovedDoctors(hospitalId: Types.ObjectId): Promise<{
-    success: number;
-    doctors: PreviewType[];
-    message: string;
-  }> {
+  async fetchApprovedDoctors(hospitalId: Types.ObjectId) {
     if (!hospitalId) {
       throw new HospitalError('Invalid or missing hospital id');
     }
@@ -409,11 +349,7 @@ export class HospitalService {
     }
   }
 
-  async fetchApprovedPharmacists(hospitalId: Types.ObjectId): Promise<{
-    success: number;
-    pharmacists: PreviewType[];
-    message: string;
-  }> {
+  async fetchApprovedPharmacists(hospitalId: Types.ObjectId) {
     if (!hospitalId) {
       throw new HospitalError('Invalid or missing hospital id');
     }
@@ -449,9 +385,7 @@ export class HospitalService {
     }
   }
 
-  async fetchAllDoctors(
-    hospitalId: Types.ObjectId,
-  ): Promise<{ success: number; doctors: PreviewType[] }> {
+  async fetchAllDoctors(hospitalId: Types.ObjectId) {
     if (!hospitalId) {
       throw new HospitalError('Invalid or missing hospital id');
     }
@@ -481,9 +415,7 @@ export class HospitalService {
     }
   }
 
-  async fetchAllPharmacists(
-    hospitalId: Types.ObjectId,
-  ): Promise<{ success: number; pharmacists: PreviewType[] }> {
+  async fetchAllPharmacists(hospitalId: Types.ObjectId) {
     if (!hospitalId) {
       throw new HospitalError('Invalid or missing hospital id');
     }
@@ -508,6 +440,45 @@ export class HospitalService {
     } catch (error) {
       console.error(error);
       throw new HospitalError('Error fetching pharmacists');
+    }
+  }
+
+  async returnDoctorFromHospital(
+    hospital: HospitalType,
+    walletAddress: string,
+  ): Promise<PreviewType | undefined> {
+    try {
+      const Doctor = hospital.doctors.find((d: PreviewType) => {
+        return d.walletAddress === walletAddress;
+      });
+
+      if (!Doctor) {
+        console.info('Doctor not found');
+      }
+
+      return Doctor;
+    } catch (error) {
+      console.error(error);
+      throw new HospitalError('Error finding doctor');
+    }
+  }
+
+  async returnPharmacistFromHospital(
+    hospital: HospitalType,
+    walletAddress: string,
+  ): Promise<PreviewType | undefined> {
+    try {
+      const pharmacists = hospital.pharmacists.find((d: PreviewType) => {
+        return d.walletAddress === walletAddress;
+      });
+      if (!pharmacists) {
+        console.info('pharmacist not found');
+      }
+
+      return pharmacists;
+    } catch (error) {
+      console.error(error);
+      throw new HospitalError('pharmacists not found');
     }
   }
 }
