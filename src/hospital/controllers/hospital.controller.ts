@@ -8,7 +8,10 @@ import {
 } from '@nestjs/common';
 import { HospitalService } from '../services/hospital.service';
 import { Types } from 'mongoose';
-import { CreateHospitalDto } from '../dto/hospital.dto';
+import {
+  CreateHospitalDto,
+  UpdateHospitalProfileDto,
+} from '../dto/hospital.dto';
 
 @Controller('hospital')
 export class HospitalController {
@@ -34,6 +37,18 @@ export class HospitalController {
       args.newAdminAddress,
       args.adminAddress,
       args.hospitalId,
+    );
+  }
+
+  @Post('updateHospital')
+  async updateHospital(
+    @Query('hospitalId', new ValidationPipe({ transform: true }))
+    hospitalId: Types.ObjectId,
+    @Body() updateHospitalDto: UpdateHospitalProfileDto,
+  ) {
+    return await this.hospitalService.updateHospitalProfile(
+      hospitalId,
+      updateHospitalDto,
     );
   }
 
