@@ -58,6 +58,20 @@ export class HospitalDao {
     return await this.hospitalModel.deleteOne({ _id: id });
   }
 
+  async pullOneDoctor(hospitalId: Types.ObjectId, walletAddress: string) {
+    return await this.hospitalModel.updateOne(
+      { _id: hospitalId },
+      { $pull: { doctors: { walletAddress: walletAddress } } },
+    );
+  }
+
+  async pullOnePharmacist(hospitalId: Types.ObjectId, walletAddress: string) {
+    return await this.hospitalModel.updateOne(
+      { _id: hospitalId },
+      { $pull: { pharmacists: { walletAddress: walletAddress } } },
+    );
+  }
+
   async pullManyPharmacists(hospitalIds: number[], walletAddress: string) {
     return await this.hospitalModel.updateMany(
       { id: { $in: hospitalIds } },
