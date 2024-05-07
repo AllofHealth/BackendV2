@@ -20,7 +20,6 @@ import { decrypt } from 'src/shared/utils/encrypt.utils';
 
 /**
  * TODO: implement approval functions for doctors and pharmacists
- * TODO: implement hospital profile update functions
  * TODO: Implement join hospital function
  */
 
