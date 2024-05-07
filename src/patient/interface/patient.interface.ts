@@ -46,6 +46,7 @@ export interface CreatePatientType {
   id: number;
   name: string;
   age: number;
+  email: string;
   profilePicture?: string;
   address: string;
   city: string;
@@ -76,6 +77,7 @@ export interface UpdatePatientProfileType {
   walletAddress: string;
   name?: string;
   age?: string;
+  email?: string;
   profilePicture?: string;
   address?: string;
   city?: string;

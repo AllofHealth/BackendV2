@@ -1,4 +1,5 @@
 import {
+  IsEmail,
   IsEthereumAddress,
   IsNumber,
   IsOptional,
@@ -14,6 +15,10 @@ export class CreatePatientDto {
 
   @IsNumber()
   age: number;
+
+  @IsEmail()
+  @IsString()
+  email: string;
 
   @IsOptional()
   @IsString()
@@ -52,6 +57,11 @@ export class UpdatePatientProfileDto {
   @IsOptional()
   @IsString()
   age?: string;
+
+  @IsOptional()
+  @IsEmail()
+  @IsString()
+  email: string;
 
   @IsOptional()
   @IsString()

@@ -20,6 +20,7 @@ export class PatientDao {
       appointmentCount: 0,
       name: patient.name,
       age: patient.age,
+      email: patient.email,
       profilePicture: patient.profilePicture
         ? patient.profilePicture
         : PROFILE_PLACEHOLDER,

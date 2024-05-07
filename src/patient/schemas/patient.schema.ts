@@ -77,6 +77,9 @@ export class Patient {
   @Prop({ required: true })
   age: number;
 
+  @Prop({ required: true })
+  email: string;
+
   @Prop()
   profilePicture: string;
 
