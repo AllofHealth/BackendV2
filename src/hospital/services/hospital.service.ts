@@ -16,7 +16,7 @@ import {
 import { ApprovalStatus, ErrorCodes, HospitalError } from 'src/shared';
 import { MyLoggerService } from 'src/my-logger/my-logger.service';
 import { HospitalDao } from '../dao/hospital.dao';
-import { decrypt } from 'src/shared/utils/encrypt.utils';
+import { decrypt, encrypt } from 'src/shared/utils/encrypt.utils';
 
 /**
  * TODO: implement approval functions for doctors and pharmacists
@@ -160,9 +160,14 @@ export class HospitalService {
           message: 'hospital not found',
         };
       }
+      let updateArgs = { ...updateData };
+      if (updateData.regNo) {
+        const encryptedRegNo = encrypt({ data: updateData.regNo });
+        updateArgs = { ...updateArgs, regNo: encryptedRegNo };
+      }
       const hospital = await this.hospitalDao.updateHospital(
         hospitalId,
-        updateData,
+        updateArgs,
       );
       return {
         success: HttpStatus.OK,
