@@ -41,8 +41,13 @@ export interface JoinHospitalType {
   category: string;
 }
 
-export interface HospitalProfileType {
+export interface UpdateHospitalProfileType {
   hospitalId: string;
-  adminAddress: string;
-  info: string;
+  name?: string;
+  email?: string;
+  phoneNo?: string;
+  regNo?: string;
+  location?: string;
+  description?: string;
+  profilePicture?: string;
 }
