@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { Admin } from '../schema/admin.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateAdminType, RemoveAdminType } from '../interface/admin.interface';
@@ -54,7 +58,10 @@ export class AdminService {
     }
 
     if (await this.adminDao.validateAdminExists(args.walletAddress)) {
-      throw new AdminError('Admin already exists');
+      return {
+        success: HttpStatus.CREATED,
+        message: 'admin already exists',
+      };
     }
 
     try {
