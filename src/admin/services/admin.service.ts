@@ -77,9 +77,7 @@ export class AdminService {
     }
   }
 
-  async removeAdmin(
-    args: RemoveAdminType,
-  ): Promise<{ success: number; message: string }> {
+  async removeAdmin(args: RemoveAdminType) {
     const { adminAddressToAuthorize, adminAddressToRemove } = args;
 
     if (
@@ -95,7 +93,10 @@ export class AdminService {
       !(await this.adminDao.validateAdminExists(adminAddressToAuthorize)) ||
       !(await this.adminDao.validateAdminExists(adminAddressToRemove))
     ) {
-      throw new AdminError('Not authorized');
+      return {
+        success: HttpStatus.UNAUTHORIZED,
+        message: 'Unauthorized',
+      };
     }
 
     try {
@@ -120,7 +121,10 @@ export class AdminService {
     }
 
     if (!(await this.adminGuard.validateAdmin(adminAddress))) {
-      throw new AdminError('Not Authorized');
+      return {
+        success: HttpStatus.UNAUTHORIZED,
+        message: 'not authorized',
+      };
     }
 
     try {
