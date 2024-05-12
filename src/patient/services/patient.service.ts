@@ -48,7 +48,10 @@ export class PatientService {
       const patientExist =
         await this.patientGuard.validatePatient(walletAddress);
       if (patientExist) {
-        throw new PatientError('Patient already exist');
+        return {
+          success: HttpStatus.CREATED,
+          message: 'patient already exist',
+        };
       }
       const patient = await this.patientDao.createNewPatient(args);
       console.info(patient);
@@ -74,7 +77,7 @@ export class PatientService {
 
       if (!patientExist) {
         return {
-          success: ErrorCodes.NotFound,
+          success: HttpStatus.NOT_FOUND,
           message: 'Patient not found',
         };
       }
