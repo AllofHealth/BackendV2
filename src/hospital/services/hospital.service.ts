@@ -50,6 +50,14 @@ export class HospitalService {
     }
 
     try {
+      const hospitalExist =
+        await this.hospitalDao.fetchHospitalWithBlockchainId(args.id);
+      if (hospitalExist) {
+        return {
+          success: HttpStatus.CREATED,
+          message: 'hospital already exists',
+        };
+      }
       const hospital = await this.hospitalDao.createHospital(args);
       return {
         success: ErrorCodes.Success,
