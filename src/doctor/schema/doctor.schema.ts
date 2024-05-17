@@ -63,9 +63,6 @@ export class Doctor {
   @Prop({ required: true, unique: true })
   walletAddress: string;
 
-  @Prop({ required: true, unique: true })
-  regNo: string;
-
   @Prop({ default: 0 })
   numberOfApprovals: number;
 
