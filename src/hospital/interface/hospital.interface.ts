@@ -17,7 +17,6 @@ export interface PreviewType {
   walletAddress: string;
   profilePicture: string;
   name: string;
-  regNo: string;
   status: string;
 }
 
