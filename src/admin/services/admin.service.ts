@@ -1,8 +1,4 @@
-import {
-  HttpStatus,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { Admin } from '../schema/admin.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateAdminType, RemoveAdminType } from '../interface/admin.interface';
@@ -38,9 +34,7 @@ export class AdminService {
       if (error instanceof MongooseError) {
         throw new MongooseError(error.message);
       }
-      throw new InternalServerErrorException(
-        'An error occurred while fetching admin',
-      );
+      throw new Error('An error occurred while fetching admin');
     }
   }
 
@@ -130,7 +124,10 @@ export class AdminService {
     try {
       const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
       if (!hospital) {
-        throw new AdminError('Hospital not found');
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'Hospital not found',
+        };
       }
 
       switch (hospital.status) {
