@@ -49,10 +49,6 @@ export class CreateDoctorDto {
   walletAddress: string;
 
   @IsString()
-  @IsNotEmpty()
-  regNo: string;
-
-  @IsString()
   @IsOptional()
   status: string;
 }
@@ -77,10 +73,6 @@ export class UpdateDoctorDto {
   @IsString()
   @IsOptional()
   location: string;
-
-  @IsString()
-  @IsOptional()
-  regNo: string;
 
   @IsString()
   @IsOptional()
