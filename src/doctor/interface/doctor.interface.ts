@@ -23,7 +23,6 @@ export interface CreateDoctorType {
   location: string;
   phoneNumber: string;
   walletAddress: string;
-  regNo: string;
   status?: string;
 }
 
@@ -33,7 +32,6 @@ export interface UpdateDoctorType {
   profilePicture?: string;
   specialty?: string;
   location?: string;
-  regNo?: string;
   phoneNumber?: string;
 }
 
@@ -47,7 +45,6 @@ export interface DoctorType {
   location: string;
   phoneNumber: string;
   walletAddress: string;
-  regNo: string;
   numberOfApprovals: number;
   activeApprovals: ActiveApprovalType[];
   status: string;
