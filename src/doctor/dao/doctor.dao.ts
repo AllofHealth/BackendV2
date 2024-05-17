@@ -7,7 +7,6 @@ import {
 } from '../interface/doctor.interface';
 import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
 import { ApprovalStatus, Category } from 'src/shared';
-import { encrypt } from 'src/shared/utils/encrypt.utils';
 
 export class DoctorDao {
   constructor(
@@ -25,7 +24,6 @@ export class DoctorDao {
       location,
       phoneNumber,
       walletAddress,
-      regNo,
     } = doctor;
     return await this.doctorModel.create({
       id,
@@ -36,7 +34,6 @@ export class DoctorDao {
       location,
       phoneNumber,
       walletAddress,
-      regNo: encrypt({ data: regNo }),
       numberOfApprovals: 0,
       status: ApprovalStatus.Pending,
       category: Category.Doctor,
