@@ -18,9 +18,6 @@ export class Doctor {
   @Prop()
   name: string;
 
-  @Prop({ required: true, unique: true, sparse: true })
-  regNo: string;
-
   @Prop()
   status: string;
 }
@@ -42,9 +39,6 @@ export class Pharmacist {
 
   @Prop()
   name: string;
-
-  @Prop({ required: true, unique: true, sparse: true })
-  regNo: string;
 
   @Prop()
   status: string;
