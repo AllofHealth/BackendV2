@@ -15,7 +15,6 @@ import { DoctorError } from 'src/shared';
 import { DoctorGuard } from '../guards/doctor.guard';
 import { HospitalDao } from 'src/hospital/dao/hospital.dao';
 import { PreviewType } from 'src/hospital/interface/hospital.interface';
-import { decrypt, encrypt } from 'src/shared/utils/encrypt.utils';
 
 @Injectable()
 export class DoctorService {
@@ -132,7 +131,6 @@ export class DoctorService {
         hospitalIds: doctor.hospitalIds,
         profilePicture: doctor.profilePicture,
         name: doctor.name,
-        regNo: doctor.regNo,
         status: doctor.status,
       };
 
@@ -175,14 +173,9 @@ export class DoctorService {
         };
       }
 
-      const decryptedRegNo = decrypt({ data: doctor.regNo });
-      const decryptedDoctor = {
-        ...doctor.toObject(),
-        regNo: decryptedRegNo,
-      };
       return {
         success: HttpStatus.OK,
-        doctor: decryptedDoctor,
+        doctor,
       };
     } catch (error) {
       console.error(error.message);
@@ -222,15 +215,8 @@ export class DoctorService {
           message: 'Doctor not found',
         };
       }
-      let updateArgs = { ...args };
-      if (args.regNo) {
-        const encryptedRegNo = encrypt({ data: args.regNo });
-        updateArgs = { ...updateArgs, regNo: encryptedRegNo };
-      }
-      const doctor = await this.doctorDao.updateDoctor(
-        walletAddress,
-        updateArgs,
-      );
+
+      const doctor = await this.doctorDao.updateDoctor(walletAddress, args);
       return {
         success: HttpStatus.OK,
         message: 'Doctor updated successfully',
