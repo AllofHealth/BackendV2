@@ -16,7 +16,6 @@ import {
 import { ApprovalStatus, ErrorCodes, HospitalError } from 'src/shared';
 import { MyLoggerService } from 'src/my-logger/my-logger.service';
 import { HospitalDao } from '../dao/hospital.dao';
-import { decrypt, encrypt } from 'src/shared/utils/encrypt.utils';
 
 /**
  * TODO: implement approval functions for doctors and pharmacists
@@ -39,7 +38,6 @@ export class HospitalService {
       'admin',
       'email',
       'phoneNo',
-      'regNo',
       'location',
     ];
 
@@ -168,14 +166,9 @@ export class HospitalService {
           message: 'hospital not found',
         };
       }
-      let updateArgs = { ...updateData };
-      if (updateData.regNo) {
-        const encryptedRegNo = encrypt({ data: updateData.regNo });
-        updateArgs = { ...updateArgs, regNo: encryptedRegNo };
-      }
       const hospital = await this.hospitalDao.updateHospital(
         hospitalId,
-        updateArgs,
+        updateData,
       );
       return {
         success: HttpStatus.OK,
@@ -273,14 +266,9 @@ export class HospitalService {
         };
       }
 
-      const decryptedRegNo = decrypt({ data: hospital.regNo });
-      const decryptedHospital = {
-        ...hospital.toObject(),
-        regNo: decryptedRegNo,
-      };
       return {
         success: ErrorCodes.Success,
-        hospital: decryptedHospital,
+        hospital: hospital,
       };
     } catch (error) {
       console.error(error);

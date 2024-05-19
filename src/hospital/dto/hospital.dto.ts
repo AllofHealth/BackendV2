@@ -31,10 +31,6 @@ export class CreateHospitalDto {
 
   @IsNotEmpty()
   @IsString()
-  regNo: string;
-
-  @IsNotEmpty()
-  @IsString()
   location: string;
 
   @IsOptional()

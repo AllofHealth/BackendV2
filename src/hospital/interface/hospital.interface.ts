@@ -6,7 +6,6 @@ export interface CreateHospitalType {
   admin: string;
   email: string;
   phoneNo: string;
-  regNo: string;
   location: string;
   profilePicture?: string;
   description?: string;
@@ -45,7 +44,6 @@ export interface UpdateHospitalProfileType {
   name?: string;
   email?: string;
   phoneNo?: string;
-  regNo?: string;
   location?: string;
   description?: string;
   profilePicture?: string;

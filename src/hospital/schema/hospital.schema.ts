@@ -65,9 +65,6 @@ export class Hospital {
   @Prop({ required: true })
   phoneNo: string;
 
-  @Prop({ required: true, unique: true, sparse: true })
-  regNo: string;
-
   @Prop({ required: true })
   location: string;
 

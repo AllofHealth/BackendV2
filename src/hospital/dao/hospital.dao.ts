@@ -7,7 +7,6 @@ import {
 } from '../interface/hospital.interface';
 import { HOSPITAL_PLACEHOLDER } from 'src/shared/constants';
 import { ApprovalStatus, Category } from 'src/shared';
-import { encrypt } from 'src/shared/utils/encrypt.utils';
 
 export class HospitalDao {
   constructor(
@@ -15,14 +14,12 @@ export class HospitalDao {
   ) {}
 
   async createHospital(hospital: CreateHospitalType) {
-    const encryptedRegNo = encrypt({ data: hospital.regNo });
     return await this.hospitalModel.create({
       id: hospital.id,
       name: hospital.name,
       admin: hospital.admin,
       email: hospital.email,
       phoneNo: hospital.phoneNo,
-      regNo: encryptedRegNo,
       location: hospital.location,
       profilePicture: hospital.profilePicture
         ? hospital.profilePicture
