@@ -25,7 +25,6 @@ export interface CreatePharmacistType {
   location: string;
   phoneNumber: string;
   walletAddress: string;
-  regNo: string;
   status?: string;
 }
 
@@ -34,7 +33,6 @@ export interface UpdatePharmacistType {
   email?: string;
   profilePicture?: string;
   location?: string;
-  regNo?: string;
   phoneNumber?: string;
 }
 

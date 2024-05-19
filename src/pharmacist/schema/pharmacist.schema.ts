@@ -103,9 +103,6 @@ export class Pharmacist {
   @Prop({ required: true, unique: true })
   walletAddress: string;
 
-  @Prop({ required: true, unique: true })
-  regNo: string;
-
   @Prop({ required: true })
   status: string;
 

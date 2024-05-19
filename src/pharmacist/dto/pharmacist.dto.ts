@@ -40,10 +40,6 @@ export class CreatePharmacistDto {
   @IsEthereumAddress()
   walletAddress: string;
 
-  @IsString()
-  @IsNotEmpty()
-  regNo: string;
-
   @IsOptional()
   @IsString()
   status?: string;

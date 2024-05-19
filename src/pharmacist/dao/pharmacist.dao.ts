@@ -7,7 +7,6 @@ import {
 } from '../interface/pharmacist.interface';
 import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
 import { ApprovalStatus } from 'src/shared';
-import { encrypt } from 'src/shared/utils/encrypt.utils';
 
 export class PharmacistDao {
   constructor(
@@ -25,7 +24,6 @@ export class PharmacistDao {
       location: pharmacist.location,
       phoneNumber: pharmacist.phoneNumber,
       walletAddress: pharmacist.walletAddress,
-      regNo: encrypt({ data: pharmacist.regNo }),
       status: ApprovalStatus.Pending,
     });
   }

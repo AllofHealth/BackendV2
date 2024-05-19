@@ -8,7 +8,6 @@ import { PharmacistGuard } from '../guards/pharmacist.guard';
 import { ErrorCodes, PharmacistError } from 'src/shared';
 import { HospitalDao } from 'src/hospital/dao/hospital.dao';
 import { MongooseError } from 'mongoose';
-import { decrypt, encrypt } from 'src/shared/utils/encrypt.utils';
 
 @Injectable()
 export class PharmacistService {
@@ -27,7 +26,6 @@ export class PharmacistService {
       'location',
       'phoneNumber',
       'walletAddress',
-      'regNo',
     ];
 
     if (
@@ -76,7 +74,6 @@ export class PharmacistService {
         hospitalIds: pharmacist.hospitalIds,
         profilePicture: pharmacist.profilePicture,
         name: pharmacist.name,
-        regNo: pharmacist.regNo,
         status: pharmacist.status,
       };
 
@@ -159,15 +156,9 @@ export class PharmacistService {
         };
       }
 
-      const decryptedRegNo = decrypt({ data: pharmacist.regNo });
-      const decryptedPharmacist = {
-        ...pharmacist.toObject(),
-        regNo: decryptedRegNo,
-      };
-
       return {
         success: ErrorCodes.Success,
-        pharmacist: decryptedPharmacist,
+        pharmacist: pharmacist,
       };
     } catch (error) {
       console.error(error);
@@ -190,15 +181,10 @@ export class PharmacistService {
           message: 'Pharmacist does not exist',
         };
       }
-      let updateArgs = { ...args };
-      if (args.regNo) {
-        const encryptedRegNo = encrypt({ data: args.regNo });
-        updateArgs = { ...updateArgs, regNo: encryptedRegNo };
-      }
 
       const pharmacist = await this.pharmacistDao.updatePharmacist(
         walletAddress,
-        updateArgs,
+        args,
       );
       return {
         success: HttpStatus.OK,
