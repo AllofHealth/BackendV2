@@ -1,7 +1,11 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { Admin } from '../schema/admin.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateAdminType, RemoveAdminType } from '../interface/admin.interface';
+import {
+  CreateAdminType,
+  RemoveAdminType,
+  UpdateAdminProfileType,
+} from '../interface/admin.interface';
 import { Model, MongooseError, Types } from 'mongoose';
 import { AdminError, ApprovalStatus, ErrorCodes } from 'src/shared';
 import { MyLoggerService } from 'src/my-logger/my-logger.service';
@@ -59,7 +63,7 @@ export class AdminService {
     }
 
     try {
-      const admin = await this.adminDao.updateAdmin(args);
+      const admin = await this.adminDao.createAdmin(args);
       return {
         success: ErrorCodes.Success,
         admin,
@@ -75,17 +79,8 @@ export class AdminService {
     const { adminAddressToAuthorize, adminAddressToRemove } = args;
 
     if (
-      !adminAddressToAuthorize ||
-      adminAddressToAuthorize.length !== 42 ||
-      !adminAddressToRemove ||
-      adminAddressToRemove.length !== 42
-    ) {
-      throw new AdminError('Invalid admin address');
-    }
-
-    if (
-      !(await this.adminDao.validateAdminExists(adminAddressToAuthorize)) ||
-      !(await this.adminDao.validateAdminExists(adminAddressToRemove))
+      !(await this.adminGuard.validateAdmin(adminAddressToAuthorize)) ||
+      !(await this.adminGuard.validateAdmin(adminAddressToRemove))
     ) {
       return {
         success: HttpStatus.UNAUTHORIZED,
@@ -110,9 +105,6 @@ export class AdminService {
     adminAddress: string;
   }): Promise<{ success: number; message: string }> {
     const { hospitalId, adminAddress } = args;
-    if (!hospitalId || !adminAddress || adminAddress.length !== 42) {
-      throw new AdminError('Invalid hospital or admin address');
-    }
 
     if (!(await this.adminGuard.validateAdmin(adminAddress))) {
       return {
@@ -132,7 +124,10 @@ export class AdminService {
 
       switch (hospital.status) {
         case ApprovalStatus.Approved:
-          throw new AdminError('Hospital already approved');
+          return {
+            success: HttpStatus.CREATED,
+            message: 'hospital already approved',
+          };
 
         case ApprovalStatus.Pending:
           hospital.status = ApprovalStatus.Approved;
@@ -141,7 +136,10 @@ export class AdminService {
           break;
 
         default:
-          throw new AdminError('Hospital not pending');
+          return {
+            success: HttpStatus.BAD_REQUEST,
+            message: 'hospital status is invalid',
+          };
       }
 
       return {
@@ -151,6 +149,32 @@ export class AdminService {
     } catch (error) {
       console.error(error);
       throw new AdminError('Error approving hospital');
+    }
+  }
+
+  async updateAdmin(args: {
+    walletAddress: string;
+    data: UpdateAdminProfileType;
+  }) {
+    const { walletAddress, data } = args;
+    try {
+      const isAdmin = await this.adminGuard.validateAdmin(walletAddress);
+      if (!isAdmin) {
+        return {
+          success: HttpStatus.UNAUTHORIZED,
+          message: 'not authorized',
+        };
+      }
+      const admin = await this.adminDao.updateAdmin(walletAddress, data);
+
+      return {
+        success: HttpStatus.OK,
+        message: 'Admin updated successfully',
+        admin,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new AdminError('Error updating admin');
     }
   }
 }
