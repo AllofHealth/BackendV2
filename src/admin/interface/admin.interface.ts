@@ -14,3 +14,9 @@ export interface RemoveAdminType {
   adminAddressToAuthorize: string;
   adminAddressToRemove: string;
 }
+
+export interface UpdateAdminProfileType {
+  name?: string;
+  profilePicture?: string;
+  email?: string;
+}
