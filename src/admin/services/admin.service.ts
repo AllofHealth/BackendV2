@@ -47,14 +47,6 @@ export class AdminService {
   }
 
   async createNewAdmin(args: CreateAdminType) {
-    const requiredParams = ['id', 'name', 'email', 'walletAddress'];
-
-    if (
-      !requiredParams.every((param) => args[param as keyof CreateAdminType])
-    ) {
-      throw new AdminError('Required parameters missing');
-    }
-
     if (await this.adminDao.validateAdminExists(args.walletAddress)) {
       return {
         success: HttpStatus.CREATED,
