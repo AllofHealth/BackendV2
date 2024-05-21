@@ -12,6 +12,7 @@ import {
   ApproveHospitalDto,
   CreateAdminDto,
   RemoveAdminDto,
+  UpdateAdminDto,
 } from '../dto/admin.dto';
 import { Types } from 'mongoose';
 
@@ -35,6 +36,18 @@ export class AdminController {
   @Post('createAdmin')
   async createAdmin(@Body(ValidationPipe) createAdminDto: CreateAdminDto) {
     return await this.adminService.createNewAdmin(createAdminDto);
+  }
+
+  @Post('updateAdmin')
+  async updateAdmin(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+    @Body() updateAdminDto: UpdateAdminDto,
+  ) {
+    return await this.adminService.updateAdmin({
+      walletAddress,
+      data: updateAdminDto,
+    });
   }
 
   @Post('approveHospital')
