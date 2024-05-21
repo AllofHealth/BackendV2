@@ -165,12 +165,11 @@ export class AdminService {
           message: 'not authorized',
         };
       }
-      const admin = await this.adminDao.updateAdmin(walletAddress, data);
+      await this.adminDao.updateAdmin(walletAddress, data);
 
       return {
         success: HttpStatus.OK,
         message: 'Admin updated successfully',
-        admin,
       };
     } catch (error) {
       console.error(error);
