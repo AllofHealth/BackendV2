@@ -52,3 +52,18 @@ export class RemoveAdminDto {
   @IsEthereumAddress()
   adminAddressToRemove: string;
 }
+
+export class UpdateAdminDto {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  profilePicture?: string;
+
+  @IsString()
+  @IsEmail()
+  @IsOptional()
+  email?: string;
+}
