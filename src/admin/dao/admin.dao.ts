@@ -3,11 +3,14 @@ import { Admin } from '../schema/admin.schema';
 import { Model } from 'mongoose';
 import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
 import { AdminError, Category } from 'src/shared';
-import { CreateAdminType } from '../interface/admin.interface';
+import {
+  CreateAdminType,
+  UpdateAdminProfileType,
+} from '../interface/admin.interface';
 
 export class AdminDao {
   constructor(@InjectModel(Admin.name) private adminModel: Model<Admin>) {}
-  async updateAdmin(admin: CreateAdminType) {
+  async createAdmin(admin: CreateAdminType) {
     return await this.adminModel.create({
       id: admin.id,
       name: admin.name,
@@ -45,5 +48,20 @@ export class AdminDao {
 
   async fetchAllAdmins() {
     return await this.adminModel.find();
+  }
+
+  async updateAdmin(address: string, updateData: UpdateAdminProfileType) {
+    const updates = Object.keys(updateData).reduce((acc, key) => {
+      if (updateData[key] !== undefined) {
+        acc[key] = updateData[key];
+      }
+      return acc;
+    }, {});
+
+    return await this.adminModel.updateOne(
+      { walletAddress: address },
+      { $set: updates },
+      { new: true, runValidators: true },
+    );
   }
 }
