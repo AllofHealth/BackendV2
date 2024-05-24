@@ -80,3 +80,24 @@ export class UpdateHospitalProfileDto {
   @IsString()
   profilePicture?: string;
 }
+
+export class JoinHospitalDto {
+  @IsNotEmpty()
+  @IsEthereumAddress()
+  @IsString()
+  walletAddress: string;
+}
+
+export class RemovePractitionerDto {
+  @IsNotEmpty()
+  @IsEthereumAddress()
+  @IsString()
+  walletAddress: string;
+}
+
+export class ApprovePractitionerDto {
+  @IsNotEmpty()
+  @IsEthereumAddress()
+  @IsString()
+  walletAddress: string;
+}
