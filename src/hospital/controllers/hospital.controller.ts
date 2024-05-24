@@ -9,10 +9,7 @@ import {
 import { HospitalService } from '../services/hospital.service';
 import { Types } from 'mongoose';
 import {
-  ApprovePractitionerDto,
   CreateHospitalDto,
-  JoinHospitalDto,
-  RemovePractitionerDto,
   UpdateHospitalProfileDto,
 } from '../dto/hospital.dto';
 
@@ -32,11 +29,11 @@ export class HospitalController {
     @Query('hospitalId', new ValidationPipe({ transform: true }))
     hospitalId: Types.ObjectId,
     @Query('walletAddress', new ValidationPipe({ transform: true }))
-    joinHospitalDto: JoinHospitalDto,
+    joinHospitalDto: string,
   ) {
     return await this.hospitalService.joinHospital({
       hospitalId,
-      walletAddress: joinHospitalDto.walletAddress,
+      walletAddress: joinHospitalDto,
     });
   }
 
@@ -45,11 +42,11 @@ export class HospitalController {
     @Query('hospitalId', new ValidationPipe({ transform: true }))
     hospitalId: Types.ObjectId,
     @Query('walletAddress', new ValidationPipe({ transform: true }))
-    approvePractitionerDto: ApprovePractitionerDto,
+    approvePractitionerDto: string,
   ) {
     return await this.hospitalService.approvePractitioner({
       hospitalId,
-      walletAddress: approvePractitionerDto.walletAddress,
+      walletAddress: approvePractitionerDto,
     });
   }
 
@@ -58,11 +55,11 @@ export class HospitalController {
     @Query('hospitalId', new ValidationPipe({ transform: true }))
     hospitalId: Types.ObjectId,
     @Query('walletAddress', new ValidationPipe({ transform: true }))
-    removePractitionerDto: RemovePractitionerDto,
+    removePractitionerDto: string,
   ) {
     return await this.hospitalService.removePractitionerFromHospital({
       hospitalId,
-      walletAddress: removePractitionerDto.walletAddress,
+      walletAddress: removePractitionerDto,
     });
   }
 

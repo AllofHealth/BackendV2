@@ -5,7 +5,7 @@ import {
   UpdatePharmacistType,
 } from '../interface/pharmacist.interface';
 import { PharmacistGuard } from '../guards/pharmacist.guard';
-import { ErrorCodes, PharmacistError } from 'src/shared';
+import { Category, ErrorCodes, PharmacistError } from 'src/shared';
 import { HospitalDao } from 'src/hospital/dao/hospital.dao';
 import { MongooseError } from 'mongoose';
 
@@ -18,24 +18,6 @@ export class PharmacistService {
   ) {}
 
   async createPharmacist(args: CreatePharmacistType) {
-    const requiredParams = [
-      'id',
-      'hospitalIds',
-      'name',
-      'email',
-      'location',
-      'phoneNumber',
-      'walletAddress',
-    ];
-
-    if (
-      !requiredParams.every(
-        (param) => args[param as keyof CreatePharmacistType],
-      )
-    ) {
-      throw new Error('Missing required parameter');
-    }
-
     const pharmacistExists =
       await this.pharmacistGuard.validatePharmacistExists(args.walletAddress);
     if (pharmacistExists) {
@@ -75,6 +57,7 @@ export class PharmacistService {
         profilePicture: pharmacist.profilePicture,
         name: pharmacist.name,
         status: pharmacist.status,
+        category: Category.Pharmacist,
       };
 
       try {

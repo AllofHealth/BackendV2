@@ -17,6 +17,7 @@ export interface PreviewType {
   profilePicture: string;
   name: string;
   status: string;
+  category: string;
 }
 
 export interface HospitalType extends CreateHospitalType {

@@ -18,6 +18,6 @@ import { PharmacistModule } from 'src/pharmacist/pharmacist.module';
   ],
   providers: [HospitalService, HospitalDao, HospitalGuard],
   controllers: [HospitalController],
-  exports: [HospitalService, HospitalDao],
+  exports: [HospitalService, HospitalDao, HospitalGuard],
 })
 export class HospitalModule {}

@@ -317,12 +317,24 @@ export class HospitalService {
       }
 
       if (isDoctor) {
+        const doctorExist =
+          await this.doctorGuard.validateDoctorExistsInHospital(
+            hospital.id,
+            walletAddress,
+          );
+        if (doctorExist) {
+          return {
+            success: HttpStatus.CREATED,
+            message: 'doctor already exists in hospital',
+          };
+        }
         const doctor = await this.doctorDao.fetchDoctorByAddress(walletAddress);
         const doctorPreview: PreviewType = {
           walletAddress,
           profilePicture: doctor.profilePicture,
           name: doctor.name,
           status: doctor.status,
+          category: doctor.category,
         };
 
         doctor.hospitalIds.push(hospital.id);
@@ -342,6 +354,17 @@ export class HospitalService {
           };
         }
       } else if (isPharmacist) {
+        const pharmacistExist =
+          await this.pharmacistGuard.validatePharmacistExistsInHospital(
+            hospital.id,
+            walletAddress,
+          );
+        if (pharmacistExist) {
+          return {
+            success: HttpStatus.CREATED,
+            message: 'pharmacist already exists in hospital',
+          };
+        }
         const pharmacist =
           await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
         const pharmacistPreview: PreviewType = {
@@ -349,6 +372,7 @@ export class HospitalService {
           profilePicture: pharmacist.profilePicture,
           name: pharmacist.name,
           status: pharmacist.status,
+          category: pharmacist.category,
         };
 
         pharmacist.hospitalIds.push(hospital.id);

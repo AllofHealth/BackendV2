@@ -98,6 +98,5 @@ export class RemovePractitionerDto {
 export class ApprovePractitionerDto {
   @IsNotEmpty()
   @IsEthereumAddress()
-  @IsString()
   walletAddress: string;
 }

@@ -11,7 +11,7 @@ import {
   CreateDoctorType,
   UpdateDoctorType,
 } from '../interface/doctor.interface';
-import { DoctorError } from 'src/shared';
+import { Category, DoctorError } from 'src/shared';
 import { DoctorGuard } from '../guards/doctor.guard';
 import { HospitalDao } from 'src/hospital/dao/hospital.dao';
 import { PreviewType } from 'src/hospital/interface/hospital.interface';
@@ -72,22 +72,6 @@ export class DoctorService {
   }
 
   async createDoctor(args: CreateDoctorType) {
-    const requiredParams = [
-      'id',
-      'email',
-      'regNo',
-      'phoneNumber',
-      'specialty',
-      'location',
-      'walletAddress',
-    ];
-
-    if (
-      !requiredParams.every((param) => args[param as keyof CreateDoctorType])
-    ) {
-      throw new DoctorError('Missing required parameter');
-    }
-
     const doctorExist = await this.doctorGuard.validateDoctorExists(
       args.walletAddress,
     );
@@ -132,6 +116,7 @@ export class DoctorService {
         profilePicture: doctor.profilePicture,
         name: doctor.name,
         status: doctor.status,
+        category: Category.Doctor,
       };
 
       try {

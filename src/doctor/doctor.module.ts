@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { DoctorService } from './services/doctor.service';
 import { DoctorController } from './controllers/doctor.controller';
 import { DoctorDao } from './dao/doctor.dao';
@@ -10,7 +10,7 @@ import { HospitalModule } from 'src/hospital/hospital.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Doctor.name, schema: DoctorSchema }]),
-    HospitalModule,
+    forwardRef(() => HospitalModule),
   ],
   providers: [DoctorService, DoctorDao, DoctorGuard],
   controllers: [DoctorController],

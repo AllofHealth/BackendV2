@@ -20,6 +20,9 @@ export class Doctor {
 
   @Prop()
   status: string;
+
+  @Prop()
+  category: string;
 }
 
 export const DoctorSchema = SchemaFactory.createForClass(Doctor);
@@ -42,6 +45,9 @@ export class Pharmacist {
 
   @Prop()
   status: string;
+
+  @Prop()
+  category: string;
 }
 
 export const PharmacistSchema = SchemaFactory.createForClass(Pharmacist);
