@@ -5,12 +5,16 @@ import { HospitalSchema, Hospital } from './schema/hospital.schema';
 import { HospitalDao } from './dao/hospital.dao';
 import { MongooseModule } from '@nestjs/mongoose';
 import { HospitalGuard } from './guard/hospital.guard';
+import { DoctorModule } from 'src/doctor/doctor.module';
+import { PharmacistModule } from 'src/pharmacist/pharmacist.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Hospital.name, schema: HospitalSchema },
     ]),
+    DoctorModule,
+    PharmacistModule,
   ],
   providers: [HospitalService, HospitalDao, HospitalGuard],
   controllers: [HospitalController],
