@@ -15,4 +15,11 @@ describe('AdminService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  describe('Practitioner List', () => {
+    it.only('should return a list of practitioners', async () => {
+      const result = await service.fetchAllPractitioners();
+      console.log(result);
+    });
+  });
 });

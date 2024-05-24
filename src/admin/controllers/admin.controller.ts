@@ -33,6 +33,11 @@ export class AdminController {
     return await this.adminService.fetchAdminByAddress(walletAddress);
   }
 
+  @Get('getAllPractitioners')
+  async getAllPractitioners() {
+    return await this.adminService.fetchAllPractitioners();
+  }
+
   @Post('createAdmin')
   async createAdmin(@Body(ValidationPipe) createAdminDto: CreateAdminDto) {
     return await this.adminService.createNewAdmin(createAdminDto);

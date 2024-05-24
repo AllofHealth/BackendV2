@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 export type ApprovalType = 'view' | 'full';
 export type RecordOwnerType = 'principal' | 'family member';
 
@@ -37,6 +39,7 @@ export interface UpdateDoctorType {
 
 export interface DoctorType {
   id: number;
+  _id: Types.ObjectId;
   hospitalIds?: number[];
   name: string;
   email: string;

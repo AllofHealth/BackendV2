@@ -12,6 +12,8 @@ import { MyLoggerService } from 'src/my-logger/my-logger.service';
 import { AdminDao } from '../dao/admin.dao';
 import { AdminGuard } from '../guards/admin.guard';
 import { HospitalDao } from 'src/hospital/dao/hospital.dao';
+import { DoctorDao } from 'src/doctor/dao/doctor.dao';
+import { PharmacistDao } from 'src/pharmacist/dao/pharmacist.dao';
 
 @Injectable()
 export class AdminService {
@@ -21,6 +23,8 @@ export class AdminService {
     private readonly adminDao: AdminDao,
     private readonly adminGuard: AdminGuard,
     private readonly hospitalDao: HospitalDao,
+    private readonly doctorDao: DoctorDao,
+    private readonly pharmacistDao: PharmacistDao,
   ) {}
 
   async fetchAdminByAddress(walletAddress: string) {
@@ -166,6 +170,29 @@ export class AdminService {
     } catch (error) {
       console.error(error);
       throw new AdminError('Error updating admin');
+    }
+  }
+
+  async fetchAllPractitioners() {
+    try {
+      const allDoctors = await this.doctorDao.fetchAllDoctors();
+      const allPharmacists = await this.pharmacistDao.fetchAllPharmacists();
+      const fullList: (any | any)[] = [...allDoctors, ...allPharmacists];
+
+      if (fullList.length === 0) {
+        return {
+          success: HttpStatus.FOUND,
+          allPractitioners: [],
+        };
+      }
+
+      return {
+        success: HttpStatus.OK,
+        allPractitioners: fullList,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new AdminError('Error fetching practitioners');
     }
   }
 }

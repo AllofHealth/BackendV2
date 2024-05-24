@@ -16,5 +16,6 @@ import { PharmacistGuard } from './guards/pharmacist.guard';
   ],
   providers: [PharmacistService, PharmacistDao, PharmacistGuard],
   controllers: [PharmacistController],
+  exports: [PharmacistDao, PharmacistGuard, PharmacistService],
 })
 export class PharmacistModule {}
