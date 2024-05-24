@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 
 export interface CreateHospitalType {
   id: number;
@@ -26,18 +26,14 @@ export interface HospitalType extends CreateHospitalType {
   _id: mongoose.Types.ObjectId;
 }
 
-export interface ApprovePractitionerType {
-  practitionerAddress: string;
-  adminAddress: string;
-  hospitalId: string;
-  hospitalBlockchainId: number;
+export interface JoinHospitalType {
+  hospitalId: Types.ObjectId;
+  walletAddress: string;
 }
 
-export interface JoinHospitalType {
-  hospitalId: string;
-  walletAddress: string;
-  category: string;
-}
+export interface RemovePractitionerType extends JoinHospitalType {}
+
+export interface ApprovePractitionerType extends JoinHospitalType {}
 
 export interface UpdateHospitalProfileType {
   hospitalId: string;
