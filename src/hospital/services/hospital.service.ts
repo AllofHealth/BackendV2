@@ -8,19 +8,21 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, MongooseError, Types } from 'mongoose';
 import { HospitalGuard } from '../guard/hospital.guard';
 import {
+  ApprovePractitionerType,
   CreateHospitalType,
   HospitalType,
+  JoinHospitalType,
   PreviewType,
+  RemovePractitionerType,
   UpdateHospitalProfileType,
 } from '../interface/hospital.interface';
 import { ApprovalStatus, ErrorCodes, HospitalError } from 'src/shared';
 import { MyLoggerService } from 'src/my-logger/my-logger.service';
 import { HospitalDao } from '../dao/hospital.dao';
-
-/**
- * TODO: implement approval functions for doctors and pharmacists
- * TODO: Implement join hospital function
- */
+import { DoctorDao } from 'src/doctor/dao/doctor.dao';
+import { PharmacistDao } from 'src/pharmacist/dao/pharmacist.dao';
+import { DoctorGuard } from 'src/doctor/guards/doctor.guard';
+import { PharmacistGuard } from 'src/pharmacist/guards/pharmacist.guard';
 
 @Injectable()
 export class HospitalService {
@@ -29,6 +31,10 @@ export class HospitalService {
     @InjectModel(Hospital.name) private hospitalModel: Model<Hospital>,
     private readonly hospitalDao: HospitalDao,
     private readonly hospitalGuard: HospitalGuard,
+    private readonly doctorDao: DoctorDao,
+    private readonly pharmacistDao: PharmacistDao,
+    private readonly doctorGuard: DoctorGuard,
+    private readonly pharmacistGuard: PharmacistGuard,
   ) {}
 
   async createNewHospital(args: CreateHospitalType) {
@@ -82,6 +88,120 @@ export class HospitalService {
     }
   }
 
+  async removeHospitalIdFromDoctorDocument(args: {
+    hospitalId: Types.ObjectId;
+    doctorAddress: string;
+  }) {
+    const { hospitalId, doctorAddress } = args;
+    try {
+      const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
+      const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
+      if (!hospital) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'hospital not found',
+        };
+      }
+
+      if (!doctor) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'doctor not found',
+        };
+      }
+      doctor.hospitalIds.splice(doctor.hospitalIds.indexOf(hospital.id), 1);
+      if (doctor.hospitalIds.length === 0) {
+        doctor.status = ApprovalStatus.Pending;
+        doctor.hospitalIds = [];
+      }
+
+      await doctor.save();
+    } catch (error) {
+      console.error(error);
+      throw new HospitalError(
+        'Error removing hospital id from doctor document',
+      );
+    }
+  }
+
+  async removeHospitalIdFromPharmacistDocument(args: {
+    hospitalId: Types.ObjectId;
+    pharmacistAddress: string;
+  }) {
+    const { hospitalId, pharmacistAddress } = args;
+    try {
+      const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(pharmacistAddress);
+      if (!hospital) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'hospital not found',
+        };
+      }
+
+      if (!pharmacist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'pharmacist not found',
+        };
+      }
+
+      pharmacist.hospitalIds.splice(
+        pharmacist.hospitalIds.indexOf(hospital.id),
+        1,
+      );
+      if (pharmacist.hospitalIds.length === 0) {
+        pharmacist.status = ApprovalStatus.Pending;
+        pharmacist.hospitalIds = [];
+      }
+
+      await pharmacist.save();
+    } catch (error) {
+      console.error(error);
+      throw new HospitalError(
+        'Error removing hospital id from pharmacist document',
+      );
+    }
+  }
+
+  async removeHospitalIdFromPractitionerDocument(args: {
+    hospitalId: Types.ObjectId;
+    practitionerAddress: string;
+  }) {
+    const { hospitalId, practitionerAddress } = args;
+    try {
+      const isDoctor =
+        await this.doctorGuard.validateDoctorExists(practitionerAddress);
+      const isPharmacist =
+        await this.pharmacistGuard.validatePharmacistExists(
+          practitionerAddress,
+        );
+
+      if (isDoctor) {
+        await this.removeHospitalIdFromDoctorDocument({
+          hospitalId,
+          doctorAddress: practitionerAddress,
+        });
+      } else if (isPharmacist) {
+        await this.removeHospitalIdFromPharmacistDocument({
+          hospitalId,
+          pharmacistAddress: practitionerAddress,
+        });
+      } else {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'practitioner not found',
+        };
+      }
+    } catch (error) {
+      console.error(error);
+      throw new HospitalError(
+        'Error removing practitioner address for hospital',
+      );
+    }
+  }
+
   async removePharmacistFromHospital(
     hospitalId: Types.ObjectId,
     pharmacistAddress: string,
@@ -102,16 +222,6 @@ export class HospitalService {
     adminAddress: string,
     hospitalId: Types.ObjectId,
   ): Promise<{ success: number; message: string }> {
-    if (
-      !newAdminAddress ||
-      newAdminAddress.length !== 42 ||
-      !adminAddress ||
-      adminAddress.length !== 42 ||
-      !hospitalId ||
-      newAdminAddress === adminAddress
-    ) {
-      throw new Error('Missing required parameter');
-    }
     try {
       const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
       if (!hospital) {
@@ -180,6 +290,187 @@ export class HospitalService {
       if (error instanceof MongooseError)
         throw new MongooseError(error.message);
       throw new HospitalError('Error updating hospital profile');
+    }
+  }
+
+  async joinHospital(args: JoinHospitalType) {
+    const { hospitalId, walletAddress } = args;
+    try {
+      const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
+      if (!hospital) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'hospital not found',
+        };
+      }
+
+      const isDoctor =
+        await this.doctorGuard.validateDoctorExists(walletAddress);
+      const isPharmacist =
+        await this.pharmacistGuard.validatePharmacistExists(walletAddress);
+
+      if (!isDoctor && !isPharmacist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'practitioner not found',
+        };
+      }
+
+      if (isDoctor) {
+        const doctor = await this.doctorDao.fetchDoctorByAddress(walletAddress);
+        const doctorPreview: PreviewType = {
+          walletAddress,
+          profilePicture: doctor.profilePicture,
+          name: doctor.name,
+          status: doctor.status,
+        };
+
+        doctor.hospitalIds.push(hospital.id);
+        await doctor.save();
+
+        try {
+          hospital.doctors.push(doctorPreview);
+        } catch (error) {
+          await this.removeHospitalIdFromDoctorDocument({
+            hospitalId,
+            doctorAddress: walletAddress,
+          });
+
+          return {
+            success: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: 'an error occurred while adding doctor to  hospital',
+          };
+        }
+      } else if (isPharmacist) {
+        const pharmacist =
+          await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+        const pharmacistPreview: PreviewType = {
+          walletAddress,
+          profilePicture: pharmacist.profilePicture,
+          name: pharmacist.name,
+          status: pharmacist.status,
+        };
+
+        pharmacist.hospitalIds.push(hospital.id);
+        await pharmacist.save();
+
+        try {
+          hospital.pharmacists.push(pharmacistPreview);
+        } catch (error) {
+          await this.removeHospitalIdFromPharmacistDocument({
+            hospitalId,
+            pharmacistAddress: walletAddress,
+          });
+
+          return {
+            success: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: 'an error occurred while adding pharmacist to  hospital',
+          };
+        }
+      }
+
+      await hospital.save();
+      return {
+        success: HttpStatus.OK,
+        message: 'joined hospital successfully',
+      };
+    } catch (error) {
+      console.error(error);
+      throw new HospitalError('An error occurred while joining hospital');
+    }
+  }
+
+  async removePractitionerFromHospital(args: RemovePractitionerType) {
+    const { hospitalId, walletAddress } = args;
+    try {
+      const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
+      const isDoctor = await this.doctorGuard.validateDoctorExistsInHospital(
+        hospital.id,
+        walletAddress,
+      );
+      const isPharmacist =
+        await this.pharmacistGuard.validatePharmacistExistsInHospital(
+          hospital.id,
+          walletAddress,
+        );
+
+      if (!isDoctor && !isPharmacist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'practitioner not found',
+        };
+      }
+
+      try {
+        await this.removeHospitalIdFromPractitionerDocument({
+          hospitalId,
+          practitionerAddress: walletAddress,
+        });
+      } catch (error) {
+        return {
+          success: HttpStatus.EXPECTATION_FAILED,
+          message:
+            'an error occurred while removing practitioner from hospital',
+        };
+      }
+
+      await hospital.save();
+      return {
+        success: HttpStatus.OK,
+        message: 'practitioner removed from hospital successfully',
+      };
+    } catch (error) {
+      console.error(error);
+      throw new HospitalError('An error occurred while removing practitioner');
+    }
+  }
+
+  async approvePractitioner(args: ApprovePractitionerType) {
+    const { hospitalId, walletAddress } = args;
+    try {
+      const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
+      const isDoctor = await this.doctorGuard.validateDoctorExistsInHospital(
+        hospital.id,
+        walletAddress,
+      );
+      const isPharmacist =
+        await this.pharmacistGuard.validatePharmacistExistsInHospital(
+          hospital.id,
+          walletAddress,
+        );
+
+      if (!isDoctor && !isPharmacist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'practitioner not found',
+        };
+      }
+
+      const practitioner = isDoctor
+        ? await this.doctorDao.fetchDoctorByAddress(walletAddress)
+        : await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+
+      if (practitioner.status !== ApprovalStatus.Approved) {
+        practitioner.status = ApprovalStatus.Approved;
+        await practitioner.save();
+      }
+
+      const practitionerList = isDoctor
+        ? hospital.doctors
+        : hospital.pharmacists;
+      const practitionerPreview = practitionerList.find(
+        (p: PreviewType) => p.walletAddress === walletAddress,
+      );
+      practitionerPreview.status = ApprovalStatus.Approved;
+
+      await hospital.save();
+
+      return {
+        success: HttpStatus.OK,
+        message: 'practitioner approved successfully',
+      };
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -475,6 +766,28 @@ export class HospitalService {
     } catch (error) {
       console.error(error);
       throw new HospitalError('Error fetching pharmacists');
+    }
+  }
+
+  async fetchHospitalPractitioners(hospitalId: Types.ObjectId) {
+    try {
+      const { doctors } = await this.fetchAllDoctors(hospitalId);
+      const { pharmacists } = await this.fetchAllPharmacists(hospitalId);
+      const allPractitioners = doctors.concat(pharmacists);
+
+      if (!allPractitioners) {
+        return {
+          success: HttpStatus.FOUND,
+          practitioners: [],
+        };
+      }
+
+      return {
+        success: HttpStatus.OK,
+        practitioners: allPractitioners,
+      };
+    } catch (error) {
+      console.error(error);
     }
   }
 
