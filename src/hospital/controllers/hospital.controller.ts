@@ -9,7 +9,10 @@ import {
 import { HospitalService } from '../services/hospital.service';
 import { Types } from 'mongoose';
 import {
+  ApprovePractitionerDto,
   CreateHospitalDto,
+  JoinHospitalDto,
+  RemovePractitionerDto,
   UpdateHospitalProfileDto,
 } from '../dto/hospital.dto';
 
@@ -22,6 +25,45 @@ export class HospitalController {
     @Body(ValidationPipe) createHospitalDto: CreateHospitalDto,
   ) {
     return await this.hospitalService.createNewHospital(createHospitalDto);
+  }
+
+  @Post('joinHospital')
+  async joinHospital(
+    @Query('hospitalId', new ValidationPipe({ transform: true }))
+    hospitalId: Types.ObjectId,
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    joinHospitalDto: JoinHospitalDto,
+  ) {
+    return await this.hospitalService.joinHospital({
+      hospitalId,
+      walletAddress: joinHospitalDto.walletAddress,
+    });
+  }
+
+  @Post('approvePractitioner')
+  async approvePractitioner(
+    @Query('hospitalId', new ValidationPipe({ transform: true }))
+    hospitalId: Types.ObjectId,
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    approvePractitionerDto: ApprovePractitionerDto,
+  ) {
+    return await this.hospitalService.approvePractitioner({
+      hospitalId,
+      walletAddress: approvePractitionerDto.walletAddress,
+    });
+  }
+
+  @Post('removePractitioner')
+  async removePractitioner(
+    @Query('hospitalId', new ValidationPipe({ transform: true }))
+    hospitalId: Types.ObjectId,
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    removePractitionerDto: RemovePractitionerDto,
+  ) {
+    return await this.hospitalService.removePractitionerFromHospital({
+      hospitalId,
+      walletAddress: removePractitionerDto.walletAddress,
+    });
   }
 
   @Post('delegateAdmin')
@@ -121,5 +163,13 @@ export class HospitalController {
     hospitalId: Types.ObjectId,
   ) {
     return await this.hospitalService.fetchAllPharmacists(hospitalId);
+  }
+
+  @Get('allPractitioners')
+  async getAllPractitioners(
+    @Query('hospitalId', new ValidationPipe({ transform: true }))
+    hospitalId: Types.ObjectId,
+  ) {
+    return await this.hospitalService.fetchHospitalPractitioners(hospitalId);
   }
 }
