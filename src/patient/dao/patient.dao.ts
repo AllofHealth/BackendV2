@@ -2,6 +2,7 @@ import { Patient } from '../schemas/patient.schema';
 import { Category } from 'src/shared';
 import {
   CreatePatientType,
+  UpdateFamilyMemberType,
   UpdatePatientProfileType,
 } from '../interface/patient.interface';
 import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
@@ -55,6 +56,25 @@ export class PatientDao {
     return await this.patientModel.updateOne(
       { walletAddress },
       { $set: updates },
+      { new: true, runValidators: true },
+    );
+  }
+
+  async updateFamilyMember(
+    walletAddress: string,
+    familyMemberId: number,
+    updateData: UpdateFamilyMemberType,
+  ) {
+    const updates = Object.keys(updateData).reduce((acc, key) => {
+      if (updateData[key] !== undefined) {
+        acc[key] = updateData[key];
+      }
+      return acc;
+    }, {});
+
+    return await this.patientModel.updateOne(
+      { walletAddress, 'familyMembers.id': familyMemberId },
+      { $set: { 'familyMembers.$': updates } },
       { new: true, runValidators: true },
     );
   }
