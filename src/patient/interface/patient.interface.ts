@@ -56,6 +56,16 @@ export interface CreatePatientType {
   category?: string;
 }
 
+export interface UpdateFamilyMemberType {
+  name?: string;
+  relationship?: string;
+  email?: string;
+  address?: string;
+  age?: number;
+  bloodGroup?: string;
+  genotype?: string;
+}
+
 export interface PatientType extends CreatePatientType {
   appointmentCount: number;
   medicalRecords: MedicalRecordPreviewType[];
