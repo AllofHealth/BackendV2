@@ -37,13 +37,26 @@ export interface FamilyMemberType {
   email?: string;
   address: string;
   age: number;
-  dob: Date;
+  dob: string;
   bloodGroup: string;
   genotype: string;
   medicalRecord?: MedicalRecordPreviewType[];
 }
 
-export interface CreateFamilyMemberType extends FamilyMemberType {}
+export interface CreateFamilyMemberType {
+  id: number;
+  principalPatient?: string;
+  name: string;
+  profilePicture?: string;
+  relationship: string;
+  email?: string;
+  address: string;
+  age: number;
+  dob: Date;
+  bloodGroup: string;
+  genotype: string;
+  medicalRecord?: MedicalRecordPreviewType[];
+}
 
 export interface CreatePatientType {
   id: number;
