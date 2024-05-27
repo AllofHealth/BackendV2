@@ -114,8 +114,8 @@ export class CreateFamilyMemberDto {
   @IsNumber()
   age: number;
 
-  @IsDate()
-  dob: Date;
+  @IsString()
+  dob: string;
 
   @IsString()
   bloodGroup: string;
@@ -125,28 +125,36 @@ export class CreateFamilyMemberDto {
 }
 
 export class UpdateFamilyMemberDto {
+  @IsOptional()
   @IsString()
   name?: string;
 
+  @IsOptional()
   @IsString()
   relationship?: string;
 
+  @IsOptional()
   @IsString()
   @IsEmail()
   email?: string;
 
+  @IsOptional()
   @IsString()
   address?: string;
 
+  @IsOptional()
   @IsNumber()
   age?: number;
 
+  @IsOptional()
   @IsDate()
   dob?: Date;
 
+  @IsOptional()
   @IsString()
   bloodGroup?: string;
 
+  @IsOptional()
   @IsString()
   genotype?: string;
 }
