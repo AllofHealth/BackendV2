@@ -57,6 +57,10 @@ export class UpdatePatientProfileDto {
 
   @IsOptional()
   @IsString()
+  lastName?: string;
+
+  @IsOptional()
+  @IsString()
   age?: string;
 
   @IsOptional()
