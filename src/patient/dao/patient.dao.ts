@@ -1,8 +1,8 @@
 import { Patient, FamilyMember } from '../schemas/patient.schema';
 import { Category } from 'src/shared';
 import {
+  CreateFamilyMemberType,
   CreatePatientType,
-  FamilyMemberType,
   UpdateFamilyMemberType,
   UpdatePatientProfileType,
 } from '../interface/patient.interface';
@@ -37,7 +37,7 @@ export class PatientDao {
     });
   }
 
-  async returnFamilyMembers(familyMember: FamilyMemberType) {
+  async returnFamilyMembers(familyMember: CreateFamilyMemberType) {
     return await this.familyMemberModel.create({
       id: familyMember.id,
       principalPatient: familyMember.principalPatient,
@@ -87,15 +87,13 @@ export class PatientDao {
     updateData: UpdateFamilyMemberType,
   ) {
     const updates = Object.keys(updateData).reduce((acc, key) => {
-      if (updateData[key] !== undefined) {
-        acc[key] = updateData[key];
-      }
+      acc[`familyMembers.$.${key}`] = updateData[key];
       return acc;
     }, {});
 
     return await this.patientModel.updateOne(
       { walletAddress, 'familyMembers.id': familyMemberId },
-      { $set: { 'familyMembers.$': updates } },
+      { $set: updates },
       { new: true, runValidators: true },
     );
   }
