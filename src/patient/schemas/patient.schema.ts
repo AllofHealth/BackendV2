@@ -77,6 +77,9 @@ export class Patient {
   @Prop({ required: true })
   name: string;
 
+  @Prop()
+  lastName: string;
+
   @Prop({ required: true })
   age: number;
 
