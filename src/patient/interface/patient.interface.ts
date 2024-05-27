@@ -61,6 +61,7 @@ export interface CreateFamilyMemberType {
 export interface CreatePatientType {
   id: number;
   name: string;
+  lastName?: string;
   age: number;
   email: string;
   profilePicture?: string;
@@ -103,6 +104,7 @@ export interface FamilyMemberApprovalInputType extends ApprovalInputType {
 export interface UpdatePatientProfileType {
   walletAddress: string;
   name?: string;
+  lastName?: string;
   age?: string;
   email?: string;
   profilePicture?: string;
