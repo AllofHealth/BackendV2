@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { Patient } from '../schemas/patient.schema';
 import {
-  CreateFamilyMemberType,
   CreatePatientType,
+  FamilyMemberType,
   UpdateFamilyMemberType,
   UpdatePatientProfileType,
 } from '../interface/patient.interface';
@@ -74,7 +74,7 @@ export class PatientService {
 
   async addFamilyMember(args: {
     walletAddress: string;
-    familyMember: CreateFamilyMemberType;
+    familyMember: FamilyMemberType;
   }) {
     const { walletAddress, familyMember } = args;
     const {
@@ -108,7 +108,7 @@ export class PatientService {
         email,
         address,
         age,
-        dob,
+        dob: new Date(dob),
         bloodGroup,
         genotype,
       };
