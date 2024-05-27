@@ -1,7 +1,8 @@
-import { Patient } from '../schemas/patient.schema';
+import { Patient, FamilyMember } from '../schemas/patient.schema';
 import { Category } from 'src/shared';
 import {
   CreatePatientType,
+  FamilyMemberType,
   UpdateFamilyMemberType,
   UpdatePatientProfileType,
 } from '../interface/patient.interface';
@@ -14,6 +15,8 @@ import { Model } from 'mongoose';
 export class PatientDao {
   constructor(
     @InjectModel(Patient.name) private patientModel: Model<Patient>,
+    @InjectModel(FamilyMember.name)
+    private familyMemberModel: Model<FamilyMember>,
   ) {}
   async createNewPatient(patient: CreatePatientType) {
     return await this.patientModel.create({
@@ -31,6 +34,24 @@ export class PatientDao {
       bloodGroup: patient.bloodGroup,
       genotype: patient.genotype,
       category: Category.Patient,
+    });
+  }
+
+  async returnFamilyMembers(familyMember: FamilyMemberType) {
+    return await this.familyMemberModel.create({
+      id: familyMember.id,
+      principalPatient: familyMember.principalPatient,
+      name: familyMember.name,
+      profilePicture: familyMember.profilePicture
+        ? familyMember.profilePicture
+        : PROFILE_PLACEHOLDER,
+      relationship: familyMember.relationship,
+      email: familyMember.email ? familyMember.email : '',
+      address: familyMember.address,
+      age: familyMember.age,
+      dob: familyMember.dob,
+      bloodGroup: familyMember.bloodGroup,
+      genotype: familyMember.genotype,
     });
   }
 
