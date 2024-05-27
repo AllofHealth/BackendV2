@@ -50,6 +50,9 @@ export class FamilyMember extends Document {
   @Prop({ required: true })
   age: number;
 
+  @Prop({ sparse: true })
+  dob: Date;
+
   @Prop({ required: true })
   bloodGroup: string;
 
