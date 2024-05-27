@@ -1,4 +1,5 @@
 import {
+  IsDate,
   IsEmail,
   IsEthereumAddress,
   IsNumber,
@@ -80,6 +81,72 @@ export class UpdatePatientProfileDto {
   bloodGroup?: string;
 
   @IsOptional()
+  @IsString()
+  genotype?: string;
+}
+
+export class CreateFamilyMemberDto {
+  @IsNumber()
+  id: number;
+
+  @IsString()
+  @IsOptional()
+  principalPatient?: string;
+
+  @IsString()
+  name: string;
+
+  @IsString()
+  @IsOptional()
+  profilePicture?: string;
+
+  @IsString()
+  relationship: string;
+
+  @IsEmail()
+  @IsOptional()
+  @IsString()
+  email: string;
+
+  @IsString()
+  address: string;
+
+  @IsNumber()
+  age: number;
+
+  @IsDate()
+  dob: Date;
+
+  @IsString()
+  bloodGroup: string;
+
+  @IsString()
+  genotype: string;
+}
+
+export class UpdateFamilyMemberDto {
+  @IsString()
+  name?: string;
+
+  @IsString()
+  relationship?: string;
+
+  @IsString()
+  @IsEmail()
+  email?: string;
+
+  @IsString()
+  address?: string;
+
+  @IsNumber()
+  age?: number;
+
+  @IsDate()
+  dob?: Date;
+
+  @IsString()
+  bloodGroup?: string;
+
   @IsString()
   genotype?: string;
 }
