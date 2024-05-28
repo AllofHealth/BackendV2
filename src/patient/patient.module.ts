@@ -6,6 +6,8 @@ import {
   FamilyMemberSchema,
   Patient,
   PatientSchema,
+  Prescriptions,
+  PrescriptionsSchema,
 } from './schemas/patient.schema';
 import { PatientDao } from './dao/patient.dao';
 import { PatientGuard } from './guards/patient.guard';
@@ -20,6 +22,9 @@ import { PharmacistModule } from 'src/pharmacist/pharmacist.module';
         name: FamilyMember.name,
         schema: FamilyMemberSchema,
       },
+    ]),
+    MongooseModule.forFeature([
+      { name: Prescriptions.name, schema: PrescriptionsSchema },
     ]),
     PharmacistModule,
   ],
