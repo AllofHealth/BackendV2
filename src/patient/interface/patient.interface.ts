@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 export type ApprovalType = 'view' | 'full';
 export type RelationShipType =
   | 'father'
@@ -112,4 +114,10 @@ export interface UpdatePatientProfileType {
   city?: string;
   bloodGroup?: string;
   genotype?: string;
+}
+
+export interface SharePrescriptionInterface {
+  walletAddress: string;
+  pharmacistAddress: string;
+  prescriptionId: Types.ObjectId;
 }
