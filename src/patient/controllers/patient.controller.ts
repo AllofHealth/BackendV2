@@ -11,9 +11,11 @@ import { PatientService } from '../services/patient.service';
 import {
   CreateFamilyMemberDto,
   CreatePatientDto,
+  SharePrescriptionDto,
   UpdateFamilyMemberDto,
   UpdatePatientProfileDto,
 } from '../dto/patient.dto';
+import { Types } from 'mongoose';
 
 @Controller('patient')
 export class PatientController {
@@ -68,6 +70,20 @@ export class PatientController {
     });
   }
 
+  @Post('sharePrescription')
+  async sharePrescription(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+    @Body(new ValidationPipe({ transform: true }))
+    sharePrescriptionDto: SharePrescriptionDto,
+  ) {
+    return await this.patientService.sharePrescription({
+      walletAddress,
+      pharmacistAddress: sharePrescriptionDto.pharmacistAddress,
+      prescriptionId: sharePrescriptionDto.prescriptionId,
+    });
+  }
+
   @Get('allPatients')
   async getAllPatients() {
     return await this.patientService.findAllPatients();
@@ -100,6 +116,27 @@ export class PatientController {
     walletAddress: string,
   ) {
     return await this.patientService.fetchPatientByWalletAddress(walletAddress);
+  }
+
+  @Get('allPrescriptions')
+  async getAllPrescriptions(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+  ) {
+    return await this.patientService.fetchAllPrescriptions(walletAddress);
+  }
+
+  @Get('prescriptionById')
+  async getPrescription(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+    @Query('prescriptionId', new ValidationPipe({ transform: true }))
+    prescriptionId: Types.ObjectId,
+  ) {
+    return await this.patientService.fetchPrescription(
+      walletAddress,
+      prescriptionId,
+    );
   }
 
   @Delete('deletePatient')
