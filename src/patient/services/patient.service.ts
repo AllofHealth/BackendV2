@@ -3,6 +3,7 @@ import { Patient } from '../schemas/patient.schema';
 import {
   CreatePatientType,
   FamilyMemberType,
+  SharePrescriptionInterface,
   UpdateFamilyMemberType,
   UpdatePatientProfileType,
 } from '../interface/patient.interface';
@@ -11,6 +12,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, MongooseError } from 'mongoose';
 import { PatientDao } from '../dao/patient.dao';
 import { PatientGuard } from '../guards/patient.guard';
+import { PharmacistGuard } from 'src/pharmacist/guards/pharmacist.guard';
+import { PharmacistDao } from 'src/pharmacist/dao/pharmacist.dao';
 
 /**
  * @file: Patient Service
@@ -22,6 +25,8 @@ export class PatientService {
     @InjectModel(Patient.name) private patientModel: Model<Patient>,
     private readonly patientDao: PatientDao,
     private readonly patientGuard: PatientGuard,
+    private readonly pharmacistGuard: PharmacistGuard,
+    private readonly pharmacistDao: PharmacistDao,
   ) {}
 
   async createNewPatient(args: CreatePatientType) {
@@ -337,6 +342,62 @@ export class PatientService {
       };
     } catch (error) {
       console.error(error);
+      throw new PatientError('An error occurred while fetching prescriptions');
+    }
+  }
+
+  async sharePrescription(args: SharePrescriptionInterface) {
+    const { walletAddress, pharmacistAddress, prescriptionId } = args;
+    try {
+      const isPharmacist =
+        await this.pharmacistGuard.validatePharmacistExists(pharmacistAddress);
+      const patient =
+        await this.patientDao.fetchPatientByAddress(walletAddress);
+      if (!isPharmacist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'Pharmacist not found',
+        };
+      }
+
+      if (!patient) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'Patient not found',
+        };
+      }
+
+      const prescription = await this.patientModel.findOne(
+        { walletAddress, 'prescriptions._id': prescriptionId },
+        { 'prescriptions.$': 1 },
+      );
+
+      if (!prescription || !prescription.prescriptions.length) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'prescription not found, invalid id',
+        };
+      }
+
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(pharmacistAddress);
+      try {
+        pharmacist.sharedPrescriptions.push(prescription.prescriptions[0]);
+        await pharmacist.save();
+      } catch (error) {
+        return {
+          success: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'an error occurred, please try again',
+        };
+      }
+
+      return {
+        success: HttpStatus.OK,
+        message: 'prescription shared successfully',
+      };
+    } catch (error) {
+      console.error(error);
+      throw new PatientError('An error occurred while sharing prescription');
     }
   }
 }
