@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { HospitalService } from './services/hospital.service';
 import { HospitalController } from './controllers/hospital.controller';
 import { HospitalSchema, Hospital } from './schema/hospital.schema';
@@ -14,7 +14,7 @@ import { PharmacistModule } from 'src/pharmacist/pharmacist.module';
       { name: Hospital.name, schema: HospitalSchema },
     ]),
     DoctorModule,
-    PharmacistModule,
+    forwardRef(() => PharmacistModule),
   ],
   providers: [HospitalService, HospitalDao, HospitalGuard],
   controllers: [HospitalController],
