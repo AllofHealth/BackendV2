@@ -1,5 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import {
+  Prescriptions,
+  PrescriptionsSchema,
+} from 'src/patient/schemas/patient.schema';
 
 @Schema()
 export class ApprovalList {
@@ -106,11 +110,14 @@ export class Pharmacist {
   @Prop({ required: true })
   status: string;
 
-  @Prop({ InventorySchema })
+  @Prop({ type: InventorySchema })
   inventory: Inventory;
 
-  @Prop([ApprovalListSchema])
+  @Prop({ type: [{ type: ApprovalListSchema }] })
   approvalList: ApprovalList[];
+
+  @Prop({ type: [{ type: PrescriptionsSchema }] })
+  sharedPrescriptions: Prescriptions[];
 
   @Prop({ default: 'pharmacist', required: true })
   category: string;
