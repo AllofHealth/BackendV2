@@ -2,10 +2,12 @@ import {
   IsDate,
   IsEmail,
   IsEthereumAddress,
+  IsMongoId,
   IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class CreatePatientDto {
   @IsNumber()
@@ -161,4 +163,13 @@ export class UpdateFamilyMemberDto {
   @IsOptional()
   @IsString()
   genotype?: string;
+}
+
+export class SharePrescriptionDto {
+  @IsEthereumAddress()
+  @IsString()
+  pharmacistAddress: string;
+
+  @IsMongoId()
+  prescriptionId: Types.ObjectId;
 }
