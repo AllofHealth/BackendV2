@@ -27,6 +27,33 @@ export class MedicalRecordPreview {
 export const MedicalRecordPreviewSchema =
   SchemaFactory.createForClass(MedicalRecordPreview);
 
+export class Prescriptions {
+  @Prop({ required: true })
+  doctorName: string;
+
+  @Prop({ required: true, unique: true, sparse: true })
+  recordId: number;
+
+  @Prop({ required: true })
+  patientAddress: string;
+
+  @Prop({ required: true })
+  medicineName: string;
+
+  @Prop({ sparse: true })
+  medicineId: string;
+
+  @Prop({ required: true })
+  medicineGroup: string;
+
+  @Prop({ required: true })
+  description: string;
+
+  @Prop({ required: true })
+  sideEffects: string;
+}
+
+export const PrescriptionsSchema = SchemaFactory.createForClass(Prescriptions);
 @Schema()
 export class FamilyMember extends Document {
   @Prop({ required: true, unique: true, sparse: true })
@@ -106,6 +133,9 @@ export class Patient {
 
   @Prop({ type: [{ type: MedicalRecordPreviewSchema }] })
   medicalRecords: MedicalRecordPreviewDocument[];
+
+  @Prop({ type: [PrescriptionsSchema] })
+  prescriptions: Prescriptions[];
 
   @Prop({ type: [FamilyMemberSchema] })
   familyMembers: FamilyMember[];
