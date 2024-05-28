@@ -316,4 +316,27 @@ export class PatientService {
       throw new PatientError('An error occurred while deleting patient');
     }
   }
+
+  async fetchPrescriptions(walletAddress: string) {
+    try {
+      const patient =
+        await this.patientDao.fetchPatientByAddress(walletAddress);
+
+      if (!patient) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'Patient not found',
+        };
+      }
+
+      const prescriptions = patient.prescriptions;
+
+      return {
+        success: HttpStatus.OK,
+        prescriptions,
+      };
+    } catch (error) {
+      console.error(error);
+    }
+  }
 }
