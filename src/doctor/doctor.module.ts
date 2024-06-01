@@ -12,7 +12,7 @@ import { PatientModule } from 'src/patient/patient.module';
   imports: [
     MongooseModule.forFeature([{ name: Doctor.name, schema: DoctorSchema }]),
     forwardRef(() => HospitalModule),
-    PatientModule,
+    forwardRef(() => PatientModule),
   ],
   providers: [DoctorService, DoctorDao, DoctorGuard],
   controllers: [DoctorController],
