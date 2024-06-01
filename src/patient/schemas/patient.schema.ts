@@ -4,7 +4,7 @@ import { Document, HydratedDocument } from 'mongoose';
 export type MedicalRecordPreviewDocument = MedicalRecordPreview & Document;
 
 @Schema()
-export class MedicalRecordPreview {
+export class MedicalRecordPreview extends Document {
   @Prop({ required: true })
   id: number;
 
@@ -27,7 +27,8 @@ export class MedicalRecordPreview {
 export const MedicalRecordPreviewSchema =
   SchemaFactory.createForClass(MedicalRecordPreview);
 
-export class Prescriptions {
+@Schema()
+export class Prescriptions extends Document {
   @Prop({ required: true })
   doctorName: string;
 
@@ -43,11 +44,11 @@ export class Prescriptions {
   @Prop({ required: true })
   medicineName: string;
 
-  @Prop({ sparse: true })
-  medicineId: string;
+  @Prop()
+  medicineId?: string;
 
-  @Prop({ required: true })
-  medicineGroup: string;
+  @Prop()
+  medicineGroup?: string;
 
   @Prop({ required: true })
   description: string;
@@ -55,7 +56,7 @@ export class Prescriptions {
   @Prop({ required: true })
   sideEffects: string;
 
-  @Prop({ required: true, default: Date.now() })
+  @Prop({ default: Date.now() })
   date: Date;
 }
 
