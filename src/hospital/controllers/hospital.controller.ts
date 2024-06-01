@@ -41,12 +41,14 @@ export class HospitalController {
   async approvePractitioner(
     @Query('hospitalId', new ValidationPipe({ transform: true }))
     hospitalId: Types.ObjectId,
-    @Query('walletAddress', new ValidationPipe({ transform: true }))
-    approvePractitionerDto: string,
+    @Query('adminAddress', new ValidationPipe({ transform: true }))
+    adminAddress: string,
+    @Query('practitionerAddress', new ValidationPipe({ transform: true }))
+    practitionerAddress: string,
   ) {
-    return await this.hospitalService.approvePractitioner({
+    return await this.hospitalService.approvePractitioner(adminAddress, {
       hospitalId,
-      walletAddress: approvePractitionerDto,
+      walletAddress: practitionerAddress,
     });
   }
 
@@ -54,13 +56,18 @@ export class HospitalController {
   async removePractitioner(
     @Query('hospitalId', new ValidationPipe({ transform: true }))
     hospitalId: Types.ObjectId,
-    @Query('walletAddress', new ValidationPipe({ transform: true }))
-    removePractitionerDto: string,
+    @Query('adminAddress', new ValidationPipe({ transform: true }))
+    adminAddress: string,
+    @Query('practitionerAddress', new ValidationPipe({ transform: true }))
+    practitionerAddress: string,
   ) {
-    return await this.hospitalService.removePractitionerFromHospital({
-      hospitalId,
-      walletAddress: removePractitionerDto,
-    });
+    return await this.hospitalService.removePractitionerFromHospital(
+      adminAddress,
+      {
+        hospitalId,
+        walletAddress: practitionerAddress,
+      },
+    );
   }
 
   @Post('delegateAdmin')
