@@ -79,3 +79,29 @@ export class UpdateDoctorDto {
   @IsPhoneNumber()
   phoneNumber: string;
 }
+
+export class CreatePrescriptionDto {
+  @IsNumber()
+  @IsNotEmpty()
+  recordId: number;
+
+  @IsString()
+  @IsNotEmpty()
+  medicineName: string;
+
+  @IsString()
+  @IsOptional()
+  medicineId: string;
+
+  @IsString()
+  @IsOptional()
+  medicineGroup?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  description: string;
+
+  @IsString()
+  @IsNotEmpty()
+  sideEffects: string;
+}
