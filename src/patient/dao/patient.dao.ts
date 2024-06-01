@@ -10,6 +10,7 @@ import {
   CreatePrescriptionInterface,
   UpdateFamilyMemberType,
   UpdatePatientProfileType,
+  UpdatePrescriptionInterface,
 } from '../interface/patient.interface';
 import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
 import { Injectable } from '@nestjs/common';
@@ -67,6 +68,7 @@ export class PatientDao {
       doctorName: prescription.doctorName,
       recordId: prescription.recordId,
       patientAddress: prescription.patientAddress,
+      doctorAddress: prescription.doctorAddress,
       medicineName: prescription.medicineName,
       medicineId: prescription.medicineId ? prescription.medicineId : '',
       medicineGroup: prescription.medicineGroup
@@ -99,6 +101,23 @@ export class PatientDao {
 
     return await this.patientModel.updateOne(
       { walletAddress },
+      { $set: updates },
+      { new: true, runValidators: true },
+    );
+  }
+
+  async updatePatientPrescription(
+    walletAddress: string,
+    recordId: number,
+    updateData: UpdatePrescriptionInterface,
+  ) {
+    const updates = Object.keys(updateData).reduce((acc, key) => {
+      acc[`prescriptions.$.${key}`] = updateData[key];
+      return acc;
+    }, {});
+
+    return await this.patientModel.updateOne(
+      { walletAddress, 'prescriptions.recordId': recordId },
       { $set: updates },
       { new: true, runValidators: true },
     );
