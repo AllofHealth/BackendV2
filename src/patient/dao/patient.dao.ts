@@ -1,8 +1,13 @@
-import { Patient, FamilyMember } from '../schemas/patient.schema';
+import {
+  Patient,
+  FamilyMember,
+  Prescriptions,
+} from '../schemas/patient.schema';
 import { Category } from 'src/shared';
 import {
   CreateFamilyMemberType,
   CreatePatientType,
+  CreatePrescriptionInterface,
   UpdateFamilyMemberType,
   UpdatePatientProfileType,
 } from '../interface/patient.interface';
@@ -17,6 +22,8 @@ export class PatientDao {
     @InjectModel(Patient.name) private patientModel: Model<Patient>,
     @InjectModel(FamilyMember.name)
     private familyMemberModel: Model<FamilyMember>,
+    @InjectModel(Prescriptions.name)
+    private prescriptionsModel: Model<Prescriptions>,
   ) {}
   async createNewPatient(patient: CreatePatientType) {
     return await this.patientModel.create({
@@ -37,7 +44,7 @@ export class PatientDao {
     });
   }
 
-  async returnFamilyMembers(familyMember: CreateFamilyMemberType) {
+  async createFamilyMembers(familyMember: CreateFamilyMemberType) {
     return await this.familyMemberModel.create({
       id: familyMember.id,
       principalPatient: familyMember.principalPatient,
@@ -52,6 +59,22 @@ export class PatientDao {
       dob: familyMember.dob,
       bloodGroup: familyMember.bloodGroup,
       genotype: familyMember.genotype,
+    });
+  }
+
+  async createPrescription(prescription: CreatePrescriptionInterface) {
+    return await this.prescriptionsModel.create({
+      doctorName: prescription.doctorName,
+      recordId: prescription.recordId,
+      patientAddress: prescription.patientAddress,
+      medicineName: prescription.medicineName,
+      medicineId: prescription.medicineId ? prescription.medicineId : '',
+      medicineGroup: prescription.medicineGroup
+        ? prescription.medicineGroup
+        : '',
+      description: prescription.description,
+      sideEffects: prescription.sideEffects ? prescription.sideEffects : '',
+      date: Date.now(),
     });
   }
 
