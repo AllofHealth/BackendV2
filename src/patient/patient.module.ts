@@ -30,6 +30,6 @@ import { PharmacistModule } from 'src/pharmacist/pharmacist.module';
   ],
   providers: [PatientService, PatientDao, PatientGuard],
   controllers: [PatientController],
-  exports: [PatientService],
+  exports: [PatientService, PatientDao, PatientGuard],
 })
 export class PatientModule {}
