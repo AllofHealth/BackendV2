@@ -129,7 +129,7 @@ export class PatientService {
       }
 
       const newFamilyMember =
-        await this.patientDao.returnFamilyMembers(sanitizedArgs);
+        await this.patientDao.createFamilyMembers(sanitizedArgs);
       patient.familyMembers.push(newFamilyMember);
       await patient.save();
       return {
