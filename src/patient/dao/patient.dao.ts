@@ -76,7 +76,6 @@ export class PatientDao {
         : '',
       description: prescription.description,
       sideEffects: prescription.sideEffects ? prescription.sideEffects : '',
-      date: Date.now(),
     });
   }
 
