@@ -53,3 +53,14 @@ export interface DoctorType {
   status: string;
   category: string;
 }
+
+export interface AddPatientPrescription {
+  recordId: number;
+  patientAddress: string;
+  doctorAddress: string;
+  medicineName: string;
+  medicineId?: string;
+  medicineGroup?: string;
+  description: string;
+  sideEffects: string;
+}
