@@ -116,6 +116,18 @@ export interface UpdatePatientProfileType {
   genotype?: string;
 }
 
+export interface CreatePrescriptionInterface {
+  doctorName: string;
+  recordId: string;
+  patientAddress: string;
+  medicineName: string;
+  medicineId?: string;
+  medicineGroup?: string;
+  description: string;
+  sideEffects: string;
+  date?: Date;
+}
+
 export interface SharePrescriptionInterface {
   walletAddress: string;
   pharmacistAddress: string;
