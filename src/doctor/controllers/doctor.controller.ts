@@ -37,7 +37,7 @@ export class DoctorController {
 
   @Post('addPatientPrescription')
   async addPatientPrescription(
-    @Query('patinetAddress', new ValidationPipe({ transform: true }))
+    @Query('patientAddress', new ValidationPipe({ transform: true }))
     patientAddress: string,
     @Query('doctorAddress', new ValidationPipe({ transform: true }))
     doctorAddress: string,
