@@ -6,11 +6,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Doctor, DoctorSchema } from './schema/doctor.schema';
 import { DoctorGuard } from './guards/doctor.guard';
 import { HospitalModule } from 'src/hospital/hospital.module';
+import { PatientModule } from 'src/patient/patient.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Doctor.name, schema: DoctorSchema }]),
     forwardRef(() => HospitalModule),
+    PatientModule,
   ],
   providers: [DoctorService, DoctorDao, DoctorGuard],
   controllers: [DoctorController],
