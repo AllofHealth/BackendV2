@@ -8,7 +8,11 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { DoctorService } from '../services/doctor.service';
-import { CreateDoctorDto, UpdateDoctorDto } from '../dto/doctor.dto';
+import {
+  CreateDoctorDto,
+  CreatePrescriptionDto,
+  UpdateDoctorDto,
+} from '../dto/doctor.dto';
 
 @Controller('doctor')
 export class DoctorController {
@@ -29,6 +33,27 @@ export class DoctorController {
       walletAddress,
       updateDoctorDto,
     );
+  }
+
+  @Post('addPatientPrescription')
+  async addPatientPrescription(
+    @Query('patinetAddress', new ValidationPipe({ transform: true }))
+    patientAddress: string,
+    @Query('doctorAddress', new ValidationPipe({ transform: true }))
+    doctorAddress: string,
+    @Body(new ValidationPipe({ transform: true }))
+    prescriptionDto: CreatePrescriptionDto,
+  ) {
+    return await this.doctorService.createPrescription({
+      recordId: prescriptionDto.recordId,
+      patientAddress,
+      doctorAddress,
+      medicineName: prescriptionDto.medicineName,
+      medicineId: prescriptionDto.medicineId,
+      medicineGroup: prescriptionDto.medicineGroup,
+      description: prescriptionDto.description,
+      sideEffects: prescriptionDto.sideEffects,
+    });
   }
 
   @Get('doctorByAddress')
