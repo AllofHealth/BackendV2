@@ -74,12 +74,14 @@ export class PatientController {
   async sharePrescription(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
+    @Query('pharmacistAddress', new ValidationPipe({ transform: true }))
+    pharmacistAddress: string,
     @Body(new ValidationPipe({ transform: true }))
     sharePrescriptionDto: SharePrescriptionDto,
   ) {
     return await this.patientService.sharePrescription({
       walletAddress,
-      pharmacistAddress: sharePrescriptionDto.pharmacistAddress,
+      pharmacistAddress,
       prescriptionId: sharePrescriptionDto.prescriptionId,
     });
   }
