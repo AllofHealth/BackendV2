@@ -8,6 +8,7 @@ import { Doctor } from '../schema/doctor.schema';
 import { Model, MongooseError } from 'mongoose';
 import { DoctorDao } from '../dao/doctor.dao';
 import {
+  AddPatientPrescription,
   CreateDoctorType,
   UpdateDoctorType,
 } from '../interface/doctor.interface';
@@ -15,6 +16,8 @@ import { Category, DoctorError } from 'src/shared';
 import { DoctorGuard } from '../guards/doctor.guard';
 import { HospitalDao } from 'src/hospital/dao/hospital.dao';
 import { PreviewType } from 'src/hospital/interface/hospital.interface';
+import { PatientDao } from 'src/patient/dao/patient.dao';
+import { PatientGuard } from 'src/patient/guards/patient.guard';
 
 @Injectable()
 export class DoctorService {
@@ -23,6 +26,8 @@ export class DoctorService {
     private readonly doctorDao: DoctorDao,
     private readonly doctorGuard: DoctorGuard,
     private readonly hospitalDao: HospitalDao,
+    private readonly patientDao: PatientDao,
+    private readonly patientGuard: PatientGuard,
   ) {}
 
   async getPendingDoctors() {
@@ -237,6 +242,68 @@ export class DoctorService {
       if (error instanceof MongooseError)
         throw new MongooseError(error.message);
       throw new InternalServerErrorException('Error deleting doctor');
+    }
+  }
+
+  async createPrescription(args: AddPatientPrescription) {
+    const {
+      recordId,
+      patientAddress,
+      doctorAddress,
+      medicineName,
+      medicineId,
+      medicineGroup,
+      description,
+      sideEffects,
+    } = args;
+    try {
+      const isPatient = await this.patientGuard.validatePatient(patientAddress);
+      const isDoctor =
+        await this.doctorGuard.validateDoctorExists(doctorAddress);
+
+      if (!isPatient) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'Patient not found',
+        };
+      }
+
+      if (!isDoctor) {
+        return {
+          success: HttpStatus.UNAUTHORIZED,
+          message: 'unauthorized',
+        };
+      }
+
+      const patient =
+        await this.patientDao.fetchPatientByAddress(patientAddress);
+      const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
+
+      const newPrescriptionArgs = {
+        doctorName: doctor.name,
+        recordId,
+        patientAddress,
+        doctorAddress,
+        medicineName,
+        medicineId,
+        medicineGroup,
+        description,
+        sideEffects,
+      };
+
+      const prescription =
+        await this.patientDao.createPrescription(newPrescriptionArgs);
+      patient.prescriptions.push(prescription);
+
+      await patient.save();
+
+      return {
+        success: HttpStatus.OK,
+        message: 'Prescription created successfully',
+      };
+    } catch (error) {
+      console.error(error);
+      throw new DoctorError('Error creating prescription');
     }
   }
 }
