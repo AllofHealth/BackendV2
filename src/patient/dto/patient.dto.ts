@@ -166,10 +166,6 @@ export class UpdateFamilyMemberDto {
 }
 
 export class SharePrescriptionDto {
-  @IsEthereumAddress()
-  @IsString()
-  pharmacistAddress: string;
-
   @IsMongoId()
   prescriptionId: Types.ObjectId;
 }
