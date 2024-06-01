@@ -104,7 +104,6 @@ export interface FamilyMemberApprovalInputType extends ApprovalInputType {
 }
 
 export interface UpdatePatientProfileType {
-  walletAddress: string;
   name?: string;
   lastName?: string;
   age?: string;

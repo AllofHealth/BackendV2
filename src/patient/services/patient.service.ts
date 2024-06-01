@@ -287,11 +287,10 @@ export class PatientService {
           message: 'Patient not found',
         };
       }
-      const patient = await this.patientDao.updatePatient(walletAddress, args);
+      await this.patientDao.updatePatient(walletAddress, args);
       return {
         success: HttpStatus.OK,
         message: 'Patient updated successfully',
-        patient,
       };
     } catch (error) {
       console.error(error);

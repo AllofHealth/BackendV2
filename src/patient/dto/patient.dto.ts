@@ -49,10 +49,6 @@ export class CreatePatientDto {
 }
 
 export class UpdatePatientProfileDto {
-  @IsString()
-  @IsEthereumAddress()
-  walletAddress: string;
-
   @IsOptional()
   @IsString()
   name?: string;
