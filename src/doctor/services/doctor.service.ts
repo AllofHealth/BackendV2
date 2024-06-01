@@ -12,7 +12,7 @@ import {
   CreateDoctorType,
   UpdateDoctorType,
 } from '../interface/doctor.interface';
-import { Category, DoctorError } from 'src/shared';
+import { ApprovalStatus, Category, DoctorError } from 'src/shared';
 import { DoctorGuard } from '../guards/doctor.guard';
 import { HospitalDao } from 'src/hospital/dao/hospital.dao';
 import { PreviewType } from 'src/hospital/interface/hospital.interface';
@@ -279,16 +279,23 @@ export class DoctorService {
         await this.patientDao.fetchPatientByAddress(patientAddress);
       const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
 
+      if (doctor.status !== ApprovalStatus.Approved) {
+        return {
+          success: HttpStatus.UNAUTHORIZED,
+          message: 'doctor not approved',
+        };
+      }
+
       const newPrescriptionArgs = {
         doctorName: doctor.name,
-        recordId,
-        patientAddress,
-        doctorAddress,
-        medicineName,
-        medicineId,
-        medicineGroup,
-        description,
-        sideEffects,
+        recordId: recordId,
+        patientAddress: patientAddress,
+        doctorAddress: doctorAddress,
+        medicineName: medicineName,
+        medicineId: medicineId,
+        medicineGroup: medicineGroup,
+        description: description,
+        sideEffects: sideEffects,
       };
 
       const prescription =
