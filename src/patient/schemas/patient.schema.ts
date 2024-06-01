@@ -38,6 +38,9 @@ export class Prescriptions {
   patientAddress: string;
 
   @Prop({ required: true })
+  doctorAddress: string;
+
+  @Prop({ required: true })
   medicineName: string;
 
   @Prop({ sparse: true })
