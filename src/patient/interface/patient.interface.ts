@@ -118,8 +118,9 @@ export interface UpdatePatientProfileType {
 
 export interface CreatePrescriptionInterface {
   doctorName: string;
-  recordId: string;
+  recordId: number;
   patientAddress: string;
+  doctorAddress: string;
   medicineName: string;
   medicineId?: string;
   medicineGroup?: string;
@@ -132,4 +133,12 @@ export interface SharePrescriptionInterface {
   walletAddress: string;
   pharmacistAddress: string;
   prescriptionId: Types.ObjectId;
+}
+
+export interface UpdatePrescriptionInterface {
+  medicineName?: string;
+  medicineId?: string;
+  medicineGroup?: string;
+  description?: string;
+  sideEffects?: string;
 }
