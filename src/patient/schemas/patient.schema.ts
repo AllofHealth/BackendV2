@@ -51,6 +51,9 @@ export class Prescriptions {
 
   @Prop({ required: true })
   sideEffects: string;
+
+  @Prop({ required: true, default: Date.now() })
+  date: Date;
 }
 
 export const PrescriptionsSchema = SchemaFactory.createForClass(Prescriptions);
