@@ -404,7 +404,10 @@ export class HospitalService {
     }
   }
 
-  async removePractitionerFromHospital(args: RemovePractitionerType) {
+  async removePractitionerFromHospital(
+    adminAddress: string,
+    args: RemovePractitionerType,
+  ) {
     const { hospitalId, walletAddress } = args;
     try {
       const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
@@ -417,6 +420,13 @@ export class HospitalService {
           hospital.id,
           walletAddress,
         );
+
+      if (adminAddress !== hospital.admin) {
+        return {
+          success: HttpStatus.UNAUTHORIZED,
+          message: 'unauthorized, not the admin',
+        };
+      }
 
       if (!isDoctor && !isPharmacist) {
         return {
@@ -449,7 +459,10 @@ export class HospitalService {
     }
   }
 
-  async approvePractitioner(args: ApprovePractitionerType) {
+  async approvePractitioner(
+    hospitalAdmin: string,
+    args: ApprovePractitionerType,
+  ) {
     const { hospitalId, walletAddress } = args;
     try {
       const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
@@ -457,6 +470,13 @@ export class HospitalService {
         hospital.id,
         walletAddress,
       );
+
+      if (hospital.admin !== hospitalAdmin) {
+        return {
+          success: HttpStatus.UNAUTHORIZED,
+          message: 'unauthorized, contact hospital admin',
+        };
+      }
       const isPharmacist =
         await this.pharmacistGuard.validatePharmacistExistsInHospital(
           hospital.id,
@@ -485,6 +505,13 @@ export class HospitalService {
       const practitionerPreview = practitionerList.find(
         (p: PreviewType) => p.walletAddress === walletAddress,
       );
+
+      if (practitionerPreview.status === ApprovalStatus.Approved) {
+        return {
+          success: HttpStatus.ACCEPTED,
+          message: 'practitioner already approved',
+        };
+      }
       practitionerPreview.status = ApprovalStatus.Approved;
 
       await hospital.save();
