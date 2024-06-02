@@ -86,6 +86,19 @@ export class PatientController {
     });
   }
 
+  @Post('removePrescription')
+  async removePrescription(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+    @Query('prescriptionId', new ValidationPipe({ transform: true }))
+    prescriptionId: Types.ObjectId,
+  ) {
+    return await this.patientService.removePrescriptions(
+      walletAddress,
+      prescriptionId,
+    );
+  }
+
   @Get('allPatients')
   async getAllPatients() {
     return await this.patientService.findAllPatients();

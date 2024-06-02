@@ -434,4 +434,41 @@ export class PatientService {
       throw new PatientError('An error occurred while sharing prescription');
     }
   }
+
+  async removePrescriptions(
+    walletAddress: string,
+    prescriptionId: Types.ObjectId,
+  ) {
+    try {
+      const patient =
+        await this.patientDao.fetchPatientByAddress(walletAddress);
+      if (!patient) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'patient not found',
+        };
+      }
+
+      const prescription = patient.prescriptions.find(
+        (prescription) => prescription._id == prescriptionId,
+      );
+      if (!prescription) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'prescription not found',
+        };
+      }
+
+      await this.patientDao.pullOnePrescription(prescriptionId, walletAddress);
+      await patient.save();
+
+      return {
+        success: HttpStatus.OK,
+        message: 'successfully deleted prescription',
+      };
+    } catch (error) {
+      console.error(error);
+      throw new PatientError('an error occurred while removing prescription');
+    }
+  }
 }

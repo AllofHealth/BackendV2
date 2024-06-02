@@ -32,7 +32,7 @@ export class Prescriptions extends Document {
   @Prop({ required: true })
   doctorName: string;
 
-  @Prop({ required: true, unique: true, sparse: true })
+  @Prop({ required: true })
   recordId: number;
 
   @Prop({ required: true })
@@ -63,7 +63,7 @@ export class Prescriptions extends Document {
 export const PrescriptionsSchema = SchemaFactory.createForClass(Prescriptions);
 @Schema()
 export class FamilyMember extends Document {
-  @Prop({ required: true, unique: true, sparse: true })
+  @Prop({ required: true })
   id: number;
 
   @Prop({ required: true })
@@ -138,13 +138,13 @@ export class Patient {
   @Prop({ required: true })
   genotype: string;
 
-  @Prop({ type: [{ type: MedicalRecordPreviewSchema }] })
+  @Prop({ type: [{ type: MedicalRecordPreviewSchema, unique: true }] })
   medicalRecords: MedicalRecordPreviewDocument[];
 
-  @Prop({ type: [PrescriptionsSchema] })
+  @Prop({ type: [{ type: PrescriptionsSchema, unique: true }] })
   prescriptions: Prescriptions[];
 
-  @Prop({ type: [FamilyMemberSchema] })
+  @Prop({ type: [{ type: FamilyMemberSchema, unique: true }] })
   familyMembers: FamilyMember[];
 
   @Prop({ default: 'patient', required: true })

@@ -16,6 +16,7 @@ import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class PatientDao {
@@ -85,6 +86,16 @@ export class PatientDao {
 
   async fetchAllPatients() {
     return await this.patientModel.find();
+  }
+
+  async pullOnePrescription(
+    prescriptionId: Types.ObjectId,
+    walletAddress: string,
+  ) {
+    return await this.patientModel.updateOne(
+      { walletAddress: walletAddress },
+      { $pull: { prescriptions: { _id: prescriptionId } } },
+    );
   }
 
   async updatePatient(
