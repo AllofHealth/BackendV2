@@ -13,6 +13,7 @@ import { PatientDao } from './dao/patient.dao';
 import { PatientGuard } from './guards/patient.guard';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PharmacistModule } from 'src/pharmacist/pharmacist.module';
+import { DoctorModule } from 'src/doctor/doctor.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { PharmacistModule } from 'src/pharmacist/pharmacist.module';
       { name: Prescriptions.name, schema: PrescriptionsSchema },
     ]),
     PharmacistModule,
+    DoctorModule,
   ],
   providers: [PatientService, PatientDao, PatientGuard],
   controllers: [PatientController],
