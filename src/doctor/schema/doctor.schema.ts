@@ -31,7 +31,7 @@ export class Approval extends Document {
   recordOwner: string;
 }
 
-const ApprovalSchema = SchemaFactory.createForClass(Approval);
+export const ApprovalSchema = SchemaFactory.createForClass(Approval);
 
 export type DoctorDocument = HydratedDocument<Doctor>;
 @Schema()
