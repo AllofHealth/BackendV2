@@ -1,19 +1,24 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { Patient } from '../schemas/patient.schema';
 import {
+  ApprovalInputType,
+  ApprovalType,
+  CreateApprovalType,
   CreatePatientType,
   FamilyMemberType,
   SharePrescriptionInterface,
   UpdateFamilyMemberType,
   UpdatePatientProfileType,
 } from '../interface/patient.interface';
-import { ErrorCodes, PatientError } from 'src/shared';
+import { ApprovalStatus, ErrorCodes, PatientError } from 'src/shared';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, MongooseError, Types } from 'mongoose';
 import { PatientDao } from '../dao/patient.dao';
 import { PatientGuard } from '../guards/patient.guard';
 import { PharmacistGuard } from 'src/pharmacist/guards/pharmacist.guard';
 import { PharmacistDao } from 'src/pharmacist/dao/pharmacist.dao';
+import { DoctorDao } from 'src/doctor/dao/doctor.dao';
+import { PatientProvider } from '../provider/patient.provider';
 
 /**
  * @file: Patient Service
@@ -27,34 +32,14 @@ export class PatientService {
     private readonly patientGuard: PatientGuard,
     private readonly pharmacistGuard: PharmacistGuard,
     private readonly pharmacistDao: PharmacistDao,
+    private readonly doctorDao: DoctorDao,
   ) {}
 
+  private provider = PatientProvider.useFactory();
+
   async createNewPatient(args: CreatePatientType) {
-    const {
-      id,
-      name,
-      age,
-      address,
-      city,
-      walletAddress,
-      bloodGroup,
-      genotype,
-    } = args;
-    if (
-      !Number.isInteger(id) ||
-      id <= 0 ||
-      !Number.isInteger(age) ||
-      age <= 0 ||
-      !name ||
-      !address ||
-      !city ||
-      !walletAddress ||
-      walletAddress.length !== 42 ||
-      !bloodGroup ||
-      !genotype
-    ) {
-      throw new PatientError('Invalid parameter');
-    }
+    const { walletAddress } = args;
+
     try {
       const patientExist =
         await this.patientGuard.validatePatient(walletAddress);
@@ -469,6 +454,101 @@ export class PatientService {
     } catch (error) {
       console.error(error);
       throw new PatientError('an error occurred while removing prescription');
+    }
+  }
+
+  async approveMedicalRecordAccess(args: ApprovalInputType) {
+    const {
+      recordId,
+      patientAddress,
+      doctorAddress,
+      approvalType,
+      approvalDurationInSecs,
+    } = args;
+
+    try {
+      const patient =
+        await this.patientDao.fetchPatientByAddress(patientAddress);
+      if (!patient) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'patient not found',
+        };
+      }
+
+      const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
+      if (!doctor) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'doctor not found',
+        };
+      }
+
+      const sanitizedApprovalType = this.getApprovalType(approvalType);
+      const durationTime = this.provider.returnDuration(approvalDurationInSecs);
+
+      const approvalInputs = this.createApprovalInputs(
+        patient,
+        recordId,
+        sanitizedApprovalType,
+        durationTime,
+      );
+
+      const approvals = await Promise.all(
+        approvalInputs.map((input) => this.patientDao.createApproval(input)),
+      );
+
+      doctor.activeApprovals.push(...approvals);
+      doctor.numberOfApprovals += approvals.length;
+      await doctor.save();
+    } catch (error) {
+      console.error(error);
+      throw new PatientError(
+        'an error occurred while approving medical record access',
+      );
+    }
+  }
+
+  private getApprovalType(approvalType: string): string {
+    const upperCaseType = approvalType.toUpperCase();
+    if (upperCaseType === ApprovalType.FULL) {
+      return ApprovalType.FULL;
+    } else if (upperCaseType === ApprovalType.READ) {
+      return ApprovalType.READ;
+    }
+    throw new PatientError('Invalid approval type');
+  }
+
+  private createApprovalInputs(
+    patient: Patient,
+    recordIds: number[] | undefined,
+    approvalType: string,
+    durationTime: Date,
+  ): CreateApprovalType[] {
+    if (recordIds && recordIds.length > 0) {
+      return recordIds.map((recordId) => ({
+        patientId: patient.id,
+        patientName: patient.name,
+        recordId,
+        profilePicture: patient.profilePicture,
+        approvalType,
+        approvalStatus: ApprovalStatus.Pending,
+        approvalDuration: durationTime,
+        recordOwner: patient.walletAddress,
+      }));
+    } else {
+      return [
+        {
+          patientId: patient.id,
+          patientName: patient.name,
+          recordId: 0,
+          profilePicture: patient.profilePicture,
+          approvalType,
+          approvalStatus: ApprovalStatus.Pending,
+          approvalDuration: durationTime,
+          recordOwner: patient.walletAddress,
+        },
+      ];
     }
   }
 }
