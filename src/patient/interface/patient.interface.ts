@@ -1,6 +1,9 @@
 import { Types } from 'mongoose';
 
-export type ApprovalType = 'view' | 'full';
+export enum ApprovalType {
+  READ = 'READ',
+  FULL = 'FULL',
+}
 export type RelationShipType =
   | 'father'
   | 'mother'
@@ -75,6 +78,17 @@ export interface CreatePatientType {
   category?: string;
 }
 
+export interface CreateApprovalType {
+  patientId: number;
+  patientName: string;
+  recordId?: number;
+  profilePicture: string;
+  approvalType: string;
+  approvalStatus?: string;
+  approvalDuration: Date;
+  recordOwner?: string;
+}
+
 export interface UpdateFamilyMemberType {
   name?: string;
   relationship?: string;
@@ -97,7 +111,8 @@ export interface ApprovalInputType {
   recordId?: number[];
   patientAddress: string;
   doctorAddress: string;
-  approvalType: ApprovalType;
+  approvalType: string;
+  approvalDurationInSecs: number;
 }
 export interface FamilyMemberApprovalInputType extends ApprovalInputType {
   familyMemberId: number;
