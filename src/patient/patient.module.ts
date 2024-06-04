@@ -14,6 +14,7 @@ import { PatientGuard } from './guards/patient.guard';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PharmacistModule } from 'src/pharmacist/pharmacist.module';
 import { DoctorModule } from 'src/doctor/doctor.module';
+import { Approval, ApprovalSchema } from 'src/doctor/schema/doctor.schema';
 
 @Module({
   imports: [
@@ -26,6 +27,9 @@ import { DoctorModule } from 'src/doctor/doctor.module';
     ]),
     MongooseModule.forFeature([
       { name: Prescriptions.name, schema: PrescriptionsSchema },
+    ]),
+    MongooseModule.forFeature([
+      { name: Approval.name, schema: ApprovalSchema },
     ]),
     PharmacistModule,
     DoctorModule,
