@@ -16,16 +16,13 @@ export class Approval extends Document {
   profilePicture: string;
 
   @Prop({ required: true })
-  patientAddress: string;
-
-  @Prop({ required: true })
   approvalType: string;
 
   @Prop({ required: true })
   approvalStatus: string;
 
   @Prop({ required: true })
-  approvalTime: Date;
+  approvalDuration: Date;
 
   @Prop({ required: true })
   recordOwner: string;
@@ -66,7 +63,7 @@ export class Doctor {
   @Prop({ default: 0 })
   numberOfApprovals: number;
 
-  @Prop([ApprovalSchema])
+  @Prop({ type: [{ type: ApprovalSchema, unique: true }] })
   activeApprovals: Approval[];
 
   @Prop({ default: 'pending', required: true })
