@@ -484,6 +484,13 @@ export class PatientService {
         };
       }
 
+      if (doctor.status !== ApprovalStatus.Approved) {
+        return {
+          success: HttpStatus.UNAUTHORIZED,
+          message: 'doctor is not approved',
+        };
+      }
+
       const sanitizedApprovalType = this.getApprovalType(approvalType);
       const durationTime = this.provider.returnDuration(approvalDurationInSecs);
 
@@ -501,6 +508,11 @@ export class PatientService {
       doctor.activeApprovals.push(...approvals);
       doctor.numberOfApprovals += approvals.length;
       await doctor.save();
+
+      return {
+        success: HttpStatus.OK,
+        message: 'approval request sent',
+      };
     } catch (error) {
       console.error(error);
       throw new PatientError(

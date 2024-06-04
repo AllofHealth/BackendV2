@@ -64,3 +64,9 @@ export interface AddPatientPrescription {
   description: string;
   sideEffects: string;
 }
+
+export interface ApproveMedicalRecordAccessRequestType {
+  patientAddress: string;
+  doctorAddress: string;
+  id: Types.ObjectId;
+}

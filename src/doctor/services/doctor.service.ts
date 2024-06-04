@@ -9,6 +9,7 @@ import { Model, MongooseError } from 'mongoose';
 import { DoctorDao } from '../dao/doctor.dao';
 import {
   AddPatientPrescription,
+  ApproveMedicalRecordAccessRequestType,
   CreateDoctorType,
   UpdateDoctorType,
 } from '../interface/doctor.interface';
@@ -311,6 +312,124 @@ export class DoctorService {
     } catch (error) {
       console.error(error);
       throw new DoctorError('Error creating prescription');
+    }
+  }
+
+  async approveMedicalRecordAccessRequest(
+    args: ApproveMedicalRecordAccessRequestType,
+  ) {
+    const { patientAddress, doctorAddress, id } = args;
+    try {
+      const patient =
+        await this.patientDao.fetchPatientByAddress(patientAddress);
+      const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
+
+      if (!patient) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'patient not found',
+        };
+      }
+
+      if (!doctor) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'doctor not found',
+        };
+      }
+
+      if (!doctor.activeApprovals.length) {
+        return {
+          success: HttpStatus.BAD_REQUEST,
+          message: 'no pending approvals',
+        };
+      }
+
+      const request = doctor.activeApprovals.find(
+        (approval) => approval._id == id,
+      );
+
+      if (!request) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'approval request not found',
+        };
+      }
+
+      if (request.approvalStatus === ApprovalStatus.Approved) {
+        return {
+          success: HttpStatus.BAD_REQUEST,
+          message: 'approval request already approved',
+        };
+      }
+
+      request.approvalStatus = ApprovalStatus.Approved;
+      patient.appointmentCount++;
+
+      await patient.save();
+      await doctor.save();
+
+      return {
+        success: HttpStatus.OK,
+        message: 'Record access request accepted',
+      };
+    } catch (error) {
+      console.error(error);
+      throw new DoctorError(
+        'An error occurred while approving record access request',
+      );
+    }
+  }
+
+  async rejectMedicalRecordAccessRequest(
+    args: ApproveMedicalRecordAccessRequestType,
+  ) {
+    const { patientAddress, doctorAddress, id } = args;
+    try {
+      const patient =
+        await this.patientDao.fetchPatientByAddress(patientAddress);
+      const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
+
+      if (!patient) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'patient not found',
+        };
+      }
+
+      if (!doctor) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'doctor not found',
+        };
+      }
+
+      if (!doctor.activeApprovals.length) {
+        return {
+          success: HttpStatus.BAD_REQUEST,
+          message: 'no pending approvals',
+        };
+      }
+
+      const request = doctor.activeApprovals.find(
+        (approval) => approval._id == id,
+      );
+
+      if (!request) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'approval request not found',
+        };
+      }
+
+      await this.patientDao.pullOneApproval(doctorAddress, patientAddress, id);
+
+      return {
+        success: HttpStatus.OK,
+        message: 'Record access request rejected',
+      };
+    } catch (error) {
+      console.error(error);
     }
   }
 }

@@ -28,7 +28,10 @@ export class PatientDao {
     private familyMemberModel: Model<FamilyMember>,
     @InjectModel(Prescriptions.name)
     private prescriptionsModel: Model<Prescriptions>,
+
+    @InjectModel(Approval.name)
     private readonly approvalModel: Model<Approval>,
+    @InjectModel(Doctor.name)
     private readonly doctorModel: Model<Doctor>,
   ) {}
   async createNewPatient(patient: CreatePatientType) {
@@ -117,7 +120,7 @@ export class PatientDao {
 
   async pullOneApproval(
     doctorAddress: string,
-    patientAddress,
+    patientAddress: string,
     recordId: Types.ObjectId,
   ) {
     return await this.doctorModel.updateOne(

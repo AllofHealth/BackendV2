@@ -1,8 +1,10 @@
 import {
+  IsArray,
   IsDate,
   IsEmail,
   IsEthereumAddress,
   IsMongoId,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -164,4 +166,22 @@ export class UpdateFamilyMemberDto {
 export class SharePrescriptionDto {
   @IsMongoId()
   prescriptionId: Types.ObjectId;
+}
+
+export class CreateApprovalDto {
+  @IsArray()
+  @IsOptional()
+  recordId?: number[];
+
+  @IsString()
+  @IsEthereumAddress()
+  patientAddress: string;
+
+  @IsString()
+  @IsNotEmpty()
+  approvalType: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  approvalDurationInSec: number;
 }

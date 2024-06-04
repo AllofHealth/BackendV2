@@ -14,7 +14,12 @@ import { PatientGuard } from './guards/patient.guard';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PharmacistModule } from 'src/pharmacist/pharmacist.module';
 import { DoctorModule } from 'src/doctor/doctor.module';
-import { Approval, ApprovalSchema } from 'src/doctor/schema/doctor.schema';
+import {
+  Approval,
+  ApprovalSchema,
+  Doctor,
+  DoctorSchema,
+} from 'src/doctor/schema/doctor.schema';
 
 @Module({
   imports: [
@@ -31,6 +36,7 @@ import { Approval, ApprovalSchema } from 'src/doctor/schema/doctor.schema';
     MongooseModule.forFeature([
       { name: Approval.name, schema: ApprovalSchema },
     ]),
+    MongooseModule.forFeature([{ name: Doctor.name, schema: DoctorSchema }]),
     PharmacistModule,
     DoctorModule,
   ],

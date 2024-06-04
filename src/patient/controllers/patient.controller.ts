@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { PatientService } from '../services/patient.service';
 import {
+  CreateApprovalDto,
   CreateFamilyMemberDto,
   CreatePatientDto,
   SharePrescriptionDto,
@@ -97,6 +98,22 @@ export class PatientController {
       walletAddress,
       prescriptionId,
     );
+  }
+
+  @Post('approveMedicalRecordAccess')
+  async approveMedicalRecordAccess(
+    @Query('doctorAddress', new ValidationPipe({ transform: true }))
+    doctorAddress: string,
+    @Body(new ValidationPipe({ transform: true }))
+    createApprovalDto: CreateApprovalDto,
+  ) {
+    return await this.patientService.approveMedicalRecordAccess({
+      recordId: createApprovalDto.recordId,
+      patientAddress: createApprovalDto.patientAddress,
+      doctorAddress: doctorAddress,
+      approvalType: createApprovalDto.approvalType,
+      approvalDurationInSecs: createApprovalDto.approvalDurationInSec,
+    });
   }
 
   @Get('allPatients')

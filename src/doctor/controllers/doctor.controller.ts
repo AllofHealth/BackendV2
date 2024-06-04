@@ -13,6 +13,7 @@ import {
   CreatePrescriptionDto,
   UpdateDoctorDto,
 } from '../dto/doctor.dto';
+import { Types } from 'mongoose';
 
 @Controller('doctor')
 export class DoctorController {
@@ -53,6 +54,38 @@ export class DoctorController {
       medicineGroup: prescriptionDto.medicineGroup,
       description: prescriptionDto.description,
       sideEffects: prescriptionDto.sideEffects,
+    });
+  }
+
+  @Post('approveRecordAccessRequest')
+  async approveRecordAccessRequest(
+    @Query('patientAddress', new ValidationPipe({ transform: true }))
+    patientAddress: string,
+    @Query('doctorAddress', new ValidationPipe({ transform: true }))
+    doctorAddress: string,
+    @Query('recordId', new ValidationPipe({ transform: true }))
+    recordId: Types.ObjectId,
+  ) {
+    return await this.doctorService.approveMedicalRecordAccessRequest({
+      patientAddress: patientAddress,
+      doctorAddress: doctorAddress,
+      id: recordId,
+    });
+  }
+
+  @Post('rejectRecordAccessRequest')
+  async rejectRecordAccessRequest(
+    @Query('patientAddress', new ValidationPipe({ transform: true }))
+    patientAddress: string,
+    @Query('doctorAddress', new ValidationPipe({ transform: true }))
+    doctorAddress: string,
+    @Query('recordId', new ValidationPipe({ transform: true }))
+    recordId: Types.ObjectId,
+  ) {
+    return await this.doctorService.rejectMedicalRecordAccessRequest({
+      patientAddress: patientAddress,
+      doctorAddress: doctorAddress,
+      id: recordId,
     });
   }
 
