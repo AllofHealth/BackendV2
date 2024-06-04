@@ -5,6 +5,7 @@ import {
 } from '../schemas/patient.schema';
 import { Category } from 'src/shared';
 import {
+  CreateApprovalType,
   CreateFamilyMemberType,
   CreatePatientType,
   CreatePrescriptionInterface,
@@ -17,6 +18,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Types } from 'mongoose';
+import { Approval, Doctor } from 'src/doctor/schema/doctor.schema';
 
 @Injectable()
 export class PatientDao {
@@ -26,6 +28,8 @@ export class PatientDao {
     private familyMemberModel: Model<FamilyMember>,
     @InjectModel(Prescriptions.name)
     private prescriptionsModel: Model<Prescriptions>,
+    private readonly approvalModel: Model<Approval>,
+    private readonly doctorModel: Model<Doctor>,
   ) {}
   async createNewPatient(patient: CreatePatientType) {
     return await this.patientModel.create({
@@ -80,6 +84,19 @@ export class PatientDao {
     });
   }
 
+  async createApproval(args: CreateApprovalType) {
+    return await this.approvalModel.create({
+      patientId: args.patientId,
+      patientName: args.patientName,
+      recordId: args.recordId,
+      profilePicture: args.profilePicture,
+      approvalType: args.approvalType,
+      approvalStatus: args.approvalStatus,
+      approvalDuration: args.approvalDuration,
+      recordOwner: args.recordOwner,
+    });
+  }
+
   async fetchPatientByAddress(walletAddress: string) {
     return await this.patientModel.findOne({ walletAddress });
   }
@@ -95,6 +112,24 @@ export class PatientDao {
     return await this.patientModel.updateOne(
       { walletAddress: walletAddress },
       { $pull: { prescriptions: { _id: prescriptionId } } },
+    );
+  }
+
+  async pullOneApproval(
+    doctorAddress: string,
+    patientAddress,
+    recordId: Types.ObjectId,
+  ) {
+    return await this.doctorModel.updateOne(
+      { walletAddress: doctorAddress },
+      {
+        $pull: {
+          activeApprovals: {
+            recordOwner: patientAddress,
+            _id: recordId,
+          },
+        },
+      },
     );
   }
 
