@@ -105,3 +105,13 @@ export class CreatePrescriptionDto {
   @IsNotEmpty()
   sideEffects: string;
 }
+
+export class CreateMedicalRecordDto {
+  @IsNumber()
+  @IsNotEmpty()
+  recordId: number;
+
+  @IsString()
+  @IsNotEmpty()
+  diagnosis: string;
+}

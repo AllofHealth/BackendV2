@@ -4,6 +4,8 @@ import { PatientController } from './controllers/patient.controller';
 import {
   FamilyMember,
   FamilyMemberSchema,
+  MedicalRecordPreview,
+  MedicalRecordPreviewSchema,
   Patient,
   PatientSchema,
   Prescriptions,
@@ -37,6 +39,9 @@ import {
       { name: Approval.name, schema: ApprovalSchema },
     ]),
     MongooseModule.forFeature([{ name: Doctor.name, schema: DoctorSchema }]),
+    MongooseModule.forFeature([
+      { name: MedicalRecordPreview.name, schema: MedicalRecordPreviewSchema },
+    ]),
     PharmacistModule,
     DoctorModule,
   ],

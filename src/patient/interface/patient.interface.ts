@@ -27,10 +27,11 @@ export type RelationShipType =
 
 export interface MedicalRecordPreviewType {
   recordId: number;
+  principalPatientAddress: string;
+  doctorAddress: string;
   diagnosis: string;
   doctorsName: string;
   hospitalName: string;
-  date: Date;
 }
 
 export interface FamilyMemberType {

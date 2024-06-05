@@ -11,6 +11,9 @@ export class MedicalRecordPreview extends Document {
   @Prop({ required: true })
   principalPatient: string;
 
+  @Prop({ required: true })
+  doctorAddress: string;
+
   @Prop()
   diagnosis: string;
 
@@ -20,7 +23,7 @@ export class MedicalRecordPreview extends Document {
   @Prop({ required: true })
   hospitalName: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: Date.now() })
   date: Date;
 }
 
@@ -93,7 +96,7 @@ export class FamilyMember extends Document {
   @Prop({ required: true })
   genotype: string;
 
-  @Prop({ type: [{ type: MedicalRecordPreviewSchema }] })
+  @Prop({ type: [{ type: MedicalRecordPreviewSchema, unique: true }] })
   medicalRecord: MedicalRecordPreviewDocument[];
 }
 

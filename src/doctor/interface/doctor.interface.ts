@@ -70,3 +70,10 @@ export interface ApproveMedicalRecordAccessRequestType {
   doctorAddress: string;
   id: Types.ObjectId;
 }
+
+export interface CreateMedicalRecordType {
+  recordId: number;
+  principalPatientAddress: string;
+  doctorAddress: string;
+  diagnosis: string;
+}

@@ -10,6 +10,7 @@ import {
 import { DoctorService } from '../services/doctor.service';
 import {
   CreateDoctorDto,
+  CreateMedicalRecordDto,
   CreatePrescriptionDto,
   UpdateDoctorDto,
 } from '../dto/doctor.dto';
@@ -86,6 +87,23 @@ export class DoctorController {
       patientAddress: patientAddress,
       doctorAddress: doctorAddress,
       id: recordId,
+    });
+  }
+
+  @Post('createMedicalRecordPreview')
+  async createMedicalRecordPreview(
+    @Query('patientAddress', new ValidationPipe({ transform: true }))
+    patientAddress: string,
+    @Query('doctorAddress', new ValidationPipe({ transform: true }))
+    doctorAddress: string,
+    @Body(new ValidationPipe({ transform: true }))
+    createMedicalRecordDto: CreateMedicalRecordDto,
+  ) {
+    return await this.doctorService.createMedicalRecord({
+      recordId: createMedicalRecordDto.recordId,
+      principalPatientAddress: patientAddress,
+      doctorAddress: doctorAddress,
+      diagnosis: createMedicalRecordDto.diagnosis,
     });
   }
 

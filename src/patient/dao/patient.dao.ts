@@ -2,6 +2,7 @@ import {
   Patient,
   FamilyMember,
   Prescriptions,
+  MedicalRecordPreview,
 } from '../schemas/patient.schema';
 import { Category } from 'src/shared';
 import {
@@ -9,6 +10,7 @@ import {
   CreateFamilyMemberType,
   CreatePatientType,
   CreatePrescriptionInterface,
+  MedicalRecordPreviewType,
   UpdateFamilyMemberType,
   UpdatePatientProfileType,
   UpdatePrescriptionInterface,
@@ -33,6 +35,9 @@ export class PatientDao {
     private readonly approvalModel: Model<Approval>,
     @InjectModel(Doctor.name)
     private readonly doctorModel: Model<Doctor>,
+
+    @InjectModel(MedicalRecordPreview.name)
+    private readonly medicalRecordPreviewModel: Model<MedicalRecordPreview>,
   ) {}
   async createNewPatient(patient: CreatePatientType) {
     return await this.patientModel.create({
@@ -97,6 +102,18 @@ export class PatientDao {
       approvalStatus: args.approvalStatus,
       approvalDuration: args.approvalDuration,
       recordOwner: args.recordOwner,
+    });
+  }
+
+  async createMedicalRecordPreview(args: MedicalRecordPreviewType) {
+    return await this.medicalRecordPreviewModel.create({
+      recordId: args.recordId,
+      principalPatient: args.principalPatientAddress,
+      doctorAddress: args.doctorAddress,
+      diagnosis: args.diagnosis,
+      doctorsName: args.doctorsName,
+      hospitalName: args.hospitalName,
+      date: Date.now(),
     });
   }
 

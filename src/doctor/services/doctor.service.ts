@@ -11,6 +11,7 @@ import {
   AddPatientPrescription,
   ApproveMedicalRecordAccessRequestType,
   CreateDoctorType,
+  CreateMedicalRecordType,
   UpdateDoctorType,
 } from '../interface/doctor.interface';
 import { ApprovalStatus, Category, DoctorError } from 'src/shared';
@@ -427,6 +428,98 @@ export class DoctorService {
       return {
         success: HttpStatus.OK,
         message: 'Record access request rejected',
+      };
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async createMedicalRecord(args: CreateMedicalRecordType) {
+    const { recordId, principalPatientAddress, doctorAddress, diagnosis } =
+      args;
+    try {
+      const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
+      const hospital = await this.hospitalDao.fetchHospitalWithBlockchainId(
+        doctor.hospitalIds[0],
+      );
+      const patient = await this.patientDao.fetchPatientByAddress(
+        principalPatientAddress,
+      );
+
+      if (!doctor) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'doctor not found',
+        };
+      }
+
+      if (!hospital) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'doctor is not associated with any hospital',
+        };
+      }
+
+      if (!patient) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'patient not found',
+        };
+      }
+
+      const approvalRequest = doctor.activeApprovals.find(
+        (approval) => approval.recordOwner == principalPatientAddress,
+      );
+
+      if (!approvalRequest) {
+        return {
+          success: HttpStatus.BAD_REQUEST,
+          message: 'approval request not found',
+        };
+      }
+
+      if (approvalRequest.approvalStatus !== ApprovalStatus.Approved) {
+        return {
+          success: HttpStatus.BAD_REQUEST,
+          message: 'approval request not approved, accept the approval first',
+        };
+      }
+
+      const currentTime = new Date();
+      if (currentTime > approvalRequest.approvalDuration) {
+        try {
+          await this.patientDao.pullOneApproval(
+            doctorAddress,
+            principalPatientAddress,
+            approvalRequest._id,
+          );
+          return {
+            success: HttpStatus.BAD_REQUEST,
+            message: 'approval request expired, removed request',
+          };
+        } catch (error) {
+          console.error(error);
+          return {
+            success: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: 'An error occurred while removing approval request',
+          };
+        }
+      }
+      const medicalRecord = await this.patientDao.createMedicalRecordPreview({
+        recordId,
+        principalPatientAddress,
+        doctorAddress,
+        diagnosis,
+        doctorsName: doctor.name,
+        hospitalName: hospital.name,
+      });
+
+      patient.medicalRecords.push(medicalRecord);
+      await patient.save();
+
+      return {
+        success: HttpStatus.OK,
+        message: 'Medical record created',
       };
     } catch (error) {
       console.error(error);
