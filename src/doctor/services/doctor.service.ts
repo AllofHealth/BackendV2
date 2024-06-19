@@ -382,6 +382,40 @@ export class DoctorService {
     }
   }
 
+  async fetchAllActiveApprovals(doctorAddress: string) {
+    try {
+      const isDoctor =
+        await this.doctorGuard.validateDoctorExists(doctorAddress);
+
+      if (!isDoctor) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'Doctor not found',
+        };
+      }
+
+      const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
+      const approvals = doctor.activeApprovals;
+
+      if (!approvals.length) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'No active approvals',
+        };
+      }
+
+      return {
+        success: HttpStatus.OK,
+        approvals,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new DoctorError(
+        'An error occurred while fetching all active approvals',
+      );
+    }
+  }
+
   async rejectMedicalRecordAccessRequest(
     args: ApproveMedicalRecordAccessRequestType,
   ) {
