@@ -171,6 +171,26 @@ export class PatientController {
     );
   }
 
+  @Get('allMedicalRecords')
+  async getAllMedicalRecords(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+  ) {
+    return await this.patientService.fetchAllMedicalRecords(walletAddress);
+  }
+
+  @Get('medicalRecordById')
+  async getMedicalRecord(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+    @Query('recordId') recordId: number,
+  ) {
+    return await this.patientService.fetchMedicalRecordById({
+      walletAddress,
+      recordId,
+    });
+  }
+
   @Delete('deletePatient')
   async deletePatient(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
