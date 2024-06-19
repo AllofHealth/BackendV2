@@ -16,7 +16,7 @@ import {
   UpdatePrescriptionInterface,
 } from '../interface/patient.interface';
 import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Types } from 'mongoose';
@@ -207,5 +207,20 @@ export class PatientDao {
 
   async DeletePatient(walletAddress: string) {
     return await this.patientModel.deleteOne({ walletAddress });
+  }
+
+  async findOneRecord(walletAddress: string, recordId: number) {
+    const record = await this.patientModel.findOne(
+      { walletAddress, 'medicalRecords.recordId': recordId },
+      { 'medicalRecords.$': 1 },
+    );
+
+    if (!record) {
+      return {
+        success: HttpStatus.NOT_FOUND,
+        message: 'Record not found',
+      };
+    }
+    return record.medicalRecords[0];
   }
 }
