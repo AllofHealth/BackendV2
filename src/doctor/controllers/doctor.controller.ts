@@ -130,6 +130,14 @@ export class DoctorController {
     return await this.doctorService.getPendingDoctors();
   }
 
+  @Get('allRecordRequests')
+  async getActiveApprovals(
+    @Query('doctorAddress', new ValidationPipe({ transform: true }))
+    doctorAddress: string,
+  ) {
+    return await this.doctorService.fetchAllActiveApprovals(doctorAddress);
+  }
+
   @Delete('deleteDoctor')
   async deleteDoctorByAddress(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
