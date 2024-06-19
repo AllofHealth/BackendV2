@@ -521,6 +521,72 @@ export class PatientService {
     }
   }
 
+  async fetchAllMedicalRecords(patientAddress: string) {
+    try {
+      const patient =
+        await this.patientDao.fetchPatientByAddress(patientAddress);
+      if (!patient) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'patient not found',
+        };
+      }
+
+      const medicalRecords = patient.medicalRecords;
+      if (!medicalRecords) {
+        return {
+          success: HttpStatus.OK,
+          medicalRecords: [],
+        };
+      }
+
+      return {
+        success: HttpStatus.OK,
+        medicalRecords,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new PatientError(
+        'an error occurred while fetching medical records',
+      );
+    }
+  }
+
+  async fetchMedicalRecordById(args: {
+    walletAddress: string;
+    recordId: number;
+  }) {
+    const { walletAddress, recordId } = args;
+    try {
+      const isPatient = await this.patientGuard.validatePatient(walletAddress);
+      if (!isPatient) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'patient not found',
+        };
+      }
+
+      const record = await this.patientDao.findOneRecord(
+        walletAddress,
+        recordId,
+      );
+      if (!record) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'record not found',
+        };
+      }
+
+      return {
+        success: HttpStatus.OK,
+        record,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new PatientError('an error occurred while fetching medical record');
+    }
+  }
+
   private getApprovalType(approvalType: string): string {
     const upperCaseType = approvalType.toUpperCase();
     if (upperCaseType === ApprovalType.FULL) {
