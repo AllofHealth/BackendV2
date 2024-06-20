@@ -577,6 +577,11 @@ export class DoctorService {
 
       doctor.activeApprovals = [];
       await doctor.save();
+
+      return {
+        success: HttpStatus.OK,
+        message: 'All approval requests deleted',
+      };
     } catch (error) {
       console.error(error);
       throw new DoctorError(
