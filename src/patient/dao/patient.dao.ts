@@ -107,7 +107,7 @@ export class PatientDao {
 
   async createMedicalRecordPreview(args: MedicalRecordPreviewType) {
     return await this.medicalRecordPreviewModel.create({
-      recordId: args.recordId,
+      id: args.recordId,
       principalPatient: args.principalPatientAddress,
       doctorAddress: args.doctorAddress,
       diagnosis: args.diagnosis,
@@ -147,6 +147,19 @@ export class PatientDao {
           activeApprovals: {
             recordOwner: patientAddress,
             _id: recordId,
+          },
+        },
+      },
+    );
+  }
+
+  async pullPatientApprovals(doctorAddress: string, patientAddress: string) {
+    return await this.doctorModel.updateOne(
+      { walletAddress: doctorAddress },
+      {
+        $pull: {
+          activeApprovals: {
+            recordOwner: patientAddress,
           },
         },
       },
