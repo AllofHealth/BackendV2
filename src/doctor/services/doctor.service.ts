@@ -551,12 +551,37 @@ export class DoctorService {
       patient.medicalRecords.push(medicalRecord);
       await patient.save();
 
+      await this.patientDao.pullPatientApprovals(
+        doctorAddress,
+        principalPatientAddress,
+      );
       return {
         success: HttpStatus.OK,
         message: 'Medical record created',
       };
     } catch (error) {
       console.error(error);
+      throw new DoctorError('An error occurred while creating medical record');
+    }
+  }
+
+  async deleteAllApprovalRequests(walletAddress: string) {
+    try {
+      const doctor = await this.doctorDao.fetchDoctorByAddress(walletAddress);
+      if (!doctor) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'doctor not found',
+        };
+      }
+
+      doctor.activeApprovals = [];
+      await doctor.save();
+    } catch (error) {
+      console.error(error);
+      throw new DoctorError(
+        'An error occurred while deleting all approval requests',
+      );
     }
   }
 }
