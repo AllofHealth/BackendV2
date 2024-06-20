@@ -107,6 +107,14 @@ export class DoctorController {
     });
   }
 
+  @Post('deleteAllApprovalRequests')
+  async deleteAllApprovalRequests(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+  ) {
+    return await this.doctorService.deleteAllApprovalRequests(walletAddress);
+  }
+
   @Get('doctorByAddress')
   async getDoctorByAddress(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
