@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 
+export type RecordTag = 'patient' | 'familyMember';
 export enum ApprovalType {
   READ = 'READ',
   FULL = 'FULL',
@@ -88,6 +89,18 @@ export interface CreateApprovalType {
   approvalStatus?: string;
   approvalDuration: Date;
   recordOwner?: string;
+  recordTag?: RecordTag;
+}
+
+export interface CreateApprovalInputType {
+  id: number;
+  name: string;
+  recordIds?: number[];
+  profilePicture: string;
+  approvalType: string;
+  approvalDuration: Date;
+  recordOwner?: string;
+  recordTag?: RecordTag;
 }
 
 export interface UpdateFamilyMemberType {
@@ -114,6 +127,11 @@ export interface ApprovalInputType {
   doctorAddress: string;
   approvalType: string;
   approvalDurationInSecs: number;
+  recordTag?: string;
+}
+
+export interface FamilyMemberApprovalInputType extends ApprovalInputType {
+  familyMemberId: number;
 }
 export interface FamilyMemberApprovalInputType extends ApprovalInputType {
   familyMemberId: number;
