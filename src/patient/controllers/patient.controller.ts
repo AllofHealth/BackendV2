@@ -10,6 +10,7 @@ import {
 import { PatientService } from '../services/patient.service';
 import {
   CreateApprovalDto,
+  CreateFamilyMemberApprovalDto,
   CreateFamilyMemberDto,
   CreatePatientDto,
   SharePrescriptionDto,
@@ -111,6 +112,23 @@ export class PatientController {
       recordId: createApprovalDto.recordId,
       patientAddress: createApprovalDto.patientAddress,
       doctorAddress: doctorAddress,
+      approvalType: createApprovalDto.approvalType,
+      approvalDurationInSecs: createApprovalDto.approvalDurationInSec,
+    });
+  }
+
+  @Post('approveFamilyMemberRecordAccess')
+  async approveFamilyMemberRecordAccess(
+    @Query('doctorAddress', new ValidationPipe({ transform: true }))
+    doctorAddress: string,
+    @Body(new ValidationPipe({ transform: true }))
+    createApprovalDto: CreateFamilyMemberApprovalDto,
+  ) {
+    return await this.patientService.approveMedicalRecordAccessForFamilyMember({
+      recordId: createApprovalDto.recordId,
+      familyMemberId: createApprovalDto.familyMemberId,
+      patientAddress: createApprovalDto.principalPatientAddress,
+      doctorAddress,
       approvalType: createApprovalDto.approvalType,
       approvalDurationInSecs: createApprovalDto.approvalDurationInSec,
     });
