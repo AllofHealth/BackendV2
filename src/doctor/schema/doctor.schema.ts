@@ -27,7 +27,7 @@ export class Approval extends Document {
   @Prop({ required: true })
   recordOwner: string;
 
-  @Prop({ required: true, default: 'patient' })
+  @Prop()
   recordTag: string;
 }
 
