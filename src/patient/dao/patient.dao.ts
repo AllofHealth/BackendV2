@@ -121,6 +121,16 @@ export class PatientDao {
     return await this.patientModel.findOne({ walletAddress });
   }
 
+  async fetchPatientFamilyMember(
+    walletAddress: string,
+    familyMemberId: number,
+  ) {
+    return await this.familyMemberModel.findOne({
+      principalPatient: walletAddress,
+      id: familyMemberId,
+    });
+  }
+
   async fetchAllPatients() {
     return await this.patientModel.find();
   }
