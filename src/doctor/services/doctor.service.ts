@@ -548,8 +548,23 @@ export class DoctorService {
         hospitalName: hospital.name,
       });
 
-      patient.medicalRecords.push(medicalRecord);
-      await patient.save();
+      if (approvalRequest.recordTag === 'familyMember') {
+        const familyMember = patient.familyMembers.find(
+          (member) => member.id == approvalRequest.patientId,
+        );
+        if (!familyMember) {
+          return {
+            success: HttpStatus.NOT_FOUND,
+            message: 'family member not found',
+          };
+        }
+
+        familyMember.medicalRecord.push(medicalRecord);
+        await patient.save();
+      } else if (approvalRequest.recordTag === 'patient') {
+        patient.medicalRecords.push(medicalRecord);
+        await patient.save();
+      }
 
       await this.patientDao.pullPatientApprovals(
         doctorAddress,
