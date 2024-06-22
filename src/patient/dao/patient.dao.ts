@@ -102,6 +102,7 @@ export class PatientDao {
       approvalStatus: args.approvalStatus,
       approvalDuration: args.approvalDuration,
       recordOwner: args.recordOwner,
+      recordTag: args.recordTag,
     });
   }
 
