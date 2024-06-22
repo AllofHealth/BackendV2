@@ -3,8 +3,10 @@ import { Patient } from '../schemas/patient.schema';
 import {
   ApprovalInputType,
   ApprovalType,
+  CreateApprovalInputType,
   CreateApprovalType,
   CreatePatientType,
+  FamilyMemberApprovalInputType,
   FamilyMemberType,
   SharePrescriptionInterface,
   UpdateFamilyMemberType,
@@ -36,6 +38,58 @@ export class PatientService {
   ) {}
 
   private provider = PatientProvider.useFactory();
+
+  private getApprovalType(approvalType: string): string {
+    const upperCaseType = approvalType.toUpperCase();
+    if (upperCaseType === ApprovalType.FULL) {
+      return ApprovalType.FULL;
+    } else if (upperCaseType === ApprovalType.READ) {
+      return ApprovalType.READ;
+    }
+    throw new PatientError('Invalid approval type');
+  }
+
+  private createApprovalInputs(
+    args: CreateApprovalInputType,
+  ): CreateApprovalType[] {
+    const {
+      id,
+      name,
+      recordIds,
+      profilePicture,
+      approvalType,
+      approvalDuration,
+      recordOwner,
+      recordTag,
+    } = args;
+    if (recordIds && recordIds.length > 0) {
+      return recordIds.map((recordId) => ({
+        patientId: id,
+        patientName: name,
+        recordId,
+        profilePicture: profilePicture,
+        approvalType,
+        approvalStatus: ApprovalStatus.Pending,
+        approvalDuration,
+        recordOwner,
+        recordTag,
+      }));
+    } else {
+      return [
+        {
+          patientId: id,
+          patientName: name,
+          recordId: 0,
+          profilePicture: profilePicture,
+          approvalType,
+          approvalStatus: ApprovalStatus.Pending,
+          approvalDuration,
+          recordOwner,
+          recordTag,
+        },
+      ];
+    }
+  }
 
   async createNewPatient(args: CreatePatientType) {
     const { walletAddress } = args;
@@ -494,12 +548,16 @@ export class PatientService {
       const sanitizedApprovalType = this.getApprovalType(approvalType);
       const durationTime = this.provider.returnDuration(approvalDurationInSecs);
 
-      const approvalInputs = this.createApprovalInputs(
-        patient,
-        recordId,
-        sanitizedApprovalType,
-        durationTime,
-      );
+      const approvalInputs = this.createApprovalInputs({
+        id: patient.id,
+        name: patient.name,
+        recordIds: recordId,
+        profilePicture: patient.profilePicture,
+        approvalType: sanitizedApprovalType,
+        approvalDuration: durationTime,
+        recordOwner: patient.walletAddress,
+        recordTag: 'patient',
+      });
 
       const approvals = await Promise.all(
         approvalInputs.map((input) => this.patientDao.createApproval(input)),
@@ -517,6 +575,90 @@ export class PatientService {
       console.error(error);
       throw new PatientError(
         'an error occurred while approving medical record access',
+      );
+    }
+  }
+
+  async approveMedicalRecordAccessForFamilyMember(
+    args: FamilyMemberApprovalInputType,
+  ) {
+    const {
+      recordId,
+      familyMemberId,
+      patientAddress,
+      doctorAddress,
+      approvalType,
+      approvalDurationInSecs,
+    } = args;
+    try {
+      const patient =
+        await this.patientDao.fetchPatientByAddress(patientAddress);
+      if (!patient) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'patient not found',
+        };
+      }
+
+      const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
+      if (!doctor) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'doctor not found',
+        };
+      }
+
+      if (doctor.status !== ApprovalStatus.Approved) {
+        return {
+          success: HttpStatus.UNAUTHORIZED,
+          message: 'doctor is not approved',
+        };
+      }
+
+      const familyMember = await this.patientDao.fetchPatientFamilyMember(
+        patientAddress,
+        familyMemberId,
+      );
+
+      if (!familyMember) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'family member not found',
+        };
+      }
+
+      if (familyMember.principalPatient != patientAddress) {
+        return {
+          success: HttpStatus.UNAUTHORIZED,
+          message: 'invalid principal patient address',
+        };
+      }
+
+      const sanitizedApprovalType = this.getApprovalType(approvalType);
+      const durationTime = this.provider.returnDuration(approvalDurationInSecs);
+
+      const approvalInputs = this.createApprovalInputs({
+        id: familyMember.id,
+        name: familyMember.name,
+        recordIds: recordId,
+        profilePicture: '',
+        approvalType: sanitizedApprovalType,
+        approvalDuration: durationTime,
+        recordOwner: familyMember.principalPatient,
+        recordTag: 'familyMember',
+      });
+
+      const approvals = await Promise.all(
+        approvalInputs.map((input) => this.patientDao.createApproval(input)),
+      );
+
+      doctor.activeApprovals.push(...approvals);
+      doctor.numberOfApprovals += approvals.length;
+      await doctor.save();
+    } catch (error) {
+      console.error(error);
+      throw new PatientError(
+        'an error occurred while approving family member medical record access',
       );
     }
   }
@@ -584,49 +726,6 @@ export class PatientService {
     } catch (error) {
       console.error(error);
       throw new PatientError('an error occurred while fetching medical record');
-    }
-  }
-
-  private getApprovalType(approvalType: string): string {
-    const upperCaseType = approvalType.toUpperCase();
-    if (upperCaseType === ApprovalType.FULL) {
-      return ApprovalType.FULL;
-    } else if (upperCaseType === ApprovalType.READ) {
-      return ApprovalType.READ;
-    }
-    throw new PatientError('Invalid approval type');
-  }
-
-  private createApprovalInputs(
-    patient: Patient,
-    recordIds: number[] | undefined,
-    approvalType: string,
-    durationTime: Date,
-  ): CreateApprovalType[] {
-    if (recordIds && recordIds.length > 0) {
-      return recordIds.map((recordId) => ({
-        patientId: patient.id,
-        patientName: patient.name,
-        recordId,
-        profilePicture: patient.profilePicture,
-        approvalType,
-        approvalStatus: ApprovalStatus.Pending,
-        approvalDuration: durationTime,
-        recordOwner: patient.walletAddress,
-      }));
-    } else {
-      return [
-        {
-          patientId: patient.id,
-          patientName: patient.name,
-          recordId: 0,
-          profilePicture: patient.profilePicture,
-          approvalType,
-          approvalStatus: ApprovalStatus.Pending,
-          approvalDuration: durationTime,
-          recordOwner: patient.walletAddress,
-        },
-      ];
     }
   }
 }
