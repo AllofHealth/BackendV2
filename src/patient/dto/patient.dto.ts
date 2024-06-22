@@ -185,3 +185,23 @@ export class CreateApprovalDto {
   @IsNumber()
   approvalDurationInSec: number;
 }
+
+export class CreateFamilyMemberApprovalDto {
+  @IsNumber()
+  familyMemberId: number;
+  @IsArray()
+  @IsOptional()
+  recordId?: number[];
+
+  @IsString()
+  @IsEthereumAddress()
+  principalPatientAddress: string;
+
+  @IsString()
+  @IsNotEmpty()
+  approvalType: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  approvalDurationInSec: number;
+}
