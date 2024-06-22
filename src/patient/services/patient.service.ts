@@ -21,6 +21,7 @@ import { PharmacistGuard } from 'src/pharmacist/guards/pharmacist.guard';
 import { PharmacistDao } from 'src/pharmacist/dao/pharmacist.dao';
 import { DoctorDao } from 'src/doctor/dao/doctor.dao';
 import { PatientProvider } from '../provider/patient.provider';
+import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
 
 /**
  * @file: Patient Service
@@ -62,6 +63,7 @@ export class PatientService {
       recordOwner,
       recordTag,
     } = args;
+
     if (recordIds && recordIds.length > 0) {
       return recordIds.map((recordId) => ({
         patientId: id,
@@ -72,7 +74,7 @@ export class PatientService {
         approvalStatus: ApprovalStatus.Pending,
         approvalDuration,
         recordOwner,
-        recordTag,
+        recordTag: recordTag,
       }));
     } else {
       return [
@@ -85,7 +87,7 @@ export class PatientService {
           approvalStatus: ApprovalStatus.Pending,
           approvalDuration,
           recordOwner,
-          recordTag,
+          recordTag: recordTag,
         },
       ];
     }
@@ -641,7 +643,7 @@ export class PatientService {
         id: familyMember.id,
         name: familyMember.name,
         recordIds: recordId,
-        profilePicture: '',
+        profilePicture: PROFILE_PLACEHOLDER,
         approvalType: sanitizedApprovalType,
         approvalDuration: durationTime,
         recordOwner: familyMember.principalPatient,
@@ -652,9 +654,14 @@ export class PatientService {
         approvalInputs.map((input) => this.patientDao.createApproval(input)),
       );
 
-      doctor.activeApprovals.push(...approvals);
+      doctor.activeApprovals = doctor.activeApprovals.concat(approvals);
       doctor.numberOfApprovals += approvals.length;
       await doctor.save();
+
+      return {
+        success: HttpStatus.OK,
+        message: 'family member approval request sent',
+      };
     } catch (error) {
       console.error(error);
       throw new PatientError(
