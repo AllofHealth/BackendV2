@@ -701,6 +701,54 @@ export class PatientService {
     }
   }
 
+  async fetchFamilyMemberRecords(args: {
+    principalPatientAddress: string;
+    familyMemberId: number;
+  }) {
+    const { principalPatientAddress, familyMemberId } = args;
+    try {
+      const patient = await this.patientDao.fetchPatientByAddress(
+        principalPatientAddress,
+      );
+      if (!patient) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'patient not found',
+        };
+      }
+
+      const familyMember = await this.patientDao.fetchPatientFamilyMember(
+        principalPatientAddress,
+        familyMemberId,
+      );
+      if (!familyMember) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'family member not found',
+        };
+      }
+
+      const records = familyMember.medicalRecord;
+
+      if (!records) {
+        return {
+          success: HttpStatus.OK,
+          records: [],
+        };
+      }
+
+      return {
+        success: HttpStatus.OK,
+        records,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new PatientError(
+        'An error occurred while fetch family member records',
+      );
+    }
+  }
+
   async fetchMedicalRecordById(args: {
     walletAddress: string;
     recordId: number;
