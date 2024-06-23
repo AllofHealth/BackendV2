@@ -197,6 +197,19 @@ export class PatientController {
     return await this.patientService.fetchAllMedicalRecords(walletAddress);
   }
 
+  @Get('familyMemberMedicalRecords')
+  async getFamilyMemberMedicalRecords(
+    @Query('principalPatientAddress', new ValidationPipe({ transform: true }))
+    principalPatientAddress: string,
+    @Query('familyMemberId', new ValidationPipe({ transform: true }))
+    familyMemberId: number,
+  ) {
+    return await this.patientService.fetchAllMedicalRecordsForFamilyMember({
+      principalPatientAddress,
+      familyMemberId,
+    });
+  }
+
   @Get('medicalRecordById')
   async getMedicalRecord(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
