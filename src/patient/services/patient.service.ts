@@ -701,7 +701,7 @@ export class PatientService {
     }
   }
 
-  async fetchFamilyMemberRecords(args: {
+  async fetchAllMedicalRecordsForFamilyMember(args: {
     principalPatientAddress: string;
     familyMemberId: number;
   }) {
