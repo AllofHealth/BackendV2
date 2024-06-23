@@ -247,4 +247,27 @@ export class PatientDao {
     }
     return record.medicalRecords[0];
   }
+
+  async findOneFamilyMemberRecord(
+    principalPatientAddress: string,
+    familyMemberId: number,
+    recordId: number,
+  ) {
+    const record = await this.patientModel.findOne(
+      {
+        walletAddress: principalPatientAddress,
+        'familyMembers.id': familyMemberId,
+        'medicalRecords.recordId': recordId,
+      },
+      { 'medicalRecords.$': 1 },
+    );
+
+    if (!record) {
+      return {
+        success: HttpStatus.NOT_FOUND,
+        message: 'Record not found',
+      };
+    }
+    return record.medicalRecords[0];
+  }
 }
