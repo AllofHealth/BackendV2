@@ -103,4 +103,8 @@ export class HospitalDao {
       { new: true, runValidators: true },
     );
   }
+
+  async findManyHospital(adminAddress: string) {
+    return await this.hospitalModel.find({ admin: adminAddress });
+  }
 }
