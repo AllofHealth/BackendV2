@@ -3,9 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Doctor } from '../schema/doctor.schema';
-import { Model, MongooseError } from 'mongoose';
+import { MongooseError } from 'mongoose';
 import { DoctorDao } from '../dao/doctor.dao';
 import {
   AddPatientPrescription,
@@ -24,7 +22,6 @@ import { PatientGuard } from 'src/patient/guards/patient.guard';
 @Injectable()
 export class DoctorService {
   constructor(
-    @InjectModel(Doctor.name) private doctorModel: Model<Doctor>,
     private readonly doctorDao: DoctorDao,
     private readonly doctorGuard: DoctorGuard,
     private readonly hospitalDao: HospitalDao,
@@ -95,7 +92,10 @@ export class DoctorService {
         args.walletAddress,
       )
     ) {
-      throw new DoctorError('Doctor already exists in hospital');
+      return {
+        success: HttpStatus.BAD_REQUEST,
+        message: 'Doctor already exists in hospital',
+      };
     }
 
     try {
@@ -104,11 +104,19 @@ export class DoctorService {
       );
 
       if (!hospital) {
-        throw new DoctorError("Hospital doesn't exist");
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'Hospital not found',
+        };
       }
 
       let doctor = await this.doctorDao.createNewDoctor(args);
       doctor = await this.doctorDao.fetchDoctorByAddress(args.walletAddress);
+
+      if (args.walletAddress === hospital.admin) {
+        doctor.status = ApprovalStatus.Approved;
+        await doctor.save();
+      }
 
       try {
         doctor.hospitalIds.push(args.hospitalIds);
