@@ -550,7 +550,7 @@ export class DoctorService {
 
       if (approvalRequest.recordTag === 'familyMember') {
         const familyMember = patient.familyMembers.find(
-          (member) => member.id == approvalRequest.patientId,
+          (member) => member.id === approvalRequest.patientId,
         );
         if (!familyMember) {
           return {
@@ -558,6 +558,21 @@ export class DoctorService {
             message: 'family member not found',
           };
         }
+
+        const familyMemberSchema =
+          await this.patientDao.fetchPatientFamilyMember(
+            principalPatientAddress,
+            approvalRequest.patientId,
+          );
+        if (!familyMember) {
+          return {
+            success: HttpStatus.NOT_FOUND,
+            message: 'family member not found',
+          };
+        }
+
+        familyMemberSchema.medicalRecord.push(medicalRecord);
+        await familyMemberSchema.save();
 
         familyMember.medicalRecord.push(medicalRecord);
         await patient.save();
