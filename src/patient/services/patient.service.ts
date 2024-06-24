@@ -717,10 +717,10 @@ export class PatientService {
         };
       }
 
-      const familyMember = await this.patientDao.fetchPatientFamilyMember(
-        principalPatientAddress,
-        familyMemberId,
+      const familyMember = patient.familyMembers.find(
+        (member) => member.id === familyMemberId,
       );
+
       if (!familyMember) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -729,13 +729,6 @@ export class PatientService {
       }
 
       const records = familyMember.medicalRecord;
-
-      if (!records) {
-        return {
-          success: HttpStatus.OK,
-          records: [],
-        };
-      }
 
       return {
         success: HttpStatus.OK,
