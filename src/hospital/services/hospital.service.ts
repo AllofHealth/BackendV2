@@ -880,4 +880,46 @@ export class HospitalService {
       throw new HospitalError('pharmacists not found');
     }
   }
+
+  private async validatePractitioner(walletAddress: string) {
+    let isPractitioner = false;
+
+    if (
+      (await this.doctorGuard.validateDoctorExists(walletAddress)) ||
+      (await this.pharmacistGuard.validatePharmacistExists(walletAddress))
+    ) {
+      isPractitioner = true;
+    }
+
+    return isPractitioner;
+  }
+
+  async fetchPractitionerCreatedHospital(walletAddress: string) {
+    try {
+      const isPractitioner = await this.validatePractitioner(walletAddress);
+      if (!isPractitioner) {
+        return {
+          success: HttpStatus.BAD_REQUEST,
+          message: 'User is not a doctor or pharmacist',
+        };
+      }
+
+      const hospitals = await this.hospitalDao.findManyHospital(walletAddress);
+
+      if (!hospitals) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'No hospitals found',
+        };
+      }
+
+      return {
+        success: HttpStatus.OK,
+        hospitals,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new HospitalError('An error occurred while fetching hospitals');
+    }
+  }
 }
