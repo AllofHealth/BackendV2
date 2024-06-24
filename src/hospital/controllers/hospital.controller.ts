@@ -176,4 +176,13 @@ export class HospitalController {
   ) {
     return await this.hospitalService.fetchHospitalPractitioners(hospitalId);
   }
+
+  @Get('practitionerCreatedHospitals')
+  async getPractitionerCreatedHospital(
+    @Query('walletAddress') walletAddress: string,
+  ) {
+    return await this.hospitalService.fetchPractitionerCreatedHospital(
+      walletAddress,
+    );
+  }
 }
