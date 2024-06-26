@@ -38,21 +38,6 @@ export class HospitalService {
   ) {}
 
   async createNewHospital(args: CreateHospitalType) {
-    const requiredParams = [
-      'id',
-      'name',
-      'admin',
-      'email',
-      'phoneNo',
-      'location',
-    ];
-
-    if (
-      !requiredParams.every((param) => args[param as keyof CreateHospitalType])
-    ) {
-      throw new HospitalError('Invalid or missing parameters');
-    }
-
     try {
       const hospitalExist =
         await this.hospitalDao.fetchHospitalWithBlockchainId(args.id);
@@ -440,6 +425,20 @@ export class HospitalService {
           hospitalId,
           practitionerAddress: walletAddress,
         });
+
+        if (isDoctor) {
+          await this.removeDoctorFromHospital(hospitalId, walletAddress);
+          return {
+            success: HttpStatus.OK,
+            message: 'doctor removed from hospital successfully',
+          };
+        } else if (isPharmacist) {
+          await this.removePharmacistFromHospital(hospitalId, walletAddress);
+          return {
+            success: HttpStatus.OK,
+            message: 'pharmacist removed from hospital successfully',
+          };
+        }
       } catch (error) {
         return {
           success: HttpStatus.EXPECTATION_FAILED,
