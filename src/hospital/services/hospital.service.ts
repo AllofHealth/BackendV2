@@ -250,25 +250,30 @@ export class HospitalService {
 
   async updateHospitalProfile(
     hospitalId: Types.ObjectId,
+    adminAddress: string,
     updateData: UpdateHospitalProfileType,
   ) {
     try {
-      const hospitalExist =
-        await this.hospitalGuard.validateHospitalExists(hospitalId);
-      if (!hospitalExist) {
+      const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
+      if (!hospital) {
         return {
           success: HttpStatus.NOT_FOUND,
           message: 'hospital not found',
         };
       }
-      const hospital = await this.hospitalDao.updateHospital(
-        hospitalId,
-        updateData,
-      );
+
+      if (hospital.admin !== adminAddress) {
+        return {
+          success: HttpStatus.UNAUTHORIZED,
+          message: 'not authorized',
+        };
+      }
+      await this.hospitalDao.updateHospital(hospitalId, updateData);
+
+      await hospital.save();
       return {
         success: HttpStatus.OK,
         message: 'hospital successfully updated',
-        hospital,
       };
     } catch (error) {
       console.error(error);
@@ -428,16 +433,10 @@ export class HospitalService {
 
         if (isDoctor) {
           await this.removeDoctorFromHospital(hospitalId, walletAddress);
-          return {
-            success: HttpStatus.OK,
-            message: 'doctor removed from hospital successfully',
-          };
+          await hospital.save();
         } else if (isPharmacist) {
           await this.removePharmacistFromHospital(hospitalId, walletAddress);
-          return {
-            success: HttpStatus.OK,
-            message: 'pharmacist removed from hospital successfully',
-          };
+          await hospital.save();
         }
       } catch (error) {
         return {
