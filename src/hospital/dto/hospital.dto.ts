@@ -60,10 +60,6 @@ export class UpdateHospitalProfileDto {
 
   @IsOptional()
   @IsString()
-  regNo?: string;
-
-  @IsOptional()
-  @IsString()
   location?: string;
 
   @IsOptional()
