@@ -28,6 +28,16 @@ jobs:
       - name: Build Application
         run: npm run build
 
+      - name: Clean Server Directory
+        uses: appleboy/ssh-action@master
+        with:
+          key: ${{ secrets.DO_SSH_KEY }}
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USERNAME }}
+          port: ${{ secrets.DO_PORT }}
+          script: |
+            rm -rf ~/BackendV2/*
+
       - name: Sync Files
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -37,6 +47,19 @@ jobs:
           port: ${{ secrets.DO_PORT }}
           source: "./dist/*"
           target: "~/BackendV2/dist"
+
+      - name: Sync Other Files
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          key: ${{ secrets.DO_SSH_KEY }}
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USERNAME }}
+          port: ${{ secrets.DO_PORT }}
+          source: |
+            package.json
+            package-lock.json
+            .env
+          target: "~/BackendV2"
 
       - name: SSH and Deploy
         uses: appleboy/ssh-action@master
@@ -48,7 +71,8 @@ jobs:
           script: |
             cd ~/BackendV2
             npm install --production
+            pm2 delete 4
+            pm2 delete 5
             PORT=3001 pm2 start dist/main.js --name BackendV2 --env production
             pm2 save
-            sudo systemctl restart nginx 
-
+            sudo systemctl restart nginx
