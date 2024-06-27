@@ -37,7 +37,6 @@ export interface RemovePractitionerType extends JoinHospitalType {}
 export interface ApprovePractitionerType extends JoinHospitalType {}
 
 export interface UpdateHospitalProfileType {
-  hospitalId: string;
   name?: string;
   email?: string;
   phoneNo?: string;
