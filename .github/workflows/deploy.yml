@@ -1,0 +1,56 @@
+name: AllOf Health Backend Application Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+          check-latest: true
+
+      - name: Install Dependencies
+        run: |
+          npm install
+
+      - name: Copy env
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Build Application
+        run: |
+          npm run build
+
+      - name: Sync Files
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          key: ${{ secrets.DO_SSH_KEY }}
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USERNAME }}
+          port: ${{ secrets.DO_PORT }}
+          source: "./*"
+          target: "~/BackendV2"
+
+      - name: SSH and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          key: ${{ secrets.DO_SSH_KEY }}
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USERNAME }}
+          port: ${{ secrets.DO_PORT }}
+          script: |
+            cd ~/BackendV2
+            npm install --production
+            PORT=3001 pm2 start --name=BackendV2 npm start --env production
+            pm2 save
+            sudo systemctl restart nginx
