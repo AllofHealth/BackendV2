@@ -50,5 +50,5 @@ jobs:
             npm install --production
             PORT=3001 pm2 start dist/main.js --name BackendV2 --env production
             pm2 save
-            sudo systemctl restart nginx
+            sudo systemctl restart nginx 
 
