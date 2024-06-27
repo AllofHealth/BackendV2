@@ -268,12 +268,16 @@ export class HospitalService {
           message: 'not authorized',
         };
       }
-      await this.hospitalDao.updateHospital(hospitalId, updateData);
+      const updatedHospital = await this.hospitalDao.updateHospital(
+        hospitalId,
+        updateData,
+      );
 
       await hospital.save();
       return {
         success: HttpStatus.OK,
         message: 'hospital successfully updated',
+        updatedHospital,
       };
     } catch (error) {
       console.error(error);
