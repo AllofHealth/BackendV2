@@ -4,7 +4,6 @@ import {
   IsOptional,
   IsEthereumAddress,
   IsNumber,
-  IsMongoId,
 } from 'class-validator';
 
 export class CreateHospitalDto {
@@ -47,11 +46,6 @@ export class CreateHospitalDto {
 }
 
 export class UpdateHospitalProfileDto {
-  @IsNotEmpty()
-  @IsMongoId()
-  @IsString()
-  hospitalId: string;
-
   @IsOptional()
   @IsString()
   name?: string;
