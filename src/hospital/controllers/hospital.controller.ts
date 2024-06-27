@@ -90,10 +90,13 @@ export class HospitalController {
   async updateHospital(
     @Query('hospitalId', new ValidationPipe({ transform: true }))
     hospitalId: Types.ObjectId,
+    @Query('adminAddress', new ValidationPipe({ transform: true }))
+    adminAddress: string,
     @Body() updateHospitalDto: UpdateHospitalProfileDto,
   ) {
     return await this.hospitalService.updateHospitalProfile(
       hospitalId,
+      adminAddress,
       updateHospitalDto,
     );
   }
