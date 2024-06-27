@@ -10,6 +10,16 @@ export interface MedicineType {
   medicineGroup: string;
 }
 
+export interface UpdateMedicineType {
+  name?: string;
+  price?: number;
+  quantity?: number;
+  description?: string;
+  sideEffects?: string;
+  image?: string;
+  medicineGroup?: string;
+}
+
 export interface InventoryType {
   numberOfMedicine: number;
   numberOfMedicineGroup: number;
