@@ -23,7 +23,7 @@ jobs:
         run: npm install
 
       - name: Copy Environment Variables
-        run: echo "${{ secrets.ENV_FILE }}" > .env
+        run: echo "${{ secrets.ENV_FILE }}" > .env.production
 
       - name: Build Application
         run: npm run build
@@ -58,8 +58,6 @@ jobs:
           script: |
             cd ~/BackendV2
             npm install --production
-            pm2 delete 4
-            pm2 delete 5
             PORT=3001 pm2 start dist/main.js --name BackendV2 --env production
             pm2 save
             sudo systemctl restart nginx
