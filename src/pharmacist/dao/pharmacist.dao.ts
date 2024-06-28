@@ -40,7 +40,7 @@ export class PharmacistDao {
       quantity: args.quantity,
       description: args.description,
       sideEffects: args.sideEffects ? args.sideEffects : 'none',
-      image: args.image ? args.image : 'https://pixy.org/src/144/1448676.jpg',
+      image: args.image,
       medicineGroup: args.medicineGroup,
     });
   }
