@@ -64,6 +64,9 @@ export class Prescriptions extends Document {
 
   @Prop()
   status?: string;
+
+  @Prop()
+  dispensedDate?: Date;
 }
 
 export const PrescriptionsSchema = SchemaFactory.createForClass(Prescriptions);
