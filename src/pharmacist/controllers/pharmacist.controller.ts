@@ -13,6 +13,7 @@ import {
   CreatePharmacistDto,
   UpdatePharmacistDto,
 } from '../dto/pharmacist.dto';
+import { Types } from 'mongoose';
 
 @Controller('pharmacist')
 export class PharmacistController {
@@ -43,6 +44,19 @@ export class PharmacistController {
     @Body(new ValidationPipe({ transform: true })) medicine: AddMedicineDto,
   ) {
     return await this.pharmacistService.addMedicine(walletAddress, medicine);
+  }
+
+  @Post('removeMedicine')
+  async removeMedicine(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+    @Query('medicineId', new ValidationPipe({ transform: true }))
+    medicineId: Types.ObjectId,
+  ) {
+    return await this.pharmacistService.deleteMedicine(
+      walletAddress,
+      medicineId,
+    );
   }
 
   @Get('getPharmacist')
