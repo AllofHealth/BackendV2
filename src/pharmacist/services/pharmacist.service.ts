@@ -357,7 +357,8 @@ export class PharmacistService {
       }
 
       const medicineExistInInventory = inventory.medicines.find(
-        (medicine: MedicineType) => medicine._id === medicineId,
+        (medicine: MedicineType) =>
+          medicine._id.toString() === medicineId.toString(),
       );
       if (!medicineExistInInventory) {
         return {
@@ -411,7 +412,8 @@ export class PharmacistService {
       }
 
       const medicineExistInInventory = inventory.medicines.find(
-        (medicine: MedicineType) => medicine._id === medicineId,
+        (medicine: MedicineType) =>
+          medicine._id.toString() === medicineId.toString(),
       );
       if (!medicineExistInInventory) {
         return {
@@ -521,7 +523,8 @@ export class PharmacistService {
         };
       }
       const medicine = inventory.medicines.find(
-        (medicine: MedicineType) => medicine._id === medicineId,
+        (medicine: MedicineType) =>
+          medicine._id.toString() === medicineId.toString(),
       );
       if (!medicine) {
         return {
