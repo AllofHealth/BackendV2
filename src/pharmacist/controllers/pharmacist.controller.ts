@@ -106,4 +106,11 @@ export class PharmacistController {
   ) {
     return await this.pharmacistService.fetchAllMedicine(walletAddress);
   }
+
+  @Get('getInventory')
+  async getInventory(
+    @Query('walletAddress', new ValidationPipe()) walletAddress: string,
+  ) {
+    return await this.pharmacistService.fetchInventory(walletAddress);
+  }
 }
