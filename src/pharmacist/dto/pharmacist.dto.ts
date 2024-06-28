@@ -70,3 +70,33 @@ export class UpdatePharmacistDto {
   @IsString()
   phoneNumber?: string;
 }
+
+export class AddMedicineDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  price: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  quantity: number;
+
+  @IsString()
+  @IsNotEmpty()
+  description: string;
+
+  @IsOptional()
+  @IsString()
+  sideEffects?: string;
+
+  @IsOptional()
+  @IsString()
+  image?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  medicineGroup: string;
+}
