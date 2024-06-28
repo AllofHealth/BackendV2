@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { PharmacistService } from '../services/pharmacist.service';
 import {
+  AddMedicineDto,
   CreatePharmacistDto,
   UpdatePharmacistDto,
 } from '../dto/pharmacist.dto';
@@ -33,6 +34,15 @@ export class PharmacistController {
       walletAddress,
       updatePharmacistDto,
     );
+  }
+
+  @Post('addMedicine')
+  async addMedicine(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+    @Body(new ValidationPipe({ transform: true })) medicine: AddMedicineDto,
+  ) {
+    return await this.pharmacistService.addMedicine(walletAddress, medicine);
   }
 
   @Get('getPharmacist')
