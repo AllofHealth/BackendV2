@@ -355,6 +355,8 @@ export class PharmacistService {
         };
       }
 
+      inventory.numberOfMedicine -= medicine.quantity;
+
       await this.pharmacistDao.pullMedicineById(walletAddress, medicineId);
       await this.pharmacistDao.deleteMedicineById(medicineId);
 
