@@ -24,7 +24,7 @@
 /// <reference types="mongoose" />
 /// <reference types="mongoose/types/inferschematype" />
 import { PharmacistService } from '../services/pharmacist.service';
-import { CreatePharmacistDto, UpdatePharmacistDto } from '../dto/pharmacist.dto';
+import { AddMedicineDto, CreatePharmacistDto, UpdatePharmacistDto } from '../dto/pharmacist.dto';
 export declare class PharmacistController {
     private readonly pharmacistService;
     constructor(pharmacistService: PharmacistService);
@@ -50,6 +50,10 @@ export declare class PharmacistController {
             _id: import("mongoose").Types.ObjectId;
         };
     }>;
+    addMedicine(walletAddress: string, medicine: AddMedicineDto): Promise<{
+        success: import("@nestjs/common").HttpStatus;
+        message: string;
+    }>;
     getPharmacist(walletAddress: string): Promise<{
         success: import("../../shared").ErrorCodes;
         message: string;
@@ -73,9 +77,15 @@ export declare class PharmacistController {
             _id: import("mongoose").Types.ObjectId;
         })[];
     }>;
-    getAllPharmacists(): Promise<(import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {
-        _id: import("mongoose").Types.ObjectId;
-    })[]>;
+    getAllPharmacists(): Promise<{
+        success: import("../../shared").ErrorCodes;
+        pharmacists: any[];
+    } | {
+        success: import("@nestjs/common").HttpStatus;
+        pharmacists: (import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {
+            _id: import("mongoose").Types.ObjectId;
+        })[];
+    }>;
     deletePharmacistByAddress(walletAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;

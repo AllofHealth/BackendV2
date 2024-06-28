@@ -17,3 +17,12 @@ export declare class UpdatePharmacistDto {
     regNo?: string;
     phoneNumber?: string;
 }
+export declare class AddMedicineDto {
+    name: string;
+    price: number;
+    quantity: number;
+    description: string;
+    sideEffects?: string;
+    image?: string;
+    medicineGroup: string;
+}

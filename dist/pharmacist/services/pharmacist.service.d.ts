@@ -25,7 +25,7 @@
 /// <reference types="mongoose/types/inferschematype" />
 import { HttpStatus } from '@nestjs/common';
 import { PharmacistDao } from '../dao/pharmacist.dao';
-import { CreatePharmacistType, UpdatePharmacistType } from '../interface/pharmacist.interface';
+import { CreatePharmacistType, MedicineType, UpdatePharmacistType } from '../interface/pharmacist.interface';
 import { PharmacistGuard } from '../guards/pharmacist.guard';
 import { ErrorCodes } from 'src/shared';
 import { HospitalDao } from 'src/hospital/dao/hospital.dao';
@@ -68,9 +68,15 @@ export declare class PharmacistService {
         };
         message?: undefined;
     }>;
-    getAllPharmacists(): Promise<(import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {
-        _id: import("mongoose").Types.ObjectId;
-    })[]>;
+    getAllPharmacists(): Promise<{
+        success: ErrorCodes;
+        pharmacists: any[];
+    } | {
+        success: HttpStatus;
+        pharmacists: (import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {
+            _id: import("mongoose").Types.ObjectId;
+        })[];
+    }>;
     updatePharmacist(walletAddress: string, args: UpdatePharmacistType): Promise<{
         success: HttpStatus;
         message: string;
@@ -83,6 +89,10 @@ export declare class PharmacistService {
         };
     }>;
     deletePharmacist(walletAddress: string): Promise<{
+        success: HttpStatus;
+        message: string;
+    }>;
+    addMedicine(walletAddress: string, args: MedicineType): Promise<{
         success: HttpStatus;
         message: string;
     }>;

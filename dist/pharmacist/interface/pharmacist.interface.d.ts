@@ -28,9 +28,19 @@ export interface MedicineType {
     price: number;
     quantity: number;
     description: string;
-    sideEffects: string;
-    image: string;
+    sideEffects?: string;
+    image?: string;
     medicineGroup: string;
+    _id?: mongoose.Types.ObjectId;
+}
+export interface UpdateMedicineType {
+    name?: string;
+    price?: number;
+    quantity?: number;
+    description?: string;
+    sideEffects?: string;
+    image?: string;
+    medicineGroup?: string;
 }
 export interface InventoryType {
     numberOfMedicine: number;

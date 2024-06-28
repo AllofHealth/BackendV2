@@ -16,6 +16,7 @@ const pharmacist_guard_1 = require("../guards/pharmacist.guard");
 const shared_1 = require("../../shared");
 const hospital_dao_1 = require("../../hospital/dao/hospital.dao");
 const mongoose_1 = require("mongoose");
+const constants_1 = require("../../shared/constants");
 let PharmacistService = class PharmacistService {
     constructor(pharmacistDao, pharmacistGuard, hospitalDao) {
         this.pharmacistDao = pharmacistDao;
@@ -131,7 +132,23 @@ let PharmacistService = class PharmacistService {
         }
     }
     async getAllPharmacists() {
-        return await this.pharmacistDao.fetchAllPharmacists();
+        try {
+            const pharmacists = await this.pharmacistDao.fetchAllPharmacists();
+            if (!pharmacists) {
+                return {
+                    success: shared_1.ErrorCodes.NotFound,
+                    pharmacists: [],
+                };
+            }
+            return {
+                success: common_1.HttpStatus.OK,
+                pharmacists,
+            };
+        }
+        catch (error) {
+            console.error(error);
+            throw new shared_1.PharmacistError('Error fetching pharmacists');
+        }
     }
     async updatePharmacist(walletAddress, args) {
         try {
@@ -179,6 +196,67 @@ let PharmacistService = class PharmacistService {
             if (error instanceof mongoose_1.MongooseError)
                 throw new mongoose_1.MongooseError(error.message);
             throw new shared_1.PharmacistError('Error deleting pharmacist');
+        }
+    }
+    async addMedicine(walletAddress, args) {
+        const { name, price, quantity, description, sideEffects, image, medicineGroup, } = args;
+        try {
+            const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+            if (!pharmacist) {
+                return {
+                    success: common_1.HttpStatus.NOT_FOUND,
+                    message: 'Pharmacist does not exist',
+                };
+            }
+            if (pharmacist.status !== shared_1.ApprovalStatus.Approved) {
+                return {
+                    success: common_1.HttpStatus.FORBIDDEN,
+                    message: 'Pharmacist is not approved',
+                };
+            }
+            const inventory = pharmacist.inventory;
+            const medicine = await this.pharmacistDao.createMedicine({
+                name,
+                price,
+                quantity,
+                description,
+                sideEffects: sideEffects ? sideEffects : 'No side effects',
+                image: image ? image : constants_1.MEDICINE_PLACEHOLDER,
+                medicineGroup,
+            });
+            if (!inventory) {
+                const newInventory = await this.pharmacistDao.createInventory({
+                    numberOfMedicine: quantity,
+                    numberOfMedicineGroup: 1,
+                    numberOfMedicineSold: 0,
+                    medicines: [medicine],
+                });
+                pharmacist.inventory = newInventory;
+                await pharmacist.save();
+                return {
+                    success: common_1.HttpStatus.OK,
+                    message: 'Medicine added successfully',
+                };
+            }
+            inventory.numberOfMedicine += quantity;
+            const medicineGroupExists = inventory.medicines.some((medicine) => medicine.medicineGroup === medicineGroup);
+            if (medicineGroupExists) {
+                const medicineGroupIndex = inventory.medicines.findIndex((medicine) => medicine.medicineGroup === medicineGroup);
+                inventory.medicines[medicineGroupIndex].quantity += quantity;
+            }
+            else {
+                inventory.numberOfMedicineGroup += 1;
+                inventory.medicines.push(medicine);
+            }
+            await pharmacist.save();
+            return {
+                success: common_1.HttpStatus.OK,
+                message: 'Medicine added successfully',
+            };
+        }
+        catch (error) {
+            console.error(error);
+            throw new Error('Error adding medicine');
         }
     }
 };

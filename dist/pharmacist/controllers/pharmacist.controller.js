@@ -26,6 +26,9 @@ let PharmacistController = class PharmacistController {
     async updatePharmacist(walletAddress, updatePharmacistDto) {
         return await this.pharmacistService.updatePharmacist(walletAddress, updatePharmacistDto);
     }
+    async addMedicine(walletAddress, medicine) {
+        return await this.pharmacistService.addMedicine(walletAddress, medicine);
+    }
     async getPharmacist(walletAddress) {
         return await this.pharmacistService.getPharmacistByAddress(walletAddress);
     }
@@ -58,6 +61,14 @@ __decorate([
     __metadata("design:paramtypes", [String, pharmacist_dto_1.UpdatePharmacistDto]),
     __metadata("design:returntype", Promise)
 ], PharmacistController.prototype, "updatePharmacist", null);
+__decorate([
+    (0, common_1.Post)('addMedicine'),
+    __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Body)(new common_1.ValidationPipe({ transform: true }))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, pharmacist_dto_1.AddMedicineDto]),
+    __metadata("design:returntype", Promise)
+], PharmacistController.prototype, "addMedicine", null);
 __decorate([
     (0, common_1.Get)('getPharmacist'),
     __param(0, (0, common_1.Query)('walletAddress')),
