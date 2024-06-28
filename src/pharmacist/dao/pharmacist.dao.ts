@@ -121,6 +121,10 @@ export class PharmacistDao {
     return await this.medicineModel.deleteOne({ _id: medicineId });
   }
 
+  async findMedicineById(medicineId: Types.ObjectId) {
+    return await this.medicineModel.findOne({ _id: medicineId });
+  }
+
   async pullMedicineById(
     pharmacistAddress: string,
     medicineId: Types.ObjectId,
