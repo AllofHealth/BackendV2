@@ -85,4 +85,25 @@ export class PharmacistController {
   ) {
     return await this.pharmacistService.deletePharmacist(walletAddress);
   }
+
+  @Get('getMedicine')
+  async getMedicine(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+    @Query('medicineId', new ValidationPipe({ transform: true }))
+    medicineId: Types.ObjectId,
+  ) {
+    return await this.pharmacistService.fetchMedicine(
+      walletAddress,
+      medicineId,
+    );
+  }
+
+  @Get('getAllMedicines')
+  async getAllMedicines(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+  ) {
+    return await this.pharmacistService.fetchAllMedicine(walletAddress);
+  }
 }
