@@ -94,18 +94,17 @@ export class PharmacistDao {
   }
 
   async updateMedicine(
+    walletAddress: string,
     medicineId: Types.ObjectId,
     updateData: UpdateMedicineType,
   ) {
     const updates = Object.keys(updateData).reduce((acc, key) => {
-      if (updateData[key] !== undefined) {
-        acc[key] = updateData[key];
-      }
+      acc[`medicines.$.${key}`] = updateData[key];
       return acc;
     }, {});
 
-    const result = await this.medicineModel.findOneAndUpdate(
-      { _id: medicineId },
+    const result = await this.pharmacistModel.findOneAndUpdate(
+      { walletAddress: walletAddress, inventory: { medicines: medicineId } },
       { $set: updates },
       { new: true, runValidators: true },
     );
