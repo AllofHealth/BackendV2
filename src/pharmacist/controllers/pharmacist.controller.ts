@@ -11,6 +11,7 @@ import { PharmacistService } from '../services/pharmacist.service';
 import {
   AddMedicineDto,
   CreatePharmacistDto,
+  UpdateMedicineDto,
   UpdatePharmacistDto,
 } from '../dto/pharmacist.dto';
 import { Types } from 'mongoose';
@@ -56,6 +57,21 @@ export class PharmacistController {
     return await this.pharmacistService.deleteMedicine(
       walletAddress,
       medicineId,
+    );
+  }
+
+  @Post('updateMedicine')
+  async updateMedicine(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+    @Query('medicineId', new ValidationPipe({ transform: true }))
+    medicineId: Types.ObjectId,
+    @Body() medicine: UpdateMedicineDto,
+  ) {
+    return await this.pharmacistService.updateMedicine(
+      walletAddress,
+      medicineId,
+      medicine,
     );
   }
 
