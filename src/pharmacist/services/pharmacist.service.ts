@@ -355,6 +355,16 @@ export class PharmacistService {
         };
       }
 
+      const medicineExistInInventory = inventory.medicines.find(
+        (medicine: MedicineType) => medicine._id === medicineId,
+      );
+      if (!medicineExistInInventory) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'medicine not found in inventory',
+        };
+      }
+
       inventory.numberOfMedicine -= medicine.quantity;
 
       await this.pharmacistDao.pullMedicineById(walletAddress, medicineId);
@@ -369,6 +379,53 @@ export class PharmacistService {
     } catch (error) {
       console.error(error);
       throw new PharmacistError('Error deleting medicine');
+    }
+  }
+
+  async fetchMedicine(walletAddress: string, medicineId: Types.ObjectId) {
+    try {
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+      if (!pharmacist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'pharmacist not found',
+        };
+      }
+
+      const inventory = pharmacist.inventory;
+      if (!inventory) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'inventory not found',
+        };
+      }
+
+      const medicine = await this.pharmacistDao.findMedicineById(medicineId);
+      if (!medicine) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'medicine not found',
+        };
+      }
+
+      const medicineExistInInventory = inventory.medicines.find(
+        (medicine: MedicineType) => medicine._id === medicineId,
+      );
+      if (!medicineExistInInventory) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'medicine not found in inventory',
+        };
+      }
+
+      return {
+        success: HttpStatus.OK,
+        medicine,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new PharmacistError('Error fetching medicine');
     }
   }
 }
