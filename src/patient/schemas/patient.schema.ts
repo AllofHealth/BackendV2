@@ -61,6 +61,9 @@ export class Prescriptions extends Document {
 
   @Prop({ default: Date.now() })
   date: Date;
+
+  @Prop()
+  status?: string;
 }
 
 export const PrescriptionsSchema = SchemaFactory.createForClass(Prescriptions);
