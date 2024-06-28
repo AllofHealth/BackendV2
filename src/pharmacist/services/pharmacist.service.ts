@@ -13,7 +13,7 @@ import {
   PharmacistError,
 } from 'src/shared';
 import { HospitalDao } from 'src/hospital/dao/hospital.dao';
-import { MongooseError } from 'mongoose';
+import { MongooseError, Types } from 'mongoose';
 import { MEDICINE_PLACEHOLDER } from 'src/shared/constants';
 
 @Injectable()
@@ -325,6 +325,48 @@ export class PharmacistService {
     } catch (error) {
       console.error(error);
       throw new PharmacistError('Error adding medicine');
+    }
+  }
+
+  async deleteMedicine(walletAddress: string, medicineId: Types.ObjectId) {
+    try {
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+      if (!pharmacist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'pharmacist not found',
+        };
+      }
+
+      const inventory = pharmacist.inventory;
+      if (!inventory) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'inventory not found',
+        };
+      }
+
+      const medicine = await this.pharmacistDao.findMedicineById(medicineId);
+      if (!medicine) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'medicine not found',
+        };
+      }
+
+      await this.pharmacistDao.pullMedicineById(walletAddress, medicineId);
+      await this.pharmacistDao.deleteMedicineById(medicineId);
+
+      await pharmacist.save();
+
+      return {
+        success: HttpStatus.OK,
+        message: 'Medicine deleted successfully',
+      };
+    } catch (error) {
+      console.error(error);
+      throw new PharmacistError('Error deleting medicine');
     }
   }
 }
