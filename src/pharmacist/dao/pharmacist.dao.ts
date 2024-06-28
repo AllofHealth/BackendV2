@@ -117,6 +117,20 @@ export class PharmacistDao {
     return await this.medicineModel.deleteOne({ _id: medicineId });
   }
 
+  async deleteMedicineById(medicineId: Types.ObjectId) {
+    return await this.medicineModel.deleteOne({ _id: medicineId });
+  }
+
+  async pullMedicineById(
+    pharmacistAddress: string,
+    medicineId: Types.ObjectId,
+  ) {
+    return await this.pharmacistModel.findOneAndUpdate(
+      { walletAddress: pharmacistAddress },
+      { $pull: { 'inventory.medicines': { _id: medicineId } } },
+    );
+  }
+
   async deletePharmacist(address: string) {
     return await this.pharmacistModel.deleteOne({ walletAddress: address });
   }
