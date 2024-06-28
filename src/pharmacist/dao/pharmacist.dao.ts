@@ -15,7 +15,9 @@ export class PharmacistDao {
   constructor(
     @InjectModel(Pharmacist.name)
     private readonly pharmacistModel: Model<Pharmacist>,
+    @InjectModel(Medicine.name)
     private readonly medicineModel: Model<Medicine>,
+    @InjectModel(Inventory.name)
     private readonly inventoryModel: Model<Inventory>,
   ) {}
   async createNewPharmacist(pharmacist: CreatePharmacistType) {
