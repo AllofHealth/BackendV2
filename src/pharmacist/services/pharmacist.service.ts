@@ -3,6 +3,7 @@ import { PharmacistDao } from '../dao/pharmacist.dao';
 import {
   CreatePharmacistType,
   MedicineType,
+  UpdateMedicineType,
   UpdatePharmacistType,
 } from '../interface/pharmacist.interface';
 import { PharmacistGuard } from '../guards/pharmacist.guard';
@@ -426,6 +427,129 @@ export class PharmacistService {
     } catch (error) {
       console.error(error);
       throw new PharmacistError('Error fetching medicine');
+    }
+  }
+
+  async fetchAllMedicine(walletAddress: string) {
+    try {
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+
+      if (!pharmacist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'pharmacist not found',
+        };
+      }
+
+      const inventory = pharmacist.inventory;
+      if (!inventory) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'inventory not found',
+        };
+      }
+
+      const medicines = inventory.medicines;
+      if (medicines.length === 0) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          medicines: [],
+        };
+      }
+
+      return {
+        success: HttpStatus.OK,
+        medicines,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new PharmacistError('Error fetching all medicine');
+    }
+  }
+
+  async fetchInventory(walletAddress: string) {
+    try {
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+
+      if (!pharmacist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'pharmacist not found',
+        };
+      }
+
+      const inventory = pharmacist.inventory;
+      if (!inventory) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          inventory: {},
+        };
+      }
+
+      return {
+        success: HttpStatus.OK,
+        inventory,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new PharmacistError('Error fetching inventory');
+    }
+  }
+
+  async updateMedicine(
+    walletAddress: string,
+    medicineId: Types.ObjectId,
+    args: UpdateMedicineType,
+  ) {
+    try {
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+      if (!pharmacist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'pharmacist not found',
+        };
+      }
+
+      const inventory = pharmacist.inventory;
+      if (!inventory) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'inventory not found',
+        };
+      }
+      const medicine = inventory.medicines.find(
+        (medicine: MedicineType) => medicine._id === medicineId,
+      );
+      if (!medicine) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'medicine not found',
+        };
+      }
+      const updateMedicine = await this.pharmacistDao.updateMedicine(
+        walletAddress,
+        medicineId,
+        args,
+      );
+      await pharmacist.save();
+
+      const totalNumberOfMedicine = inventory.medicines.reduce(
+        (total, medicine) => total + medicine.quantity,
+        0,
+      );
+
+      inventory.numberOfMedicine = totalNumberOfMedicine;
+      await pharmacist.save();
+
+      return {
+        success: HttpStatus.OK,
+        updateMedicine,
+      };
+    } catch (error) {
+      console.error('Error updating medicine');
     }
   }
 }
