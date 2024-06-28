@@ -100,3 +100,33 @@ export class AddMedicineDto {
   @IsNotEmpty()
   medicineGroup: string;
 }
+
+export class UpdateMedicineDto {
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @IsOptional()
+  @IsNumber()
+  price?: number;
+
+  @IsOptional()
+  @IsNumber()
+  quantity?: number;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  sideEffects?: string;
+
+  @IsOptional()
+  @IsString()
+  image?: string;
+
+  @IsOptional()
+  @IsString()
+  medicineGroup?: string;
+}
