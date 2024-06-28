@@ -61,5 +61,9 @@ export declare class PharmacistDao {
         _id: Types.ObjectId;
     }>;
     deleteMedicine(medicineId: Types.ObjectId): Promise<import("mongodb").DeleteResult>;
+    deleteMedicineById(medicineId: Types.ObjectId): Promise<import("mongodb").DeleteResult>;
+    pullMedicineById(pharmacistAddress: string, medicineId: Types.ObjectId): Promise<import("mongoose").Document<unknown, {}, Pharmacist> & Pharmacist & {
+        _id: Types.ObjectId;
+    }>;
     deletePharmacist(address: string): Promise<import("mongodb").DeleteResult>;
 }

@@ -215,16 +215,16 @@ let PharmacistService = class PharmacistService {
                 };
             }
             const inventory = pharmacist.inventory;
-            const medicine = await this.pharmacistDao.createMedicine({
-                name,
-                price,
-                quantity,
-                description,
-                sideEffects: sideEffects ? sideEffects : 'No side effects',
-                image: image ? image : constants_1.MEDICINE_PLACEHOLDER,
-                medicineGroup,
-            });
             if (!inventory) {
+                const medicine = await this.pharmacistDao.createMedicine({
+                    name,
+                    price,
+                    quantity,
+                    description,
+                    sideEffects: sideEffects ? sideEffects : 'No side effects',
+                    image: image ? image : constants_1.MEDICINE_PLACEHOLDER,
+                    medicineGroup,
+                });
                 const newInventory = await this.pharmacistDao.createInventory({
                     numberOfMedicine: quantity,
                     numberOfMedicineGroup: 1,
@@ -238,14 +238,28 @@ let PharmacistService = class PharmacistService {
                     message: 'Medicine added successfully',
                 };
             }
-            inventory.numberOfMedicine += quantity;
-            const medicineGroupExists = inventory.medicines.some((medicine) => medicine.medicineGroup === medicineGroup);
-            if (medicineGroupExists) {
-                const medicineGroupIndex = inventory.medicines.findIndex((medicine) => medicine.medicineGroup === medicineGroup);
-                inventory.medicines[medicineGroupIndex].quantity += quantity;
+            const existingMedicine = inventory.medicines.find((medicine) => medicine.name === name && medicine.medicineGroup === medicineGroup);
+            if (existingMedicine) {
+                existingMedicine.price = price;
+                existingMedicine.description = description;
+                existingMedicine.sideEffects = sideEffects
+                    ? sideEffects
+                    : 'No side effects';
+                existingMedicine.quantity += quantity;
+                inventory.numberOfMedicine += quantity;
             }
             else {
+                const medicine = await this.pharmacistDao.createMedicine({
+                    name,
+                    price,
+                    quantity,
+                    description,
+                    sideEffects: sideEffects ? sideEffects : 'No side effects',
+                    image: image ? image : constants_1.MEDICINE_PLACEHOLDER,
+                    medicineGroup,
+                });
                 inventory.numberOfMedicineGroup += 1;
+                inventory.numberOfMedicine += quantity;
                 inventory.medicines.push(medicine);
             }
             await pharmacist.save();
@@ -256,7 +270,7 @@ let PharmacistService = class PharmacistService {
         }
         catch (error) {
             console.error(error);
-            throw new Error('Error adding medicine');
+            throw new shared_1.PharmacistError('Error adding medicine');
         }
     }
 };
