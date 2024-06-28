@@ -2,12 +2,14 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { PharmacistDao } from '../dao/pharmacist.dao';
 import {
   CreatePharmacistType,
+  MedicineType,
   UpdatePharmacistType,
 } from '../interface/pharmacist.interface';
 import { PharmacistGuard } from '../guards/pharmacist.guard';
 import { Category, ErrorCodes, PharmacistError } from 'src/shared';
 import { HospitalDao } from 'src/hospital/dao/hospital.dao';
 import { MongooseError } from 'mongoose';
+import { MEDICINE_PLACEHOLDER } from 'src/shared/constants';
 
 @Injectable()
 export class PharmacistService {
@@ -151,7 +153,23 @@ export class PharmacistService {
     }
   }
   async getAllPharmacists() {
-    return await this.pharmacistDao.fetchAllPharmacists();
+    try {
+      const pharmacists = await this.pharmacistDao.fetchAllPharmacists();
+      if (!pharmacists) {
+        return {
+          success: ErrorCodes.NotFound,
+          pharmacists: [],
+        };
+      }
+
+      return {
+        success: HttpStatus.OK,
+        pharmacists,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new PharmacistError('Error fetching pharmacists');
+    }
   }
 
   async updatePharmacist(walletAddress: string, args: UpdatePharmacistType) {
@@ -207,6 +225,80 @@ export class PharmacistService {
       if (error instanceof MongooseError)
         throw new MongooseError(error.message);
       throw new PharmacistError('Error deleting pharmacist');
+    }
+  }
+
+  async addMedicine(walletAddress: string, args: MedicineType) {
+    const {
+      name,
+      price,
+      quantity,
+      description,
+      sideEffects,
+      image,
+      medicineGroup,
+    } = args;
+    try {
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+      if (!pharmacist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'Pharmacist does not exist',
+        };
+      }
+
+      const inventory = pharmacist.inventory;
+      const medicine = await this.pharmacistDao.createMedicine({
+        name,
+        price,
+        quantity,
+        description,
+        sideEffects: sideEffects ? sideEffects : 'No side effects',
+        image: image ? image : MEDICINE_PLACEHOLDER,
+        medicineGroup,
+      });
+      if (!inventory) {
+        const newInventory = await this.pharmacistDao.createInventory({
+          numberOfMedicine: quantity,
+          numberOfMedicineGroup: 1,
+          numberOfMedicineSold: 0,
+          medicines: [medicine],
+        });
+
+        pharmacist.inventory = newInventory;
+        await pharmacist.save();
+
+        return {
+          success: HttpStatus.OK,
+          message: 'Medicine added successfully',
+        };
+      }
+
+      inventory.numberOfMedicine += quantity;
+      const medicineGroupExists = inventory.medicines.some(
+        (medicine) => medicine.medicineGroup === medicineGroup,
+      );
+
+      if (medicineGroupExists) {
+        const medicineGroupIndex = inventory.medicines.findIndex(
+          (medicine) => medicine.medicineGroup === medicineGroup,
+        );
+        inventory.medicines[medicineGroupIndex].quantity += quantity;
+      } else {
+        inventory.numberOfMedicineGroup += 1;
+        inventory.medicines.push(medicine);
+      }
+
+      await pharmacist.save();
+
+      return {
+        success: HttpStatus.OK,
+        message: 'Medicine added successfully',
+      };
+    } catch (error) {
+      console.error(error);
+      throw new Error('Error adding medicine');
     }
   }
 }
