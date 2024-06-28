@@ -6,7 +6,12 @@ import {
   UpdatePharmacistType,
 } from '../interface/pharmacist.interface';
 import { PharmacistGuard } from '../guards/pharmacist.guard';
-import { Category, ErrorCodes, PharmacistError } from 'src/shared';
+import {
+  ApprovalStatus,
+  Category,
+  ErrorCodes,
+  PharmacistError,
+} from 'src/shared';
 import { HospitalDao } from 'src/hospital/dao/hospital.dao';
 import { MongooseError } from 'mongoose';
 import { MEDICINE_PLACEHOLDER } from 'src/shared/constants';
@@ -245,6 +250,13 @@ export class PharmacistService {
         return {
           success: HttpStatus.NOT_FOUND,
           message: 'Pharmacist does not exist',
+        };
+      }
+
+      if (pharmacist.status !== ApprovalStatus.Approved) {
+        return {
+          success: HttpStatus.FORBIDDEN,
+          message: 'Pharmacist is not approved',
         };
       }
 
