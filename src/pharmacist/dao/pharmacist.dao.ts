@@ -99,17 +99,22 @@ export class PharmacistDao {
     updateData: UpdateMedicineType,
   ) {
     const updates = Object.keys(updateData).reduce((acc, key) => {
-      acc[`medicines.$.${key}`] = updateData[key];
+      acc[`inventory.medicines.$.${key}`] = updateData[key];
       return acc;
     }, {});
 
     const result = await this.pharmacistModel.findOneAndUpdate(
-      { walletAddress: walletAddress, inventory: { medicines: medicineId } },
+      { walletAddress, 'inventory.medicines._id': medicineId },
       { $set: updates },
       { new: true, runValidators: true },
     );
 
-    return result;
+    const medicine = result.inventory.medicines.find(
+      (medicine: MedicineType) =>
+        medicine._id.toString() === medicineId.toString(),
+    );
+
+    return medicine;
   }
 
   async deleteMedicine(medicineId: Types.ObjectId) {
