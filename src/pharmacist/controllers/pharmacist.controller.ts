@@ -139,4 +139,17 @@ export class PharmacistController {
       walletAddress,
     );
   }
+
+  @Get('getSharedPrescription')
+  async getSharedPrescription(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+    @Query('prescriptionId', new ValidationPipe({ transform: true }))
+    prescriptionId: Types.ObjectId,
+  ) {
+    return await this.pharmacistService.fetchPrescriptionById({
+      walletAddress,
+      prescriptionId,
+    });
+  }
 }
