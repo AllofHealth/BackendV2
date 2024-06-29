@@ -555,4 +555,33 @@ export class PharmacistService {
       console.error('Error updating medicine');
     }
   }
+
+  async fetchAllSharedPrescriptions(walletAddress: string) {
+    try {
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+      if (!pharmacist) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'pharmacist not found',
+        };
+      }
+
+      const prescriptions = pharmacist.sharedPrescriptions;
+      if (!prescriptions) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'prescriptions not found',
+        };
+      }
+
+      return {
+        success: HttpStatus.OK,
+        prescriptions,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new PharmacistError('Error fetching all shared prescriptions');
+    }
+  }
 }
