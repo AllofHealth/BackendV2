@@ -67,6 +67,14 @@ export declare class PharmacistController {
         updateMedicine: import("../schema/pharmacist.schema").Medicine;
         message?: undefined;
     }>;
+    dispensePrescription(walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
+        success: import("@nestjs/common").HttpStatus;
+        message: string;
+    }>;
+    removePrescription(walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
+        success: import("@nestjs/common").HttpStatus;
+        message: string;
+    }>;
     getPharmacist(walletAddress: string): Promise<{
         success: import("../../shared").ErrorCodes;
         message: string;

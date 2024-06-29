@@ -36,6 +36,18 @@ let PharmacistController = class PharmacistController {
     async updateMedicine(walletAddress, medicineId, medicine) {
         return await this.pharmacistService.updateMedicine(walletAddress, medicineId, medicine);
     }
+    async dispensePrescription(walletAddress, prescriptionId) {
+        return await this.pharmacistService.dispensePrescription({
+            walletAddress,
+            prescriptionId,
+        });
+    }
+    async removePrescription(walletAddress, prescriptionId) {
+        return await this.pharmacistService.removePrescription({
+            walletAddress,
+            prescriptionId,
+        });
+    }
     async getPharmacist(walletAddress) {
         return await this.pharmacistService.getPharmacistByAddress(walletAddress);
     }
@@ -111,6 +123,22 @@ __decorate([
     __metadata("design:paramtypes", [String, mongoose_1.Types.ObjectId, pharmacist_dto_1.UpdateMedicineDto]),
     __metadata("design:returntype", Promise)
 ], PharmacistController.prototype, "updateMedicine", null);
+__decorate([
+    (0, common_1.Post)('dispensePrescription'),
+    __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Query)('prescriptionId', new common_1.ValidationPipe({ transform: true }))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, mongoose_1.Types.ObjectId]),
+    __metadata("design:returntype", Promise)
+], PharmacistController.prototype, "dispensePrescription", null);
+__decorate([
+    (0, common_1.Post)('removePrescription'),
+    __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Query)('prescriptionId', new common_1.ValidationPipe({ transform: true }))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, mongoose_1.Types.ObjectId]),
+    __metadata("design:returntype", Promise)
+], PharmacistController.prototype, "removePrescription", null);
 __decorate([
     (0, common_1.Get)('getPharmacist'),
     __param(0, (0, common_1.Query)('walletAddress')),
