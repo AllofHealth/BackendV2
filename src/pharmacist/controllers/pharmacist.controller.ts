@@ -75,6 +75,32 @@ export class PharmacistController {
     );
   }
 
+  @Post('dispensePrescription')
+  async dispensePrescription(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+    @Query('prescriptionId', new ValidationPipe({ transform: true }))
+    prescriptionId: Types.ObjectId,
+  ) {
+    return await this.pharmacistService.dispensePrescription({
+      walletAddress,
+      prescriptionId,
+    });
+  }
+
+  @Post('removePrescription')
+  async removePrescription(
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+    @Query('prescriptionId', new ValidationPipe({ transform: true }))
+    prescriptionId: Types.ObjectId,
+  ) {
+    return await this.pharmacistService.removePrescription({
+      walletAddress,
+      prescriptionId,
+    });
+  }
+
   @Get('getPharmacist')
   async getPharmacist(@Query('walletAddress') walletAddress: string) {
     return await this.pharmacistService.getPharmacistByAddress(walletAddress);
