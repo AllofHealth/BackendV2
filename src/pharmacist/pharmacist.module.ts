@@ -13,6 +13,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { HospitalModule } from 'src/hospital/hospital.module';
 import { PharmacistDao } from './dao/pharmacist.dao';
 import { PharmacistGuard } from './guards/pharmacist.guard';
+import { PatientModule } from 'src/patient/patient.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PharmacistGuard } from './guards/pharmacist.guard';
       { name: Inventory.name, schema: InventorySchema },
     ]),
     forwardRef(() => HospitalModule),
+    forwardRef(() => PatientModule),
   ],
   providers: [PharmacistService, PharmacistDao, PharmacistGuard],
   controllers: [PharmacistController],
