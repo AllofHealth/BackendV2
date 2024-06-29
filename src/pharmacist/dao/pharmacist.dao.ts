@@ -145,7 +145,7 @@ export class PharmacistDao {
   ) {
     return await this.pharmacistModel.findOneAndUpdate(
       { walletAddress: pharmacistAddress },
-      { $pull: { prescriptions: { _id: prescriptionId } } },
+      { $pull: { sharedPrescriptions: { _id: prescriptionId } } },
     );
   }
 
