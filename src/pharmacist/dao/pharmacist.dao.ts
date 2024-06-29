@@ -139,6 +139,16 @@ export class PharmacistDao {
     );
   }
 
+  async pullOnePrescription(
+    pharmacistAddress: string,
+    prescriptionId: Types.ObjectId,
+  ) {
+    return await this.pharmacistModel.findOneAndUpdate(
+      { walletAddress: pharmacistAddress },
+      { $pull: { prescriptions: { _id: prescriptionId } } },
+    );
+  }
+
   async deletePharmacist(address: string) {
     return await this.pharmacistModel.deleteOne({ walletAddress: address });
   }
