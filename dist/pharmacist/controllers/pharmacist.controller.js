@@ -60,6 +60,15 @@ let PharmacistController = class PharmacistController {
     async getInventory(walletAddress) {
         return await this.pharmacistService.fetchInventory(walletAddress);
     }
+    async getAllSharedPrescriptions(walletAddress) {
+        return await this.pharmacistService.fetchAllSharedPrescriptions(walletAddress);
+    }
+    async getSharedPrescription(walletAddress, prescriptionId) {
+        return await this.pharmacistService.fetchPrescriptionById({
+            walletAddress,
+            prescriptionId,
+        });
+    }
 };
 exports.PharmacistController = PharmacistController;
 __decorate([
@@ -156,6 +165,21 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], PharmacistController.prototype, "getInventory", null);
+__decorate([
+    (0, common_1.Get)('getAllSharedPrescriptions'),
+    __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PharmacistController.prototype, "getAllSharedPrescriptions", null);
+__decorate([
+    (0, common_1.Get)('getSharedPrescription'),
+    __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Query)('prescriptionId', new common_1.ValidationPipe({ transform: true }))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, mongoose_1.Types.ObjectId]),
+    __metadata("design:returntype", Promise)
+], PharmacistController.prototype, "getSharedPrescription", null);
 exports.PharmacistController = PharmacistController = __decorate([
     (0, common_1.Controller)('pharmacist'),
     __metadata("design:paramtypes", [pharmacist_service_1.PharmacistService])

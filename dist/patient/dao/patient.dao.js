@@ -71,6 +71,7 @@ let PatientDao = class PatientDao {
             patientAddress: prescription.patientAddress,
             doctorAddress: prescription.doctorAddress,
             medicineName: prescription.medicineName,
+            quantity: prescription.quantity,
             medicineId: prescription.medicineId ? prescription.medicineId : '',
             medicineGroup: prescription.medicineGroup
                 ? prescription.medicineGroup

@@ -228,7 +228,7 @@ let DoctorService = class DoctorService {
         }
     }
     async createPrescription(args) {
-        const { recordId, patientAddress, doctorAddress, medicineName, medicineId, medicineGroup, description, sideEffects, } = args;
+        const { recordId, patientAddress, doctorAddress, medicineName, quantity, medicineId, medicineGroup, description, sideEffects, } = args;
         try {
             const isPatient = await this.patientGuard.validatePatient(patientAddress);
             const isDoctor = await this.doctorGuard.validateDoctorExists(doctorAddress);
@@ -258,6 +258,7 @@ let DoctorService = class DoctorService {
                 patientAddress: patientAddress,
                 doctorAddress: doctorAddress,
                 medicineName: medicineName,
+                quantity: quantity ? quantity : 1,
                 medicineId: medicineId,
                 medicineGroup: medicineGroup,
                 description: description,

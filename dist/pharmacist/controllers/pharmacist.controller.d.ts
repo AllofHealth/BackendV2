@@ -136,4 +136,22 @@ export declare class PharmacistController {
         inventory: import("../schema/pharmacist.schema").Inventory;
         message?: undefined;
     }>;
+    getAllSharedPrescriptions(walletAddress: string): Promise<{
+        success: import("@nestjs/common").HttpStatus;
+        message: string;
+        prescriptions?: undefined;
+    } | {
+        success: import("@nestjs/common").HttpStatus;
+        prescriptions: import("../../patient/schemas/patient.schema").Prescriptions[];
+        message?: undefined;
+    }>;
+    getSharedPrescription(walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
+        success: import("@nestjs/common").HttpStatus;
+        message: string;
+        prescription?: undefined;
+    } | {
+        success: import("@nestjs/common").HttpStatus;
+        prescription: import("../../patient/schemas/patient.schema").Prescriptions;
+        message?: undefined;
+    }>;
 }

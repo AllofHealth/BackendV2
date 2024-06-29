@@ -17,11 +17,13 @@ const shared_1 = require("../../shared");
 const hospital_dao_1 = require("../../hospital/dao/hospital.dao");
 const mongoose_1 = require("mongoose");
 const constants_1 = require("../../shared/constants");
+const patient_dao_1 = require("../../patient/dao/patient.dao");
 let PharmacistService = class PharmacistService {
-    constructor(pharmacistDao, pharmacistGuard, hospitalDao) {
+    constructor(pharmacistDao, pharmacistGuard, hospitalDao, patientDao) {
         this.pharmacistDao = pharmacistDao;
         this.pharmacistGuard = pharmacistGuard;
         this.hospitalDao = hospitalDao;
+        this.patientDao = patientDao;
     }
     async createPharmacist(args) {
         const pharmacistExists = await this.pharmacistGuard.validatePharmacistExists(args.walletAddress);
@@ -453,12 +455,163 @@ let PharmacistService = class PharmacistService {
             console.error('Error updating medicine');
         }
     }
+    async fetchAllSharedPrescriptions(walletAddress) {
+        try {
+            const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+            if (!pharmacist) {
+                return {
+                    success: common_1.HttpStatus.NOT_FOUND,
+                    message: 'pharmacist not found',
+                };
+            }
+            const prescriptions = pharmacist.sharedPrescriptions;
+            if (!prescriptions) {
+                return {
+                    success: common_1.HttpStatus.NOT_FOUND,
+                    message: 'prescriptions not found',
+                };
+            }
+            return {
+                success: common_1.HttpStatus.OK,
+                prescriptions,
+            };
+        }
+        catch (error) {
+            console.error(error);
+            throw new shared_1.PharmacistError('Error fetching all shared prescriptions');
+        }
+    }
+    async fetchPrescriptionById(args) {
+        const { walletAddress, prescriptionId } = args;
+        try {
+            const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+            if (!pharmacist) {
+                return {
+                    success: common_1.HttpStatus.NOT_FOUND,
+                    message: 'pharmacist not found',
+                };
+            }
+            const prescription = pharmacist.sharedPrescriptions.find((prescription) => prescription._id.toString() === prescriptionId.toString());
+            if (!prescription) {
+                return {
+                    success: common_1.HttpStatus.NOT_FOUND,
+                    message: 'prescription not found',
+                };
+            }
+            return {
+                success: common_1.HttpStatus.OK,
+                prescription,
+            };
+        }
+        catch (error) {
+            console.error(error);
+            throw new Error('Error fetching prescription');
+        }
+    }
+    async dispensePrescription(args) {
+        const { walletAddress, prescriptionId } = args;
+        try {
+            const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+            if (!pharmacist) {
+                return {
+                    success: common_1.HttpStatus.NOT_FOUND,
+                    message: 'pharmacist not found',
+                };
+            }
+            const prescription = pharmacist.sharedPrescriptions.find((p) => p._id.toString() === prescriptionId.toString());
+            if (!prescription) {
+                return {
+                    success: common_1.HttpStatus.NOT_FOUND,
+                    message: 'prescription not found',
+                };
+            }
+            const patient = await this.patientDao.fetchPatientByAddress(prescription.patientAddress);
+            if (!patient) {
+                return {
+                    success: common_1.HttpStatus.NOT_FOUND,
+                    message: 'patient not found',
+                };
+            }
+            const inventory = pharmacist.inventory;
+            const medicine = inventory.medicines.find((m) => m.name === prescription.medicineName);
+            if (!medicine) {
+                await this.pharmacistDao.pullOnePrescription(walletAddress, prescriptionId);
+                await pharmacist.save();
+                return {
+                    success: common_1.HttpStatus.NOT_FOUND,
+                    message: 'medicine not found in inventory, removing prescription',
+                };
+            }
+            const patientPrescription = patient.prescriptions.find((p) => p._id.toString() === prescriptionId.toString());
+            if (!patientPrescription) {
+                return {
+                    success: common_1.HttpStatus.NOT_FOUND,
+                    message: 'prescription not found in patient prescriptions',
+                };
+            }
+            const prescriptionQuantity = prescription.quantity
+                ? prescription.quantity
+                : 1;
+            if (medicine.quantity < prescriptionQuantity) {
+                return {
+                    success: common_1.HttpStatus.BAD_REQUEST,
+                    message: 'quantity of medicine in inventory is less than prescribed quantity',
+                };
+            }
+            medicine.quantity -= prescriptionQuantity;
+            inventory.numberOfMedicine -= prescriptionQuantity;
+            patientPrescription.status = 'dispensed';
+            patientPrescription.dispensedDate = new Date();
+            patientPrescription.dispensedBy = walletAddress;
+            await patient.save();
+            await this.pharmacistDao.pullOnePrescription(walletAddress, prescriptionId);
+            await pharmacist.save();
+            return {
+                success: common_1.HttpStatus.OK,
+                message: 'Prescription dispensed successfully',
+            };
+        }
+        catch (error) {
+            console.error(error);
+            throw new shared_1.PharmacistError('Error dispensing prescription');
+        }
+    }
+    async removePrescription(args) {
+        const { walletAddress, prescriptionId } = args;
+        try {
+            const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+            if (!pharmacist) {
+                return {
+                    success: common_1.HttpStatus.NOT_FOUND,
+                    message: 'pharmacist not found',
+                };
+            }
+            const prescription = pharmacist.sharedPrescriptions.find((p) => p._id.toString() === prescriptionId.toString());
+            if (!prescription) {
+                return {
+                    success: common_1.HttpStatus.NOT_FOUND,
+                    message: 'prescription not found',
+                };
+            }
+            await this.pharmacistDao.pullOnePrescription(walletAddress, prescriptionId);
+            await pharmacist.save();
+            return {
+                success: common_1.HttpStatus.OK,
+                message: 'Prescription removed successfully',
+            };
+        }
+        catch (error) {
+            console.error(error);
+            throw new shared_1.PharmacistError('Error removing prescription');
+        }
+    }
 };
 exports.PharmacistService = PharmacistService;
 exports.PharmacistService = PharmacistService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [pharmacist_dao_1.PharmacistDao,
         pharmacist_guard_1.PharmacistGuard,
-        hospital_dao_1.HospitalDao])
+        hospital_dao_1.HospitalDao,
+        patient_dao_1.PatientDao])
 ], PharmacistService);
 //# sourceMappingURL=pharmacist.service.js.map

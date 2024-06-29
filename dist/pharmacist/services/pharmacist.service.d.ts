@@ -29,11 +29,13 @@ import { PharmacistGuard } from '../guards/pharmacist.guard';
 import { ErrorCodes } from 'src/shared';
 import { HospitalDao } from 'src/hospital/dao/hospital.dao';
 import { Types } from 'mongoose';
+import { PatientDao } from 'src/patient/dao/patient.dao';
 export declare class PharmacistService {
     private readonly pharmacistDao;
     private readonly pharmacistGuard;
     private readonly hospitalDao;
-    constructor(pharmacistDao: PharmacistDao, pharmacistGuard: PharmacistGuard, hospitalDao: HospitalDao);
+    private readonly patientDao;
+    constructor(pharmacistDao: PharmacistDao, pharmacistGuard: PharmacistGuard, hospitalDao: HospitalDao, patientDao: PatientDao);
     createPharmacist(args: CreatePharmacistType): Promise<{
         success: ErrorCodes;
         message: string;
@@ -141,5 +143,40 @@ export declare class PharmacistService {
         success: HttpStatus;
         updateMedicine: import("../schema/pharmacist.schema").Medicine;
         message?: undefined;
+    }>;
+    fetchAllSharedPrescriptions(walletAddress: string): Promise<{
+        success: HttpStatus;
+        message: string;
+        prescriptions?: undefined;
+    } | {
+        success: HttpStatus;
+        prescriptions: import("../../patient/schemas/patient.schema").Prescriptions[];
+        message?: undefined;
+    }>;
+    fetchPrescriptionById(args: {
+        walletAddress: string;
+        prescriptionId: Types.ObjectId;
+    }): Promise<{
+        success: HttpStatus;
+        message: string;
+        prescription?: undefined;
+    } | {
+        success: HttpStatus;
+        prescription: import("../../patient/schemas/patient.schema").Prescriptions;
+        message?: undefined;
+    }>;
+    dispensePrescription(args: {
+        walletAddress: string;
+        prescriptionId: Types.ObjectId;
+    }): Promise<{
+        success: HttpStatus;
+        message: string;
+    }>;
+    removePrescription(args: {
+        walletAddress: string;
+        prescriptionId: Types.ObjectId;
+    }): Promise<{
+        success: HttpStatus;
+        message: string;
     }>;
 }

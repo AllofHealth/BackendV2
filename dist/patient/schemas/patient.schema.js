@@ -72,6 +72,10 @@ __decorate([
 ], Prescriptions.prototype, "medicineName", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Prescriptions.prototype, "quantity", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Prescriptions.prototype, "medicineId", void 0);
 __decorate([
@@ -98,6 +102,10 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)
 ], Prescriptions.prototype, "dispensedDate", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Prescriptions.prototype, "dispensedBy", void 0);
 exports.Prescriptions = Prescriptions = __decorate([
     (0, mongoose_1.Schema)()
 ], Prescriptions);

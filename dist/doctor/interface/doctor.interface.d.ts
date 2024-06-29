@@ -77,6 +77,7 @@ export interface AddPatientPrescription {
     patientAddress: string;
     doctorAddress: string;
     medicineName: string;
+    quantity?: number;
     medicineId?: string;
     medicineGroup?: string;
     description: string;

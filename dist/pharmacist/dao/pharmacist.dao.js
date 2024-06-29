@@ -103,6 +103,9 @@ let PharmacistDao = class PharmacistDao {
     async pullMedicineById(pharmacistAddress, medicineId) {
         return await this.pharmacistModel.findOneAndUpdate({ walletAddress: pharmacistAddress }, { $pull: { 'inventory.medicines': { _id: medicineId } } });
     }
+    async pullOnePrescription(pharmacistAddress, prescriptionId) {
+        return await this.pharmacistModel.findOneAndUpdate({ walletAddress: pharmacistAddress }, { $pull: { prescriptions: { _id: prescriptionId } } });
+    }
     async deletePharmacist(address) {
         return await this.pharmacistModel.deleteOne({ walletAddress: address });
     }

@@ -44,6 +44,7 @@ export declare class Prescriptions extends Document {
     patientAddress: string;
     doctorAddress: string;
     medicineName: string;
+    quantity?: number;
     medicineId?: string;
     medicineGroup?: string;
     description: string;
@@ -51,6 +52,7 @@ export declare class Prescriptions extends Document {
     date: Date;
     status?: string;
     dispensedDate?: Date;
+    dispensedBy?: string;
 }
 export declare const PrescriptionsSchema: import("mongoose").Schema<Prescriptions, import("mongoose").Model<Prescriptions, any, any, any, Document<unknown, any, Prescriptions> & Prescriptions & {
     _id: import("mongoose").Types.ObjectId;

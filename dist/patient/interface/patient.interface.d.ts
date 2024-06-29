@@ -147,11 +147,15 @@ export interface CreatePrescriptionInterface {
     patientAddress: string;
     doctorAddress: string;
     medicineName: string;
+    quantity?: number;
     medicineId?: string;
     medicineGroup?: string;
     description: string;
     sideEffects: string;
     date?: Date;
+    status?: string;
+    dispensedDate?: Date;
+    dispensedBy?: string;
 }
 export interface SharePrescriptionInterface {
     walletAddress: string;
