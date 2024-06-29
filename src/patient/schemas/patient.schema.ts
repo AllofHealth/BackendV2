@@ -48,6 +48,9 @@ export class Prescriptions extends Document {
   medicineName: string;
 
   @Prop()
+  quantity?: number;
+
+  @Prop()
   medicineId?: string;
 
   @Prop()
@@ -67,6 +70,9 @@ export class Prescriptions extends Document {
 
   @Prop()
   dispensedDate?: Date;
+
+  @Prop()
+  dispensedBy?: string;
 }
 
 export const PrescriptionsSchema = SchemaFactory.createForClass(Prescriptions);
