@@ -144,8 +144,10 @@ export interface UpdatePatientProfileType {
 export interface CreatePrescriptionInterface {
     doctorName: string;
     recordId: number;
+    patientName: string;
     patientAddress: string;
     doctorAddress: string;
+    institutionName: string;
     medicineName: string;
     quantity?: number;
     medicineId?: string;

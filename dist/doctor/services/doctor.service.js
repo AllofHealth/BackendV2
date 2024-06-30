@@ -246,6 +246,14 @@ let DoctorService = class DoctorService {
             }
             const patient = await this.patientDao.fetchPatientByAddress(patientAddress);
             const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
+            const hospitalId = doctor.hospitalIds[0];
+            const institution = await this.hospitalDao.fetchHospitalWithBlockchainId(hospitalId);
+            if (!institution) {
+                return {
+                    success: common_1.HttpStatus.NOT_FOUND,
+                    message: 'Hospital not found',
+                };
+            }
             if (doctor.status !== shared_1.ApprovalStatus.Approved) {
                 return {
                     success: common_1.HttpStatus.UNAUTHORIZED,
@@ -255,8 +263,10 @@ let DoctorService = class DoctorService {
             const newPrescriptionArgs = {
                 doctorName: doctor.name,
                 recordId: recordId,
+                patientName: patient.name,
                 patientAddress: patientAddress,
                 doctorAddress: doctorAddress,
+                institutionName: institution.name,
                 medicineName: medicineName,
                 quantity: quantity ? quantity : 1,
                 medicineId: medicineId,

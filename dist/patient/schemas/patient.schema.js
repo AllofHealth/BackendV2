@@ -59,6 +59,10 @@ __decorate([
     __metadata("design:type", Number)
 ], Prescriptions.prototype, "recordId", void 0);
 __decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Prescriptions.prototype, "patientName", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Prescriptions.prototype, "patientAddress", void 0);
@@ -66,6 +70,10 @@ __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Prescriptions.prototype, "doctorAddress", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Prescriptions.prototype, "institutionName", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)

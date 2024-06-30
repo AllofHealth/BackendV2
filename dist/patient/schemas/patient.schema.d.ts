@@ -41,8 +41,10 @@ export declare const MedicalRecordPreviewSchema: import("mongoose").Schema<Medic
 export declare class Prescriptions extends Document {
     doctorName: string;
     recordId: number;
+    patientName?: string;
     patientAddress: string;
     doctorAddress: string;
+    institutionName?: string;
     medicineName: string;
     quantity?: number;
     medicineId?: string;

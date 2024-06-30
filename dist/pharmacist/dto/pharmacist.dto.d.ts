@@ -14,7 +14,6 @@ export declare class UpdatePharmacistDto {
     email?: string;
     profilePicture?: string;
     location?: string;
-    regNo?: string;
     phoneNumber?: string;
 }
 export declare class AddMedicineDto {
