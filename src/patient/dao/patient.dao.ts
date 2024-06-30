@@ -80,8 +80,10 @@ export class PatientDao {
     return await this.prescriptionsModel.create({
       doctorName: prescription.doctorName,
       recordId: prescription.recordId,
+      patientName: prescription.patientName,
       patientAddress: prescription.patientAddress,
       doctorAddress: prescription.doctorAddress,
+      institutionName: prescription.institutionName,
       medicineName: prescription.medicineName,
       quantity: prescription.quantity,
       medicineId: prescription.medicineId ? prescription.medicineId : '',
