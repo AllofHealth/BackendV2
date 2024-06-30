@@ -38,11 +38,17 @@ export class Prescriptions extends Document {
   @Prop({ required: true })
   recordId: number;
 
+  @Prop()
+  patientName?: string;
+
   @Prop({ required: true })
   patientAddress: string;
 
   @Prop({ required: true })
   doctorAddress: string;
+
+  @Prop()
+  institutionName?: string;
 
   @Prop({ required: true })
   medicineName: string;
