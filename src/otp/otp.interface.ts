@@ -1,1 +1,4 @@
-export interface Otp {}
+export interface OtpEntry {
+  otp: string;
+  expiresAt: number;
+}
