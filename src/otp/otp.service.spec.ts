@@ -15,4 +15,23 @@ describe('OtpService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  describe('OTP', () => {
+    it('Should generate secret', () => {
+      const secret = service.generateSecret();
+      console.log(secret);
+      expect(secret).toBeDefined();
+    });
+
+    it('Should generate OTP and verify otp', () => {
+      const secret = service.generateSecret();
+      const otp = service.generateOtp(secret);
+      console.log(otp);
+      const isValid = service.verifyOtp(secret, otp);
+
+      console.log(isValid);
+      expect(otp).toBeDefined();
+      expect(isValid).toBe(true);
+    });
+  });
 });
