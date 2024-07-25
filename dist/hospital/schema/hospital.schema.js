@@ -65,10 +65,6 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Pharmacist.prototype, "status", void 0);
-__decorate([
-    (0, mongoose_1.Prop)(),
-    __metadata("design:type", String)
-], Pharmacist.prototype, "category", void 0);
 exports.Pharmacist = Pharmacist = __decorate([
     (0, mongoose_1.Schema)()
 ], Pharmacist);
@@ -124,6 +120,10 @@ __decorate([
     (0, mongoose_1.Prop)({ required: true, default: 'hospital' }),
     __metadata("design:type", String)
 ], Hospital.prototype, "category", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Hospital.prototype, "secret", void 0);
 exports.Hospital = Hospital = __decorate([
     (0, mongoose_1.Schema)()
 ], Hospital);

@@ -45,7 +45,6 @@ export declare class Pharmacist {
     profilePicture: string;
     name: string;
     status: string;
-    category: string;
 }
 export declare const PharmacistSchema: import("mongoose").Schema<Pharmacist, import("mongoose").Model<Pharmacist, any, any, any, Document<unknown, any, Pharmacist> & Pharmacist & {
     _id: import("mongoose").Types.ObjectId;
@@ -66,6 +65,7 @@ export declare class Hospital {
     pharmacists: PreviewType[];
     status: string;
     category: string;
+    secret: string;
 }
 export declare const HospitalSchema: import("mongoose").Schema<Hospital, import("mongoose").Model<Hospital, any, any, any, Document<unknown, any, Hospital> & Hospital & {
     _id: import("mongoose").Types.ObjectId;

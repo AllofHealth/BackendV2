@@ -20,6 +20,7 @@ const admin_module_1 = require("./admin/admin.module");
 const hospital_module_1 = require("./hospital/hospital.module");
 const doctor_module_1 = require("./doctor/doctor.module");
 const pharmacist_module_1 = require("./pharmacist/pharmacist.module");
+const otp_module_1 = require("./otp/otp.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -47,6 +48,7 @@ exports.AppModule = AppModule = __decorate([
             hospital_module_1.HospitalModule,
             doctor_module_1.DoctorModule,
             pharmacist_module_1.PharmacistModule,
+            otp_module_1.OtpModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, { provide: core_1.APP_GUARD, useClass: throttler_1.ThrottlerGuard }],
