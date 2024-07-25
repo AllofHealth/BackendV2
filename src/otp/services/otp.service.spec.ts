@@ -24,7 +24,7 @@ describe('OtpService', () => {
     });
 
     it('Should generate OTP and verify otp', () => {
-      const secret = service.generateSecret();
+      const secret = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
       const otp = service.generateOtp(secret);
       console.log(otp);
       const isValid = service.verifyOtp(secret, otp);
