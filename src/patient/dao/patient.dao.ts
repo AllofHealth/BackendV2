@@ -5,6 +5,7 @@ import {
   MedicalRecordPreview,
 } from '../schemas/patient.schema';
 import { Category } from 'src/shared';
+import { authenticator } from 'otplib';
 import {
   CreateApprovalType,
   CreateFamilyMemberType,
@@ -55,6 +56,7 @@ export class PatientDao {
       bloodGroup: patient.bloodGroup,
       genotype: patient.genotype,
       category: Category.Patient,
+      secret: authenticator.generateSecret(),
     });
   }
 
