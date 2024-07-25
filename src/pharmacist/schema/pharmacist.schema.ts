@@ -121,9 +121,6 @@ export class Pharmacist {
 
   @Prop({ default: 'pharmacist', required: true })
   category: string;
-
-  @Prop()
-  secret: string;
 }
 
 export const PharmacistSchema = SchemaFactory.createForClass(Pharmacist);

@@ -170,9 +170,6 @@ export class Patient {
 
   @Prop({ default: 'patient', required: true })
   category: string;
-
-  @Prop()
-  secret: string;
 }
 
 export const PatientSchema = SchemaFactory.createForClass(Patient);
