@@ -74,6 +74,9 @@ export class Doctor {
 
   @Prop({ default: 'doctor', required: true })
   category: string;
+
+  @Prop()
+  secret: string;
 }
 
 export const DoctorSchema = SchemaFactory.createForClass(Doctor);
