@@ -91,6 +91,9 @@ export class Hospital {
 
   @Prop({ required: true, default: 'hospital' })
   category: string;
+
+  @Prop()
+  secret: string;
 }
 
 export const HospitalSchema = SchemaFactory.createForClass(Hospital);
