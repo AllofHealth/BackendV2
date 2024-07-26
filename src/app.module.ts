@@ -12,6 +12,7 @@ import { HospitalModule } from './hospital/hospital.module';
 import { DoctorModule } from './doctor/doctor.module';
 import { PharmacistModule } from './pharmacist/pharmacist.module';
 import { OtpModule } from './otp/otp.module';
+import { TermillModule } from './termill/termill.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { OtpModule } from './otp/otp.module';
     DoctorModule,
     PharmacistModule,
     OtpModule,
+    TermillModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
