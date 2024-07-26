@@ -9,3 +9,5 @@ export const PROFILE_PLACEHOLDER =
 export const HOSPITAL_PLACEHOLDER =
   'https://www.kindpng.com/picc/m/264-2646273_hydrodent-micro-channel-icon-hospital-navigation-icon-hospital.png';
 export const MEDICINE_PLACEHOLDER = 'https://pixy.org/src/144/1448676.jpg';
+export const TERMILL_API_KEY = process.env.TERMILL_API_KEY;
+export const TERMILL_BASE_URL = process.env.TERMILL_BASE_URL;
