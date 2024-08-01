@@ -5,14 +5,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MONGODB_URI } from './shared/constants';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
-import { MyLoggerModule } from './my-logger/my-logger.module';
-import { PatientModule } from './patient/patient.module';
-import { AdminModule } from './admin/admin.module';
-import { HospitalModule } from './hospital/hospital.module';
-import { DoctorModule } from './doctor/doctor.module';
-import { PharmacistModule } from './pharmacist/pharmacist.module';
-import { OtpModule } from './otp/otp.module';
-import { TermillModule } from './termill/termill.module';
+import { MyLoggerModule } from './modules/my-logger/my-logger.module';
+import { PatientModule } from './modules/patient/patient.module';
+import { AdminModule } from './modules/admin/admin.module';
+import { HospitalModule } from './modules/hospital/hospital.module';
+import { DoctorModule } from './modules/doctor/doctor.module';
+import { PharmacistModule } from './modules/pharmacist/pharmacist.module';
+import { OtpModule } from './modules/otp/otp.module';
+import { TermillModule } from './modules/termill/termill.module';
+import { PostmarkModule } from './modules/postmark/postmark.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { TermillModule } from './termill/termill.module';
     PharmacistModule,
     OtpModule,
     TermillModule,
+    PostmarkModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

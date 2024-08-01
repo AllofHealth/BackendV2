@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { MyLoggerService } from './my-logger/my-logger.service';
+import { MyLoggerService } from './modules/my-logger/my-logger.service';
 
 @SkipThrottle()
 @Controller()
