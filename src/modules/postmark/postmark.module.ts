@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
-import { PostmarkService } from './postmark.service';
+import { PostmarkService } from './service/postmark.service';
+import { PostmarkDao } from './dao/postmark.dao';
 
 @Module({
-  providers: [PostmarkService]
+  providers: [PostmarkService, PostmarkDao],
+  exports: [PostmarkService, PostmarkDao],
 })
 export class PostmarkModule {}
