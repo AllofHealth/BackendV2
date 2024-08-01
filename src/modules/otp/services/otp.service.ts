@@ -18,6 +18,7 @@ export class OtpService {
     const otp = authenticator.generate(secret);
     const expiresAt = Date.now() + this.expirationTime;
     try {
+      //run clean up before creating another otp
       const result = await this.otpDao.createOtp(
         secret,
         otp,
