@@ -11,3 +11,4 @@ export const HOSPITAL_PLACEHOLDER =
 export const MEDICINE_PLACEHOLDER = 'https://pixy.org/src/144/1448676.jpg';
 export const TERMILL_API_KEY = process.env.TERMILL_API_KEY;
 export const TERMILL_BASE_URL = process.env.TERMILL_BASE_URL;
+export const POSTMARK_SERVER_TOKEN = process.env.POSTMARK_SERVER_TOKEN;
