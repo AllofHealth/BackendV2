@@ -14,13 +14,15 @@ const mongoose_1 = require("@nestjs/mongoose");
 const constants_1 = require("./shared/constants");
 const throttler_1 = require("@nestjs/throttler");
 const core_1 = require("@nestjs/core");
-const my_logger_module_1 = require("./my-logger/my-logger.module");
-const patient_module_1 = require("./patient/patient.module");
-const admin_module_1 = require("./admin/admin.module");
-const hospital_module_1 = require("./hospital/hospital.module");
-const doctor_module_1 = require("./doctor/doctor.module");
-const pharmacist_module_1 = require("./pharmacist/pharmacist.module");
-const otp_module_1 = require("./otp/otp.module");
+const my_logger_module_1 = require("./modules/my-logger/my-logger.module");
+const patient_module_1 = require("./modules/patient/patient.module");
+const admin_module_1 = require("./modules/admin/admin.module");
+const hospital_module_1 = require("./modules/hospital/hospital.module");
+const doctor_module_1 = require("./modules/doctor/doctor.module");
+const pharmacist_module_1 = require("./modules/pharmacist/pharmacist.module");
+const otp_module_1 = require("./modules/otp/otp.module");
+const termill_module_1 = require("./modules/termill/termill.module");
+const postmark_module_1 = require("./modules/postmark/postmark.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -49,6 +51,8 @@ exports.AppModule = AppModule = __decorate([
             doctor_module_1.DoctorModule,
             pharmacist_module_1.PharmacistModule,
             otp_module_1.OtpModule,
+            termill_module_1.TermillModule,
+            postmark_module_1.PostmarkModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, { provide: core_1.APP_GUARD, useClass: throttler_1.ThrottlerGuard }],

@@ -16,6 +16,7 @@ import { PatientGuard } from './guards/patient.guard';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PharmacistModule } from 'src/modules/pharmacist/pharmacist.module';
 import { DoctorModule } from 'src/modules/doctor/doctor.module';
+import { OtpModule } from 'src/modules/otp/otp.module';
 import {
   Approval,
   ApprovalSchema,
@@ -44,6 +45,7 @@ import {
     ]),
     PharmacistModule,
     DoctorModule,
+    OtpModule,
   ],
   providers: [PatientService, PatientDao, PatientGuard],
   controllers: [PatientController],

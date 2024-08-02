@@ -17,6 +17,7 @@ import { HospitalDao } from 'src/modules/hospital/dao/hospital.dao';
 import { MongooseError, Types } from 'mongoose';
 import { MEDICINE_PLACEHOLDER } from 'src/shared/constants';
 import { PatientDao } from 'src/modules/patient/dao/patient.dao';
+import { OtpService } from '@/modules/otp/services/otp.service';
 
 @Injectable()
 export class PharmacistService {
@@ -25,12 +26,12 @@ export class PharmacistService {
     private readonly pharmacistGuard: PharmacistGuard,
     private readonly hospitalDao: HospitalDao,
     private readonly patientDao: PatientDao,
+    private readonly otpService: OtpService,
   ) {}
 
   async createPharmacist(args: CreatePharmacistType) {
-    const pharmacistExists = await this.pharmacistGuard.validatePharmacistExists(
-      args.walletAddress,
-    );
+    const pharmacistExists =
+      await this.pharmacistGuard.validatePharmacistExists(args.walletAddress);
     if (pharmacistExists) {
       return {
         success: ErrorCodes.Error,
@@ -73,6 +74,7 @@ export class PharmacistService {
 
       try {
         hospital.pharmacists.push(pharmacistPreview);
+        await this.otpService.deliverOtp(args.walletAddress, pharmacist.email);
       } catch (error) {
         await this.pharmacistDao.deletePharmacist(pharmacist.walletAddress);
         throw new PharmacistError('Error adding pharmacist to hospital');
@@ -96,7 +98,8 @@ export class PharmacistService {
 
   async getPendingPharmacists() {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistWithPendingStatus();
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistWithPendingStatus();
 
       if (!pharmacist || pharmacist.length === 0) {
         return {
@@ -117,7 +120,8 @@ export class PharmacistService {
 
   async getApprovedPharmacists() {
     try {
-      const pharmacists = await this.pharmacistDao.fetchPharmacistsWithApprovedStatus();
+      const pharmacists =
+        await this.pharmacistDao.fetchPharmacistsWithApprovedStatus();
 
       if (!pharmacists || pharmacists.length === 0) {
         return {
@@ -138,9 +142,8 @@ export class PharmacistService {
 
   async getPharmacistByAddress(address: string) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        address,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(address);
 
       if (!pharmacist) {
         return {
@@ -160,6 +163,7 @@ export class PharmacistService {
       throw new PharmacistError('Error fetching pharmacist');
     }
   }
+
   async getAllPharmacists() {
     try {
       const pharmacists = await this.pharmacistDao.fetchAllPharmacists();
@@ -182,9 +186,8 @@ export class PharmacistService {
 
   async updatePharmacist(walletAddress: string, args: UpdatePharmacistType) {
     try {
-      const pharmacistExist = await this.pharmacistGuard.validatePharmacistExists(
-        walletAddress,
-      );
+      const pharmacistExist =
+        await this.pharmacistGuard.validatePharmacistExists(walletAddress);
       if (!pharmacistExist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -211,9 +214,8 @@ export class PharmacistService {
 
   async deletePharmacist(walletAddress: string) {
     try {
-      const pharmacistExist = await this.pharmacistGuard.validatePharmacistExists(
-        walletAddress,
-      );
+      const pharmacistExist =
+        await this.pharmacistGuard.validatePharmacistExists(walletAddress);
       if (!pharmacistExist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -221,9 +223,8 @@ export class PharmacistService {
         };
       }
 
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
       const hospitalIds = pharmacist.hospitalIds;
       await this.hospitalDao.pullManyPharmacists(hospitalIds, walletAddress);
       await this.pharmacistDao.deletePharmacist(walletAddress);
@@ -250,9 +251,8 @@ export class PharmacistService {
       medicineGroup,
     } = args;
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
       if (!pharmacist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -337,9 +337,8 @@ export class PharmacistService {
 
   async deleteMedicine(walletAddress: string, medicineId: Types.ObjectId) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
       if (!pharmacist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -393,9 +392,8 @@ export class PharmacistService {
 
   async fetchMedicine(walletAddress: string, medicineId: Types.ObjectId) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
       if (!pharmacist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -442,9 +440,8 @@ export class PharmacistService {
 
   async fetchAllMedicine(walletAddress: string) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
 
       if (!pharmacist) {
         return {
@@ -481,9 +478,8 @@ export class PharmacistService {
 
   async fetchInventory(walletAddress: string) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
 
       if (!pharmacist) {
         return {
@@ -516,9 +512,8 @@ export class PharmacistService {
     args: UpdateMedicineType,
   ) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
       if (!pharmacist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -569,9 +564,8 @@ export class PharmacistService {
 
   async fetchAllSharedPrescriptions(walletAddress: string) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
       if (!pharmacist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -603,9 +597,8 @@ export class PharmacistService {
   }) {
     const { walletAddress, prescriptionId } = args;
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
       if (!pharmacist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -641,9 +634,8 @@ export class PharmacistService {
   }) {
     const { walletAddress, prescriptionId } = args;
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
       if (!pharmacist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -738,9 +730,8 @@ export class PharmacistService {
   }) {
     const { walletAddress, prescriptionId } = args;
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
       if (!pharmacist) {
         return {
           success: HttpStatus.NOT_FOUND,

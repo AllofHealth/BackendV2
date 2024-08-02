@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
-const my_logger_service_1 = require("./my-logger/my-logger.service");
+const my_logger_service_1 = require("./modules/my-logger/my-logger.service");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.useLogger(app.get(my_logger_service_1.MyLoggerService));

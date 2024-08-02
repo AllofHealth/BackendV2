@@ -121,6 +121,9 @@ export class Pharmacist {
 
   @Prop({ default: 'pharmacist', required: true })
   category: string;
+
+  @Prop({ required: true })
+  isVerified: boolean;
 }
 
 export const PharmacistSchema = SchemaFactory.createForClass(Pharmacist);

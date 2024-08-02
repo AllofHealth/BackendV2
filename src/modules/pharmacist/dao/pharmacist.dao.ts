@@ -32,6 +32,7 @@ export class PharmacistDao {
       phoneNumber: pharmacist.phoneNumber,
       walletAddress: pharmacist.walletAddress,
       status: ApprovalStatus.Pending,
+      isVerified: false,
     });
   }
 

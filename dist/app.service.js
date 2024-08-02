@@ -12,7 +12,7 @@ var AppService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppService = void 0;
 const common_1 = require("@nestjs/common");
-const my_logger_service_1 = require("./my-logger/my-logger.service");
+const my_logger_service_1 = require("./modules/my-logger/my-logger.service");
 let AppService = AppService_1 = class AppService {
     constructor() {
         this.logger = new my_logger_service_1.MyLoggerService(AppService_1.name);

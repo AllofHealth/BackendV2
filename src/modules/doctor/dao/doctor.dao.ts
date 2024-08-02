@@ -37,6 +37,7 @@ export class DoctorDao {
       numberOfApprovals: 0,
       status: ApprovalStatus.Pending,
       category: Category.Doctor,
+      isVerified: false,
     });
   }
 

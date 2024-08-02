@@ -13,7 +13,7 @@ exports.AppController = void 0;
 const common_1 = require("@nestjs/common");
 const app_service_1 = require("./app.service");
 const throttler_1 = require("@nestjs/throttler");
-const my_logger_service_1 = require("./my-logger/my-logger.service");
+const my_logger_service_1 = require("./modules/my-logger/my-logger.service");
 let AppController = class AppController {
     constructor(appService, logger) {
         this.appService = appService;

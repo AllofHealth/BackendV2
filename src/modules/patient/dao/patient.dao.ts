@@ -4,7 +4,7 @@ import {
   Prescriptions,
   MedicalRecordPreview,
 } from '../schemas/patient.schema';
-import { Category } from 'src/shared';
+import { Category } from '@/shared';
 import {
   CreateApprovalType,
   CreateFamilyMemberType,
@@ -15,12 +15,13 @@ import {
   UpdatePatientProfileType,
   UpdatePrescriptionInterface,
 } from '../interface/patient.interface';
-import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
+import { PROFILE_PLACEHOLDER } from '@/shared/constants';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Types } from 'mongoose';
-import { Approval, Doctor } from 'src/modules/doctor/schema/doctor.schema';
+import { Approval } from '@/modules/doctor/schema/doctor.schema';
+import { Doctor } from '@/modules/hospital/schema/hospital.schema';
 
 @Injectable()
 export class PatientDao {
@@ -55,6 +56,7 @@ export class PatientDao {
       bloodGroup: patient.bloodGroup,
       genotype: patient.genotype,
       category: Category.Patient,
+      isVerified: false,
     });
   }
 
