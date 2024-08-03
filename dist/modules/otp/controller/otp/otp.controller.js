@@ -19,8 +19,8 @@ let OtpController = class OtpController {
     constructor(otpService) {
         this.otpService = otpService;
     }
-    generateOTP(walletAddress) {
-        return this.otpService.generateOtp(walletAddress);
+    resendOTP(walletAddress) {
+        return this.otpService.resendOtp(walletAddress);
     }
     verifyOTP(walletAddress, otp) {
         return this.otpService.verifyOtp(walletAddress, otp);
@@ -28,12 +28,12 @@ let OtpController = class OtpController {
 };
 exports.OtpController = OtpController;
 __decorate([
-    (0, common_1.Post)('generate'),
+    (0, common_1.Post)('resendOTP'),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
-], OtpController.prototype, "generateOTP", null);
+], OtpController.prototype, "resendOTP", null);
 __decorate([
     (0, common_1.Post)('verify'),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
