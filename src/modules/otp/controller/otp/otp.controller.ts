@@ -5,12 +5,12 @@ import { OtpService } from 'src/modules/otp/services/otp.service';
 export class OtpController {
   constructor(private readonly otpService: OtpService) {}
 
-  @Post('generate')
-  generateOTP(
+  @Post('resendOTP')
+  resendOTP(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
   ) {
-    return this.otpService.generateOtp(walletAddress);
+    return this.otpService.resendOtp(walletAddress);
   }
 
   @Post('verify')
