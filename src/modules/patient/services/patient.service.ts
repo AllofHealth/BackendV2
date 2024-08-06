@@ -22,7 +22,6 @@ import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
 import { PatientProvider } from '../provider/patient.provider';
 import { PROFILE_PLACEHOLDER } from '@/shared/constants';
 import { OtpService } from '@/modules/otp/services/otp.service';
-import { PostmarkService } from '@/modules/postmark/service/postmark.service';
 import { PatientError, ErrorCodes, ApprovalStatus } from '@/shared';
 
 /**
@@ -118,6 +117,7 @@ export class PatientService {
 
       try {
         await this.otpService.deliverOtp(walletAddress, args.email);
+        console.log('Email sent');
       } catch (error) {
         console.error(error);
         throw new Error('An error occurred while creating patient');
