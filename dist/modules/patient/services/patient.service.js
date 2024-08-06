@@ -98,6 +98,7 @@ let PatientService = class PatientService {
             }
             try {
                 await this.otpService.deliverOtp(walletAddress, args.email);
+                console.log('Email sent');
             }
             catch (error) {
                 console.error(error);
