@@ -10,11 +10,16 @@ export class PostmarkService {
     const { to, otp } = args;
     try {
       const client = this.postmarkDao.provideClient();
-      const result = await client.sendEmail({
+      const result = await client.sendEmailWithTemplate({
         From: 'support@allofhealth.xyz',
         To: to,
-        Subject: 'OTP Verification',
-        HtmlBody: `<html> <body> <h1>Your OTP is <strong>${otp}</strong></h1> </body> </html>`,
+        TemplateId: 36865837,
+        TemplateModel: {
+          otp: otp,
+          company_name: 'AllofHealth',
+          product_name: 'AllofHealth',
+          company_address: 'Victoria Island, Lagos, Nigeria',
+        },
       });
 
       if (result.ErrorCode) {
