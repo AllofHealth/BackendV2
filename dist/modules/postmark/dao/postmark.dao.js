@@ -15,6 +15,10 @@ let PostmarkDao = class PostmarkDao {
         const client = new postmark_1.ServerClient(constants_1.POSTMARK_SERVER_TOKEN);
         return client;
     }
+    async fetchTemplates() {
+        const client = this.provideClient();
+        return await client.getTemplates();
+    }
 };
 exports.PostmarkDao = PostmarkDao;
 exports.PostmarkDao = PostmarkDao = __decorate([
