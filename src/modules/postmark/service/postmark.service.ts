@@ -13,7 +13,7 @@ export class PostmarkService {
       const result = await client.sendEmailWithTemplate({
         From: 'support@allofhealth.xyz',
         To: to,
-        TemplateId: 36865837,
+        TemplateAlias: 'otp-1',
         TemplateModel: {
           otp: otp,
           company_name: 'AllofHealth',
