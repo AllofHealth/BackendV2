@@ -15,4 +15,13 @@ describe('Postmark', () => {
   it('should be defined', () => {
     expect(provider).toBeDefined();
   });
+
+  describe('Templates', () => {
+    it('should fetch templates', async () => {
+      const result = await provider.fetchTemplates();
+
+      console.log(result);
+      expect(result).toBeDefined();
+    });
+  });
 });

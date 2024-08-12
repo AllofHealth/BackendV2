@@ -8,4 +8,9 @@ export class PostmarkDao {
     const client = new ServerClient(POSTMARK_SERVER_TOKEN);
     return client;
   }
+
+  async fetchTemplates() {
+    const client = this.provideClient();
+    return await client.getTemplates();
+  }
 }
