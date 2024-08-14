@@ -9,7 +9,8 @@ export interface CreateHospitalType {
   location: string;
   profilePicture?: string;
   description?: string;
-  status?: string;
+  type?: string;
+  regNo: string;
 }
 
 export interface PreviewType {
