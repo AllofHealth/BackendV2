@@ -1,6 +1,7 @@
 import * as crypto from 'crypto';
+import { ENCRYPTION_KEY } from '../constants';
 
-const KEY = 'i02lvumS2enyb9ovJrETPRIwojy8W1X6MdQUaOO6rLc=';
+const KEY = ENCRYPTION_KEY;
 
 interface Encrypt {
   data: string;
