@@ -13,20 +13,21 @@ export class HospitalDao {
     @InjectModel(Hospital.name) private hospitalModel: Model<Hospital>,
   ) {}
 
-  async createHospital(hospital: CreateHospitalType) {
+  async createHospital(institution: CreateHospitalType) {
     return await this.hospitalModel.create({
-      id: hospital.id,
-      name: hospital.name,
-      admin: hospital.admin,
-      email: hospital.email,
-      phoneNo: hospital.phoneNo,
-      location: hospital.location,
-      profilePicture: hospital.profilePicture
-        ? hospital.profilePicture
+      id: institution.id,
+      name: institution.name,
+      admin: institution.admin,
+      email: institution.email,
+      phoneNo: institution.phoneNo,
+      location: institution.location,
+      profilePicture: institution.profilePicture
+        ? institution.profilePicture
         : HOSPITAL_PLACEHOLDER,
-      description: hospital.description,
+      description: institution.description,
       status: ApprovalStatus.Pending,
-      category: Category.Hospital,
+      category: institution.type ? institution.type : Category.Hospital,
+      regNo: institution.regNo,
     });
   }
 
