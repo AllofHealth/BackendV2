@@ -23,6 +23,7 @@ import { DoctorDao } from 'src/modules/doctor/dao/doctor.dao';
 import { PharmacistDao } from 'src/modules/pharmacist/dao/pharmacist.dao';
 import { DoctorGuard } from 'src/modules/doctor/guards/doctor.guard';
 import { PharmacistGuard } from 'src/modules/pharmacist/guards/pharmacist.guard';
+import { encrypt } from '@/shared/utils/encrypt.utils';
 
 @Injectable()
 export class HospitalService {
@@ -38,17 +39,29 @@ export class HospitalService {
   ) {}
 
   async createNewHospital(args: CreateHospitalType) {
+    const { regNo, ...rest } = args;
+
+    if ((args.type && args.type !== 'hospital') || 'pharmacy') {
+      return {
+        success: HttpStatus.BAD_REQUEST,
+        message: 'invalid institution type',
+      };
+    }
+
     try {
-      const hospitalExist = await this.hospitalDao.fetchHospitalWithBlockchainId(
-        args.id,
-      );
+      const hospitalExist =
+        await this.hospitalDao.fetchHospitalWithBlockchainId(args.id);
       if (hospitalExist) {
         return {
           success: HttpStatus.CREATED,
           message: 'hospital already exists',
         };
       }
-      const hospital = await this.hospitalDao.createHospital(args);
+
+      const hospital = await this.hospitalDao.createHospital({
+        ...rest,
+        regNo: encrypt({ data: regNo }),
+      });
       return {
         success: ErrorCodes.Success,
         hospital,
@@ -117,9 +130,8 @@ export class HospitalService {
     const { hospitalId, pharmacistAddress } = args;
     try {
       const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        pharmacistAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(pharmacistAddress);
       if (!hospital) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -158,12 +170,12 @@ export class HospitalService {
   }) {
     const { hospitalId, practitionerAddress } = args;
     try {
-      const isDoctor = await this.doctorGuard.validateDoctorExists(
-        practitionerAddress,
-      );
-      const isPharmacist = await this.pharmacistGuard.validatePharmacistExists(
-        practitionerAddress,
-      );
+      const isDoctor =
+        await this.doctorGuard.validateDoctorExists(practitionerAddress);
+      const isPharmacist =
+        await this.pharmacistGuard.validatePharmacistExists(
+          practitionerAddress,
+        );
 
       if (isDoctor) {
         await this.removeHospitalIdFromDoctorDocument({
@@ -300,12 +312,10 @@ export class HospitalService {
         };
       }
 
-      const isDoctor = await this.doctorGuard.validateDoctorExists(
-        walletAddress,
-      );
-      const isPharmacist = await this.pharmacistGuard.validatePharmacistExists(
-        walletAddress,
-      );
+      const isDoctor =
+        await this.doctorGuard.validateDoctorExists(walletAddress);
+      const isPharmacist =
+        await this.pharmacistGuard.validatePharmacistExists(walletAddress);
 
       if (!isDoctor && !isPharmacist) {
         return {
@@ -315,10 +325,11 @@ export class HospitalService {
       }
 
       if (isDoctor) {
-        const doctorExist = await this.doctorGuard.validateDoctorExistsInHospital(
-          hospital.id,
-          walletAddress,
-        );
+        const doctorExist =
+          await this.doctorGuard.validateDoctorExistsInHospital(
+            hospital.id,
+            walletAddress,
+          );
         if (doctorExist) {
           return {
             success: HttpStatus.CREATED,
@@ -351,19 +362,19 @@ export class HospitalService {
           };
         }
       } else if (isPharmacist) {
-        const pharmacistExist = await this.pharmacistGuard.validatePharmacistExistsInHospital(
-          hospital.id,
-          walletAddress,
-        );
+        const pharmacistExist =
+          await this.pharmacistGuard.validatePharmacistExistsInHospital(
+            hospital.id,
+            walletAddress,
+          );
         if (pharmacistExist) {
           return {
             success: HttpStatus.CREATED,
             message: 'pharmacist already exists in hospital',
           };
         }
-        const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-          walletAddress,
-        );
+        const pharmacist =
+          await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
         const pharmacistPreview: PreviewType = {
           walletAddress,
           profilePicture: pharmacist.profilePicture,
@@ -412,10 +423,11 @@ export class HospitalService {
         hospital.id,
         walletAddress,
       );
-      const isPharmacist = await this.pharmacistGuard.validatePharmacistExistsInHospital(
-        hospital.id,
-        walletAddress,
-      );
+      const isPharmacist =
+        await this.pharmacistGuard.validatePharmacistExistsInHospital(
+          hospital.id,
+          walletAddress,
+        );
 
       if (adminAddress !== hospital.admin) {
         return {
@@ -481,10 +493,11 @@ export class HospitalService {
           message: 'unauthorized, contact hospital admin',
         };
       }
-      const isPharmacist = await this.pharmacistGuard.validatePharmacistExistsInHospital(
-        hospital.id,
-        walletAddress,
-      );
+      const isPharmacist =
+        await this.pharmacistGuard.validatePharmacistExistsInHospital(
+          hospital.id,
+          walletAddress,
+        );
 
       if (!isDoctor && !isPharmacist) {
         return {
@@ -534,7 +547,8 @@ export class HospitalService {
 
   async fetchApprovedHospitals() {
     try {
-      const hospitals = await this.hospitalDao.fetchHospitalWithApprovedStatus();
+      const hospitals =
+        await this.hospitalDao.fetchHospitalWithApprovedStatus();
       if (!hospitals) {
         console.log('No approved hospitals');
         throw new HospitalError('No approved hospitals found');
