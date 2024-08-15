@@ -41,13 +41,6 @@ export class HospitalService {
   async createNewHospital(args: CreateHospitalType) {
     const { regNo, ...rest } = args;
 
-    if ((args.type && args.type !== 'hospital') || 'pharmacy') {
-      return {
-        success: HttpStatus.BAD_REQUEST,
-        message: 'invalid institution type',
-      };
-    }
-
     try {
       const hospitalExist =
         await this.hospitalDao.fetchHospitalWithBlockchainId(args.id);
@@ -267,6 +260,7 @@ export class HospitalService {
     adminAddress: string,
     updateData: UpdateHospitalProfileType,
   ) {
+    const { regNo, ...rest } = updateData;
     try {
       const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
       if (!hospital) {
@@ -282,9 +276,15 @@ export class HospitalService {
           message: 'not authorized',
         };
       }
+      const newUpdateData = {
+        encryptedRegNo: encrypt({
+          data: regNo,
+        }),
+        ...rest,
+      };
       const updatedHospital = await this.hospitalDao.updateHospital(
         hospitalId,
-        updateData,
+        newUpdateData,
       );
 
       await hospital.save();
