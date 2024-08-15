@@ -57,9 +57,13 @@ __decorate([
 ], CreateHospitalDto.prototype, "description", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], CreateHospitalDto.prototype, "status", void 0);
+], CreateHospitalDto.prototype, "type", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateHospitalDto.prototype, "regNo", void 0);
 class UpdateHospitalProfileDto {
 }
 exports.UpdateHospitalProfileDto = UpdateHospitalProfileDto;
@@ -93,6 +97,15 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpdateHospitalProfileDto.prototype, "profilePicture", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateHospitalProfileDto.prototype, "regNo", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateHospitalProfileDto.prototype, "type", void 0);
 class JoinHospitalDto {
 }
 exports.JoinHospitalDto = JoinHospitalDto;

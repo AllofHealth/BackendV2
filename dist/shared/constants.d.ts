@@ -5,3 +5,4 @@ export declare const MEDICINE_PLACEHOLDER = "https://pixy.org/src/144/1448676.jp
 export declare const TERMILL_API_KEY: string;
 export declare const TERMILL_BASE_URL: string;
 export declare const POSTMARK_SERVER_TOKEN: string;
+export declare const ENCRYPTION_KEY = "i02lvumS2enyb9ovJrETPRIwojy8W1X6MdQUaOO6rLc=";

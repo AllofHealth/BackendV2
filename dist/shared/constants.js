@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.POSTMARK_SERVER_TOKEN = exports.TERMILL_BASE_URL = exports.TERMILL_API_KEY = exports.MEDICINE_PLACEHOLDER = exports.HOSPITAL_PLACEHOLDER = exports.PROFILE_PLACEHOLDER = exports.MONGODB_URI = void 0;
+exports.ENCRYPTION_KEY = exports.POSTMARK_SERVER_TOKEN = exports.TERMILL_BASE_URL = exports.TERMILL_API_KEY = exports.MEDICINE_PLACEHOLDER = exports.HOSPITAL_PLACEHOLDER = exports.PROFILE_PLACEHOLDER = exports.MONGODB_URI = void 0;
 const dotenv_1 = require("dotenv");
 (0, dotenv_1.config)();
 exports.MONGODB_URI = process.env.MONGODB_URI ||
@@ -11,4 +11,5 @@ exports.MEDICINE_PLACEHOLDER = 'https://pixy.org/src/144/1448676.jpg';
 exports.TERMILL_API_KEY = process.env.TERMILL_API_KEY;
 exports.TERMILL_BASE_URL = process.env.TERMILL_BASE_URL;
 exports.POSTMARK_SERVER_TOKEN = process.env.POSTMARK_SERVER_TOKEN;
+exports.ENCRYPTION_KEY = 'i02lvumS2enyb9ovJrETPRIwojy8W1X6MdQUaOO6rLc=';
 //# sourceMappingURL=constants.js.map

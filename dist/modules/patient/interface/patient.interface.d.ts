@@ -71,12 +71,11 @@ export interface CreatePatientType {
     lastName?: string;
     age: number;
     email: string;
+    phoneNo: string;
     profilePicture?: string;
     address: string;
     city: string;
     walletAddress: string;
-    bloodGroup: string;
-    genotype: string;
     category?: string;
 }
 export interface CreateApprovalType {
@@ -135,6 +134,7 @@ export interface UpdatePatientProfileType {
     lastName?: string;
     age?: string;
     email?: string;
+    phoneNo?: string;
     profilePicture?: string;
     address?: string;
     city?: string;

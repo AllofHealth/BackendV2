@@ -33,6 +33,11 @@ __decorate([
     __metadata("design:type", String)
 ], CreatePatientDto.prototype, "email", void 0);
 __decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsPhoneNumber)(),
+    __metadata("design:type", String)
+], CreatePatientDto.prototype, "phoneNo", void 0);
+__decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -50,14 +55,6 @@ __decorate([
     (0, class_validator_1.IsEthereumAddress)(),
     __metadata("design:type", String)
 ], CreatePatientDto.prototype, "walletAddress", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreatePatientDto.prototype, "bloodGroup", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreatePatientDto.prototype, "genotype", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
@@ -87,6 +84,11 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpdatePatientProfileDto.prototype, "email", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsPhoneNumber)(),
+    __metadata("design:type", String)
+], UpdatePatientProfileDto.prototype, "phoneNo", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),

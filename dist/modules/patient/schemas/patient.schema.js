@@ -197,6 +197,10 @@ __decorate([
     __metadata("design:type", String)
 ], Patient.prototype, "email", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
+], Patient.prototype, "phoneNo", void 0);
+__decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Patient.prototype, "profilePicture", void 0);
@@ -213,11 +217,11 @@ __decorate([
     __metadata("design:type", String)
 ], Patient.prototype, "walletAddress", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Patient.prototype, "bloodGroup", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Patient.prototype, "genotype", void 0);
 __decorate([

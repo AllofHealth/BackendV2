@@ -1,3 +1,4 @@
+import { InstitutionType } from '../interface/hospital.interface';
 export declare class CreateHospitalDto {
     id: number;
     name: string;
@@ -7,7 +8,8 @@ export declare class CreateHospitalDto {
     location: string;
     profilePicture?: string;
     description?: string;
-    status?: string;
+    type: InstitutionType;
+    regNo: string;
 }
 export declare class UpdateHospitalProfileDto {
     name?: string;
@@ -16,6 +18,8 @@ export declare class UpdateHospitalProfileDto {
     location?: string;
     description?: string;
     profilePicture?: string;
+    regNo?: string;
+    type: InstitutionType;
 }
 export declare class JoinHospitalDto {
     walletAddress: string;

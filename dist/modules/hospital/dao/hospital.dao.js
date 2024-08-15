@@ -22,20 +22,21 @@ let HospitalDao = class HospitalDao {
     constructor(hospitalModel) {
         this.hospitalModel = hospitalModel;
     }
-    async createHospital(hospital) {
+    async createHospital(institution) {
         return await this.hospitalModel.create({
-            id: hospital.id,
-            name: hospital.name,
-            admin: hospital.admin,
-            email: hospital.email,
-            phoneNo: hospital.phoneNo,
-            location: hospital.location,
-            profilePicture: hospital.profilePicture
-                ? hospital.profilePicture
+            id: institution.id,
+            name: institution.name,
+            admin: institution.admin,
+            email: institution.email,
+            phoneNo: institution.phoneNo,
+            location: institution.location,
+            profilePicture: institution.profilePicture
+                ? institution.profilePicture
                 : constants_1.HOSPITAL_PLACEHOLDER,
-            description: hospital.description,
+            description: institution.description,
             status: shared_1.ApprovalStatus.Pending,
-            category: shared_1.Category.Hospital,
+            category: institution.type ? institution.type : shared_1.Category.General,
+            regNo: institution.regNo,
         });
     }
     async fetchHospitalWithBlockchainId(id) {

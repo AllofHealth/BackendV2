@@ -28,12 +28,11 @@ export declare class CreatePatientDto {
     name: string;
     age: number;
     email: string;
+    phoneNo: string;
     profilePicture?: string;
     address: string;
     city: string;
     walletAddress: string;
-    bloodGroup: string;
-    genotype: string;
     category?: string;
 }
 export declare class UpdatePatientProfileDto {
@@ -41,6 +40,7 @@ export declare class UpdatePatientProfileDto {
     lastName?: string;
     age?: string;
     email: string;
+    phoneNo: string;
     profilePicture?: string;
     address?: string;
     city?: string;

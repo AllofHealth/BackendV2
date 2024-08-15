@@ -8,6 +8,7 @@ var Category;
     Category["Hospital"] = "hospital";
     Category["Pharmacist"] = "pharmacist";
     Category["Patient"] = "patient";
+    Category["General"] = "general";
 })(Category || (exports.Category = Category = {}));
 var ApprovalStatus;
 (function (ApprovalStatus) {

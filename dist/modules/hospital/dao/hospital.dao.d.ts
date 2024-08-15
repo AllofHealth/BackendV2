@@ -28,7 +28,7 @@ import { CreateHospitalType, UpdateHospitalProfileType } from '../interface/hosp
 export declare class HospitalDao {
     private hospitalModel;
     constructor(hospitalModel: Model<Hospital>);
-    createHospital(hospital: CreateHospitalType): Promise<import("mongoose").Document<unknown, {}, Hospital> & Hospital & {
+    createHospital(institution: CreateHospitalType): Promise<import("mongoose").Document<unknown, {}, Hospital> & Hospital & {
         _id: Types.ObjectId;
     }>;
     fetchHospitalWithBlockchainId(id: number): Promise<import("mongoose").Document<unknown, {}, Hospital> & Hospital & {

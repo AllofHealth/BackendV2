@@ -2,7 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.decrypt = exports.encrypt = void 0;
 const crypto = require("crypto");
-const KEY = 'i02lvumS2enyb9ovJrETPRIwojy8W1X6MdQUaOO6rLc=';
+const constants_1 = require("../constants");
+const KEY = constants_1.ENCRYPTION_KEY;
 function encrypt(args) {
     const { data, key } = args;
     const iv = crypto.randomBytes(16);

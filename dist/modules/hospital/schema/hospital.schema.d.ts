@@ -65,7 +65,7 @@ export declare class Hospital {
     pharmacists: PreviewType[];
     status: string;
     category: string;
-    secret: string;
+    regNo: string;
 }
 export declare const HospitalSchema: import("mongoose").Schema<Hospital, import("mongoose").Model<Hospital, any, any, any, Document<unknown, any, Hospital> & Hospital & {
     _id: import("mongoose").Types.ObjectId;

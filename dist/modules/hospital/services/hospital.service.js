@@ -25,6 +25,7 @@ const doctor_dao_1 = require("../../doctor/dao/doctor.dao");
 const pharmacist_dao_1 = require("../../pharmacist/dao/pharmacist.dao");
 const doctor_guard_1 = require("../../doctor/guards/doctor.guard");
 const pharmacist_guard_1 = require("../../pharmacist/guards/pharmacist.guard");
+const encrypt_utils_1 = require("../../../shared/utils/encrypt.utils");
 let HospitalService = class HospitalService {
     constructor(hospitalModel, hospitalDao, hospitalGuard, doctorDao, pharmacistDao, doctorGuard, pharmacistGuard) {
         this.hospitalModel = hospitalModel;
@@ -37,6 +38,7 @@ let HospitalService = class HospitalService {
         this.logger = new my_logger_service_1.MyLoggerService('HospitalService');
     }
     async createNewHospital(args) {
+        const { regNo, ...rest } = args;
         try {
             const hospitalExist = await this.hospitalDao.fetchHospitalWithBlockchainId(args.id);
             if (hospitalExist) {
@@ -45,7 +47,11 @@ let HospitalService = class HospitalService {
                     message: 'hospital already exists',
                 };
             }
-            const hospital = await this.hospitalDao.createHospital(args);
+            const hospitalData = {
+                ...rest,
+                regNo: (0, encrypt_utils_1.encrypt)({ data: regNo }),
+            };
+            const hospital = await this.hospitalDao.createHospital(hospitalData);
             return {
                 success: shared_1.ErrorCodes.Success,
                 hospital,
@@ -193,6 +199,7 @@ let HospitalService = class HospitalService {
         }
     }
     async updateHospitalProfile(hospitalId, adminAddress, updateData) {
+        const { regNo, ...rest } = updateData;
         try {
             const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
             if (!hospital) {
@@ -207,7 +214,13 @@ let HospitalService = class HospitalService {
                     message: 'not authorized',
                 };
             }
-            const updatedHospital = await this.hospitalDao.updateHospital(hospitalId, updateData);
+            const newUpdateData = {
+                encryptedRegNo: (0, encrypt_utils_1.encrypt)({
+                    data: regNo,
+                }),
+                ...rest,
+            };
+            const updatedHospital = await this.hospitalDao.updateHospital(hospitalId, newUpdateData);
             await hospital.save();
             return {
                 success: common_1.HttpStatus.OK,

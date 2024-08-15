@@ -87,6 +87,7 @@ export declare class Patient {
     lastName: string;
     age: number;
     email: string;
+    phoneNo: string;
     profilePicture: string;
     address: string;
     city: string;

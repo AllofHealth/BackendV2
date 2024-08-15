@@ -3,7 +3,8 @@ export declare enum Category {
     Doctor = "doctor",
     Hospital = "hospital",
     Pharmacist = "pharmacist",
-    Patient = "patient"
+    Patient = "patient",
+    General = "general"
 }
 export declare enum ApprovalStatus {
     Approved = "approved",
