@@ -7,6 +7,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  IsPhoneNumber,
   IsString,
 } from 'class-validator';
 import { Types } from 'mongoose';
@@ -25,6 +26,10 @@ export class CreatePatientDto {
   @IsString()
   email: string;
 
+  @IsString()
+  @IsPhoneNumber()
+  phoneNo: string;
+
   @IsOptional()
   @IsString()
   profilePicture?: string;
@@ -38,12 +43,6 @@ export class CreatePatientDto {
   @IsString()
   @IsEthereumAddress()
   walletAddress: string;
-
-  @IsString()
-  bloodGroup: string;
-
-  @IsString()
-  genotype: string;
 
   @IsOptional()
   @IsString()
@@ -67,6 +66,10 @@ export class UpdatePatientProfileDto {
   @IsEmail()
   @IsString()
   email: string;
+
+  @IsString()
+  @IsPhoneNumber()
+  phoneNo: string;
 
   @IsOptional()
   @IsString()
