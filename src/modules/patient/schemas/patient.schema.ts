@@ -141,6 +141,9 @@ export class Patient {
   @Prop({ required: true })
   email: string;
 
+  @Prop({ required: true })
+  phoneNo: string;
+
   @Prop()
   profilePicture: string;
 
@@ -153,10 +156,10 @@ export class Patient {
   @Prop({ required: true, unique: true })
   walletAddress: string;
 
-  @Prop({ required: true })
+  @Prop()
   bloodGroup: string;
 
-  @Prop({ required: true })
+  @Prop()
   genotype: string;
 
   @Prop({ type: [{ type: MedicalRecordPreviewSchema, unique: true }] })
