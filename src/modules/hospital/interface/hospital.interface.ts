@@ -1,5 +1,14 @@
 import mongoose, { Types } from 'mongoose';
 
+export type InstitutionType =
+  | 'general'
+  | 'paediatric'
+  | 'optical'
+  | 'dental'
+  | 'diagnostic'
+  | 'physiotherapy'
+  | 'referrals';
+
 export interface CreateHospitalType {
   id: number;
   name: string;
@@ -9,7 +18,7 @@ export interface CreateHospitalType {
   location: string;
   profilePicture?: string;
   description?: string;
-  type?: string;
+  type?: InstitutionType;
   regNo: string;
 }
 
@@ -44,4 +53,6 @@ export interface UpdateHospitalProfileType {
   location?: string;
   description?: string;
   profilePicture?: string;
+  regNo?: string;
+  type?: InstitutionType;
 }
