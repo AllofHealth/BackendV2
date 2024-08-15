@@ -51,10 +51,12 @@ export class HospitalService {
         };
       }
 
-      const hospital = await this.hospitalDao.createHospital({
+      const hospitalData: CreateHospitalType = {
         ...rest,
         regNo: encrypt({ data: regNo }),
-      });
+      };
+
+      const hospital = await this.hospitalDao.createHospital(hospitalData);
       return {
         success: ErrorCodes.Success,
         hospital,

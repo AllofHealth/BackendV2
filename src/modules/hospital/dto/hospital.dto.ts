@@ -42,10 +42,6 @@ export class CreateHospitalDto {
   description?: string;
 
   @IsOptional()
-  @IsString()
-  status?: string;
-
-  @IsOptional()
   type: InstitutionType;
 
   @IsString()
