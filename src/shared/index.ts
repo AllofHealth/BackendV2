@@ -4,6 +4,7 @@ export enum Category {
   Hospital = 'hospital',
   Pharmacist = 'pharmacist',
   Patient = 'patient',
+  General = 'general',
 }
 
 export enum ApprovalStatus {
