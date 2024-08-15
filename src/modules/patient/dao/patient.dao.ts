@@ -47,14 +47,13 @@ export class PatientDao {
       name: patient.name,
       age: patient.age,
       email: patient.email,
+      phoneNo: patient.phoneNo,
       profilePicture: patient.profilePicture
         ? patient.profilePicture
         : PROFILE_PLACEHOLDER,
       address: patient.address,
       city: patient.city,
       walletAddress: patient.walletAddress,
-      bloodGroup: patient.bloodGroup,
-      genotype: patient.genotype,
       category: Category.Patient,
       isVerified: false,
     });
