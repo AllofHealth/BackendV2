@@ -5,6 +5,7 @@ import {
   IsEthereumAddress,
   IsNumber,
 } from 'class-validator';
+import { InstitutionType } from '../interface/hospital.interface';
 
 export class CreateHospitalDto {
   @IsNumber()
@@ -43,6 +44,13 @@ export class CreateHospitalDto {
   @IsOptional()
   @IsString()
   status?: string;
+
+  @IsOptional()
+  type: InstitutionType;
+
+  @IsString()
+  @IsNotEmpty()
+  regNo: string;
 }
 
 export class UpdateHospitalProfileDto {
@@ -69,6 +77,13 @@ export class UpdateHospitalProfileDto {
   @IsOptional()
   @IsString()
   profilePicture?: string;
+
+  @IsOptional()
+  @IsString()
+  regNo?: string;
+
+  @IsOptional()
+  type: InstitutionType;
 }
 
 export class JoinHospitalDto {
