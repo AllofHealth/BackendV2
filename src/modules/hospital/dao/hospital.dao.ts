@@ -26,7 +26,7 @@ export class HospitalDao {
         : HOSPITAL_PLACEHOLDER,
       description: institution.description,
       status: ApprovalStatus.Pending,
-      category: institution.type ? institution.type : Category.Hospital,
+      category: institution.type ? institution.type : Category.General,
       regNo: institution.regNo,
     });
   }
