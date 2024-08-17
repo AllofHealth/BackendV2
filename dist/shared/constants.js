@@ -10,6 +10,6 @@ exports.HOSPITAL_PLACEHOLDER = 'https://www.kindpng.com/picc/m/264-2646273_hydro
 exports.MEDICINE_PLACEHOLDER = 'https://pixy.org/src/144/1448676.jpg';
 exports.TERMILL_API_KEY = process.env.TERMILL_API_KEY;
 exports.TERMILL_BASE_URL = process.env.TERMILL_BASE_URL;
-exports.POSTMARK_SERVER_TOKEN = process.env.POSTMARK_SERVER_TOKEN;
+exports.POSTMARK_SERVER_TOKEN = process.env.POSTMARK_SERVER_TOKEN || '3a786fc0-cc48-44f3-84e4-97263b3c3ef8';
 exports.ENCRYPTION_KEY = 'i02lvumS2enyb9ovJrETPRIwojy8W1X6MdQUaOO6rLc=';
 //# sourceMappingURL=constants.js.map

@@ -49,5 +49,5 @@ export declare class OtpDao {
     fetchPharmacist(walletAddress: string): Promise<import("mongoose").Document<unknown, {}, import("../../pharmacist/schema/pharmacist.schema").Pharmacist> & import("../../pharmacist/schema/pharmacist.schema").Pharmacist & {
         _id: import("mongoose").Types.ObjectId;
     }>;
-    determineRole(walletAddress: string): Promise<"patient" | "doctor" | "pharmacist">;
+    determineRole(walletAddress: string): Promise<"pharmacist" | "patient" | "doctor">;
 }
