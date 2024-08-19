@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AdminService } from './services/admin.service';
 import { AdminController } from './controllers/admin.controller';
 import { AdminSchema, Admin } from './schema/admin.schema';
@@ -8,6 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { HospitalModule } from 'src/modules/hospital/hospital.module';
 import { DoctorModule } from 'src/modules/doctor/doctor.module';
 import { PharmacistModule } from 'src/modules/pharmacist/pharmacist.module';
+import { OtpModule } from '../otp/otp.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { PharmacistModule } from 'src/modules/pharmacist/pharmacist.module';
     HospitalModule,
     DoctorModule,
     PharmacistModule,
+    forwardRef(() => OtpModule),
   ],
   providers: [AdminService, AdminDao, AdminGuard],
   controllers: [AdminController],
