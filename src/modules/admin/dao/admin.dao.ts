@@ -20,6 +20,7 @@ export class AdminDao {
       email: admin.email,
       walletAddress: admin.walletAddress,
       category: Category.Admin,
+      isVerified: false,
     });
   }
 
