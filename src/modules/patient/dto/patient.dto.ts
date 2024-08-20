@@ -40,6 +40,14 @@ export class CreatePatientDto {
   @IsString()
   city: string;
 
+  @IsNotEmpty()
+  @IsString()
+  bloodGroup: string;
+
+  @IsNotEmpty()
+  @IsString()
+  genotype: string;
+
   @IsString()
   @IsEthereumAddress()
   walletAddress: string;
