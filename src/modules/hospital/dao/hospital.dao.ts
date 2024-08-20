@@ -28,6 +28,7 @@ export class HospitalDao {
       status: ApprovalStatus.Pending,
       category: institution.type ? institution.type : Category.General,
       regNo: institution.regNo,
+      isVerified: false,
     });
   }
 
@@ -37,6 +38,10 @@ export class HospitalDao {
 
   async fetchHospitalByRegNo(regNo: string) {
     return await this.hospitalModel.findOne({ regNo });
+  }
+
+  async fetchHospitalByAdminAddress(admin: string) {
+    return await this.hospitalModel.findOne({ admin });
   }
 
   async fetchHospitalWithId(id: Types.ObjectId) {
