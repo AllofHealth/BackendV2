@@ -74,7 +74,11 @@ export class PharmacistService {
 
       try {
         hospital.pharmacists.push(pharmacistPreview);
-        await this.otpService.deliverOtp(args.walletAddress, pharmacist.email);
+        await this.otpService.deliverOtp(
+          args.walletAddress,
+          pharmacist.email,
+          'pharmacist',
+        );
       } catch (error) {
         await this.pharmacistDao.deletePharmacist(pharmacist.walletAddress);
         throw new PharmacistError('Error adding pharmacist to hospital');
