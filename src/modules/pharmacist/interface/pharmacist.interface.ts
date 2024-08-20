@@ -42,6 +42,7 @@ export interface CreatePharmacistType {
 export interface UpdatePharmacistType {
   name?: string;
   email?: string;
+  about?: string;
   profilePicture?: string;
   location?: string;
   phoneNumber?: string;
