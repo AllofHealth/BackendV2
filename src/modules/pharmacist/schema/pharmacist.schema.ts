@@ -95,6 +95,9 @@ export class Pharmacist {
   @Prop()
   email?: string;
 
+  @Prop()
+  about?: string;
+
   @Prop({ required: true })
   profilePicture: string;
 
