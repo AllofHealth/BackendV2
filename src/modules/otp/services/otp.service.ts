@@ -2,6 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { authenticator } from 'otplib';
 import { OtpDao } from '../dao/otp.dao';
 import { PostmarkService } from '@/modules/postmark/service/postmark.service';
+import { RoleType } from '../interface/otp.interface';
 
 @Injectable()
 export class OtpService {
@@ -21,7 +22,7 @@ export class OtpService {
     }
   }
 
-  async generateOtp(secret: string) {
+  async generateOtp(secret: string, role: RoleType) {
     const otp = authenticator.generate(secret);
     const expiresAt = Date.now() + this.expirationTime;
     try {
@@ -37,6 +38,7 @@ export class OtpService {
         secret,
         otp,
         new Date(expiresAt),
+        role,
       );
       if (!result) {
         return {
@@ -57,10 +59,8 @@ export class OtpService {
     }
   }
 
-  async verifyUser(walletAddress: string) {
+  async verifyUser(walletAddress: string, role: RoleType) {
     try {
-      const role = await this.otpDao.determineRole(walletAddress);
-
       switch (role) {
         case 'patient':
           const patient = await this.otpDao.fetchPatient(walletAddress);
@@ -77,6 +77,17 @@ export class OtpService {
           pharmacist.isVerified = true;
           await pharmacist.save();
           break;
+
+        case 'institution':
+          const institution = await this.otpDao.fetchInstitution(walletAddress);
+          institution.isVerified = true;
+          await institution.save();
+          break;
+        case 'admin':
+          const admin = await this.otpDao.fetchAdmin(walletAddress);
+          admin.isVerified = true;
+          await admin.save();
+          break;
       }
     } catch (error) {
       console.error(error);
@@ -84,7 +95,7 @@ export class OtpService {
     }
   }
 
-  async verifyOtp(secret: string, otp: string) {
+  async verifyOtp(secret: string, otp: string, role: RoleType) {
     let isValid: boolean = false;
     try {
       const entry = await this.otpDao.findOtp(secret);
@@ -114,10 +125,10 @@ export class OtpService {
       }
       await this.otpDao.deleteOtp(secret);
       try {
-        await this.verifyUser(entry.walletAddress);
+        await this.verifyUser(entry.walletAddress, role);
       } catch (error) {
         console.error(error);
-        await this.verifyUser(entry.walletAddress);
+        await this.verifyUser(entry.walletAddress, role);
       }
       return {
         success: HttpStatus.OK,
@@ -130,9 +141,13 @@ export class OtpService {
     }
   }
 
-  async deliverOtp(walletAddress: string, emailAddress: string) {
+  async deliverOtp(
+    walletAddress: string,
+    emailAddress: string,
+    role: RoleType,
+  ) {
     try {
-      const { otp } = await this.generateOtp(walletAddress);
+      const { otp } = await this.generateOtp(walletAddress, role);
       console.log(otp);
       await this.postmarkService.sendEmail({
         to: emailAddress,
@@ -145,23 +160,30 @@ export class OtpService {
     }
   }
 
-  async resendOtp(walletAddress: string) {
+  async resendOtp(walletAddress: string, role: RoleType) {
     await this.cleanUp(walletAddress);
     try {
-      const role = await this.otpDao.determineRole(walletAddress);
-
       switch (role) {
         case 'patient':
           const patient = await this.otpDao.fetchPatient(walletAddress);
-          await this.deliverOtp(walletAddress, patient.email);
+          await this.deliverOtp(walletAddress, patient.email, 'patient');
           break;
         case 'doctor':
           const doctor = await this.otpDao.fetchDoctor(walletAddress);
-          await this.deliverOtp(walletAddress, doctor.email);
+          await this.deliverOtp(walletAddress, doctor.email, 'doctor');
           break;
         case 'pharmacist':
           const pharmacist = await this.otpDao.fetchPharmacist(walletAddress);
-          await this.deliverOtp(walletAddress, pharmacist.email);
+          await this.deliverOtp(walletAddress, pharmacist.email, 'pharmacist');
+          break;
+
+        case 'institution':
+          const institution = await this.otpDao.fetchInstitution(walletAddress);
+          await this.deliverOtp(
+            walletAddress,
+            institution.admin,
+            'institution',
+          );
           break;
       }
 
