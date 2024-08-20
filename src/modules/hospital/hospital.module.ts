@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { HospitalGuard } from './guard/hospital.guard';
 import { DoctorModule } from 'src/modules/doctor/doctor.module';
 import { PharmacistModule } from 'src/modules/pharmacist/pharmacist.module';
+import { OtpModule } from '../otp/otp.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { PharmacistModule } from 'src/modules/pharmacist/pharmacist.module';
     ]),
     DoctorModule,
     forwardRef(() => PharmacistModule),
+    forwardRef(() => OtpModule),
   ],
   providers: [HospitalService, HospitalDao, HospitalGuard],
   controllers: [HospitalController],
