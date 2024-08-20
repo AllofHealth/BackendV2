@@ -91,6 +91,9 @@ export class Hospital {
 
   @Prop({ required: true })
   regNo: string;
+
+  @Prop({ required: true })
+  isVerified: boolean;
 }
 
 export const HospitalSchema = SchemaFactory.createForClass(Hospital);
