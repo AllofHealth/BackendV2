@@ -3,7 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { MongooseError } from 'mongoose';
+import { MongooseError, ObjectId, Types } from 'mongoose';
 import { DoctorDao } from '../dao/doctor.dao';
 import {
   AddPatientPrescription,
@@ -138,7 +138,11 @@ export class DoctorService {
 
       try {
         hospital.doctors.push(doctorPreview as PreviewType);
-        await this.otpService.deliverOtp(args.walletAddress, doctor.email);
+        await this.otpService.deliverOtp(
+          args.walletAddress,
+          doctor.email,
+          'doctor',
+        );
       } catch (error) {
         await this.doctorDao.deleteDoctor(args.walletAddress);
         return {
@@ -554,7 +558,7 @@ export class DoctorService {
           await this.patientDao.pullOneApproval(
             doctorAddress,
             principalPatientAddress,
-            approvalRequest._id,
+            approvalRequest._id as Types.ObjectId,
           );
           return {
             success: HttpStatus.BAD_REQUEST,
