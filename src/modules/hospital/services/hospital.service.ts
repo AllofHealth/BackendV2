@@ -24,6 +24,7 @@ import { PharmacistDao } from 'src/modules/pharmacist/dao/pharmacist.dao';
 import { DoctorGuard } from 'src/modules/doctor/guards/doctor.guard';
 import { PharmacistGuard } from 'src/modules/pharmacist/guards/pharmacist.guard';
 import { encrypt } from '@/shared/utils/encrypt.utils';
+import { OtpService } from '@/modules/otp/services/otp.service';
 
 @Injectable()
 export class HospitalService {
@@ -36,6 +37,7 @@ export class HospitalService {
     private readonly pharmacistDao: PharmacistDao,
     private readonly doctorGuard: DoctorGuard,
     private readonly pharmacistGuard: PharmacistGuard,
+    private readonly otpService: OtpService,
   ) {}
 
   async createNewHospital(args: CreateHospitalType) {
@@ -57,6 +59,22 @@ export class HospitalService {
       };
 
       const hospital = await this.hospitalDao.createHospital(hospitalData);
+      if (!hospital) {
+        return {
+          success: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Error creating hospital',
+        };
+      }
+
+      try {
+        await this.otpService.deliverOtp(args.admin, args.email, 'institution');
+      } catch (error) {
+        await this.hospitalDao.removeHospitalById(hospital._id);
+        return {
+          success: HttpStatus.BAD_REQUEST,
+          message: 'An error occurred while creating instiution',
+        };
+      }
       return {
         success: ErrorCodes.Success,
         hospital,
