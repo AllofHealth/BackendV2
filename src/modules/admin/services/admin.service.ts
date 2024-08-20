@@ -14,6 +14,7 @@ import { AdminGuard } from '../guards/admin.guard';
 import { HospitalDao } from 'src/modules/hospital/dao/hospital.dao';
 import { DoctorDao } from 'src/modules/doctor/dao/doctor.dao';
 import { PharmacistDao } from 'src/modules/pharmacist/dao/pharmacist.dao';
+import { OtpService } from '@/modules/otp/services/otp.service';
 
 @Injectable()
 export class AdminService {
@@ -25,6 +26,7 @@ export class AdminService {
     private readonly hospitalDao: HospitalDao,
     private readonly doctorDao: DoctorDao,
     private readonly pharmacistDao: PharmacistDao,
+    private readonly otpService: OtpService,
   ) {}
 
   async fetchAdminByAddress(walletAddress: string) {
@@ -60,6 +62,19 @@ export class AdminService {
 
     try {
       const admin = await this.adminDao.createAdmin(args);
+      try {
+        await this.otpService.deliverOtp(
+          args.walletAddress,
+          args.email,
+          'admin',
+        );
+      } catch (error) {
+        await this.adminDao.removeAdminByAddress(args.walletAddress);
+        return {
+          success: HttpStatus.BAD_REQUEST,
+          message: 'An error occurred while creating an admin',
+        };
+      }
       return {
         success: ErrorCodes.Success,
         admin,
