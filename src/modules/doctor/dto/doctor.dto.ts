@@ -62,6 +62,10 @@ export class UpdateDoctorDto {
   @IsOptional()
   email: string;
 
+  @IsString()
+  @IsOptional()
+  about: string;
+
   @IsUrl()
   @IsOptional()
   profilePicture: string;
