@@ -54,6 +54,10 @@ export class UpdatePharmacistDto {
   @IsEmail()
   email?: string;
 
+  @IsString()
+  @IsOptional()
+  about?: string;
+
   @IsOptional()
   @IsString()
   profilePicture?: string;
