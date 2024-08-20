@@ -48,6 +48,9 @@ export class Doctor {
   @Prop()
   email: string;
 
+  @Prop()
+  about: string;
+
   @Prop({ required: true })
   profilePicture: string;
 
