@@ -10,6 +10,9 @@ export class Otp extends Document {
   otp: string;
 
   @Prop({ required: true })
+  role: string;
+
+  @Prop({ required: true })
   expirationTime: Date;
 }
 
