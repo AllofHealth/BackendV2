@@ -31,6 +31,7 @@ export interface CreateDoctorType {
 export interface UpdateDoctorType {
   name?: string;
   email?: string;
+  about?: string;
   profilePicture?: string;
   specialty?: string;
   location?: string;
