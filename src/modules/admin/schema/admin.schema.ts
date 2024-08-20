@@ -22,6 +22,9 @@ export class Admin {
 
   @Prop({ default: 'admin', required: true })
   category: string;
+
+  @Prop({ required: true })
+  isVerified: boolean;
 }
 
 export const AdminSchema = SchemaFactory.createForClass(Admin);
