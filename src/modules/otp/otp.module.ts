@@ -8,6 +8,8 @@ import { PatientModule } from '../patient/patient.module';
 import { DoctorModule } from '../doctor/doctor.module';
 import { PharmacistModule } from '../pharmacist/pharmacist.module';
 import { PostmarkModule } from '../postmark/postmark.module';
+import { HospitalModule } from '../hospital/hospital.module';
+import { AdminModule } from '../admin/admin.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { PostmarkModule } from '../postmark/postmark.module';
     forwardRef(() => PatientModule),
     forwardRef(() => DoctorModule),
     forwardRef(() => PharmacistModule),
+    forwardRef(() => HospitalModule),
+    forwardRef(() => AdminModule),
     PostmarkModule,
   ],
   providers: [OtpService, OtpDao],
