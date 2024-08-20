@@ -5,6 +5,9 @@ import { Model } from 'mongoose';
 import { PatientDao } from '@/modules/patient/dao/patient.dao';
 import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
 import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
+import { RoleType } from '../interface/otp.interface';
+import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
+import { AdminDao } from '@/modules/admin/dao/admin.dao';
 
 @Injectable()
 export class OtpDao {
@@ -13,13 +16,21 @@ export class OtpDao {
     private readonly patientDao: PatientDao,
     private readonly doctorDao: DoctorDao,
     private readonly pharmacistDao: PharmacistDao,
+    private readonly hospitalDao: HospitalDao,
+    private readonly adminDao: AdminDao,
   ) {}
 
-  async createOtp(walletAddress: string, otp: string, expirationTime: Date) {
+  async createOtp(
+    walletAddress: string,
+    otp: string,
+    expirationTime: Date,
+    role: RoleType,
+  ) {
     return await this.otpModel.create({
       walletAddress,
       otp,
       expirationTime,
+      role,
     });
   }
 
@@ -43,19 +54,11 @@ export class OtpDao {
     return await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
   }
 
-  async determineRole(walletAddress: string) {
-    const patient = await this.fetchPatient(walletAddress);
-    if (patient) {
-      return 'patient';
-    }
-    const doctor = await this.fetchDoctor(walletAddress);
-    if (doctor) {
-      return 'doctor';
-    }
-    const pharmacist = await this.fetchPharmacist(walletAddress);
-    if (pharmacist) {
-      return 'pharmacist';
-    }
-    return null;
+  async fetchInstitution(walletAddress: string) {
+    return await this.hospitalDao.fetchHospitalByAdminAddress(walletAddress);
+  }
+
+  async fetchAdmin(walletAddress: string) {
+    return await this.adminDao.fetchAdminByAddress(walletAddress);
   }
 }
