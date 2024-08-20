@@ -53,6 +53,8 @@ export class PatientDao {
         : PROFILE_PLACEHOLDER,
       address: patient.address,
       city: patient.city,
+      bloodGroup: patient.bloodGroup,
+      genotype: patient.genotype,
       walletAddress: patient.walletAddress,
       category: Category.Patient,
       isVerified: false,
