@@ -75,6 +75,8 @@ export interface CreatePatientType {
   profilePicture?: string;
   address: string;
   city: string;
+  bloodGroup: string;
+  genotype: string;
   walletAddress: string;
   category?: string;
 }
