@@ -1,11 +1,13 @@
 import {
+  HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { MongooseError, ObjectId, Types } from 'mongoose';
+import { MongooseError, Types } from 'mongoose';
 import { DoctorDao } from '../dao/doctor.dao';
 import {
+  AddMedicineType,
   AddPatientPrescription,
   ApproveMedicalRecordAccessRequestType,
   CreateDoctorType,
@@ -19,6 +21,8 @@ import { PreviewType } from 'src/modules/hospital/interface/hospital.interface';
 import { PatientDao } from 'src/modules/patient/dao/patient.dao';
 import { PatientGuard } from 'src/modules/patient/guards/patient.guard';
 import { OtpService } from '@/modules/otp/services/otp.service';
+import { MedicineDao } from '@/modules/medicine/dao/medicine.dao';
+import { Medicine } from '@/modules/medicine/schema/medicine.schema';
 
 @Injectable()
 export class DoctorService {
@@ -29,6 +33,7 @@ export class DoctorService {
     private readonly patientDao: PatientDao,
     private readonly patientGuard: PatientGuard,
     private readonly otpService: OtpService,
+    private readonly medicineDao: MedicineDao,
   ) {}
 
   async getPendingDoctors() {
@@ -217,8 +222,9 @@ export class DoctorService {
 
   async updateDoctor(walletAddress: string, args: UpdateDoctorType) {
     try {
-      const doctorExist =
-        await this.doctorGuard.validateDoctorExists(walletAddress);
+      const doctorExist = await this.doctorGuard.validateDoctorExists(
+        walletAddress,
+      );
       if (!doctorExist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -265,22 +271,33 @@ export class DoctorService {
     }
   }
 
+  private async addMedication(args: AddMedicineType) {
+    try {
+      const medication = await this.medicineDao.createMedicine(args);
+      if (!medication) {
+        throw new HttpException(
+          { message: 'An error occurred creating a new medication' },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      return medication;
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        { message: 'An error occurred while adding medication' },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
   async createPrescription(args: AddPatientPrescription) {
-    const {
-      recordId,
-      patientAddress,
-      doctorAddress,
-      medicineName,
-      quantity,
-      medicineId,
-      medicineGroup,
-      description,
-      sideEffects,
-    } = args;
+    const { recordId, patientAddress, doctorAddress, medicine } = args;
     try {
       const isPatient = await this.patientGuard.validatePatient(patientAddress);
-      const isDoctor =
-        await this.doctorGuard.validateDoctorExists(doctorAddress);
+      const isDoctor = await this.doctorGuard.validateDoctorExists(
+        doctorAddress,
+      );
 
       if (!isPatient) {
         return {
@@ -296,13 +313,15 @@ export class DoctorService {
         };
       }
 
-      const patient =
-        await this.patientDao.fetchPatientByAddress(patientAddress);
+      const patient = await this.patientDao.fetchPatientByAddress(
+        patientAddress,
+      );
       const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
       const hospitalId = doctor.hospitalIds[0];
 
-      const institution =
-        await this.hospitalDao.fetchHospitalWithBlockchainId(hospitalId);
+      const institution = await this.hospitalDao.fetchHospitalWithBlockchainId(
+        hospitalId,
+      );
 
       if (!institution) {
         return {
@@ -318,23 +337,26 @@ export class DoctorService {
         };
       }
 
+      let medication: Medicine[] = [];
+
+      medicine.forEach(async (medicine) => {
+        const newMedicine = await this.addMedication(medicine);
+        medication.push(newMedicine);
+      });
+
       const newPrescriptionArgs = {
-        doctorName: doctor.name,
         recordId: recordId,
-        patientName: patient.name,
-        patientAddress: patientAddress,
+        doctorName: doctor.name,
         doctorAddress: doctorAddress,
         institutionName: institution.name,
-        medicineName: medicineName,
-        quantity: quantity ? quantity : 1,
-        medicineId: medicineId,
-        medicineGroup: medicineGroup,
-        description: description,
-        sideEffects: sideEffects,
+        patientName: patient.name,
+        patientAddress: patientAddress,
+        medicine: medication,
       };
 
-      const prescription =
-        await this.patientDao.createPrescription(newPrescriptionArgs);
+      const prescription = await this.patientDao.createPrescription(
+        newPrescriptionArgs,
+      );
       patient.prescriptions.push(prescription);
 
       await patient.save();
@@ -354,8 +376,9 @@ export class DoctorService {
   ) {
     const { patientAddress, doctorAddress, id } = args;
     try {
-      const patient =
-        await this.patientDao.fetchPatientByAddress(patientAddress);
+      const patient = await this.patientDao.fetchPatientByAddress(
+        patientAddress,
+      );
       const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
 
       if (!patient) {
@@ -417,8 +440,9 @@ export class DoctorService {
 
   async fetchAllActiveApprovals(doctorAddress: string) {
     try {
-      const isDoctor =
-        await this.doctorGuard.validateDoctorExists(doctorAddress);
+      const isDoctor = await this.doctorGuard.validateDoctorExists(
+        doctorAddress,
+      );
 
       if (!isDoctor) {
         return {
@@ -454,8 +478,9 @@ export class DoctorService {
   ) {
     const { patientAddress, doctorAddress, id } = args;
     try {
-      const patient =
-        await this.patientDao.fetchPatientByAddress(patientAddress);
+      const patient = await this.patientDao.fetchPatientByAddress(
+        patientAddress,
+      );
       const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
 
       if (!patient) {
@@ -502,8 +527,12 @@ export class DoctorService {
   }
 
   async createMedicalRecord(args: CreateMedicalRecordType) {
-    const { recordId, principalPatientAddress, doctorAddress, diagnosis } =
-      args;
+    const {
+      recordId,
+      principalPatientAddress,
+      doctorAddress,
+      diagnosis,
+    } = args;
     try {
       const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
       const hospital = await this.hospitalDao.fetchHospitalWithBlockchainId(
@@ -592,11 +621,10 @@ export class DoctorService {
           };
         }
 
-        const familyMemberSchema =
-          await this.patientDao.fetchPatientFamilyMember(
-            principalPatientAddress,
-            approvalRequest.patientId,
-          );
+        const familyMemberSchema = await this.patientDao.fetchPatientFamilyMember(
+          principalPatientAddress,
+          approvalRequest.patientId,
+        );
         if (!familyMember) {
           return {
             success: HttpStatus.NOT_FOUND,
