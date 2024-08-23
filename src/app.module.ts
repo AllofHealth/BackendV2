@@ -14,6 +14,7 @@ import { PharmacistModule } from './modules/pharmacist/pharmacist.module';
 import { OtpModule } from './modules/otp/otp.module';
 import { TermillModule } from './modules/termill/termill.module';
 import { PostmarkModule } from './modules/postmark/postmark.module';
+import { ConfigifyModule } from '@itgorillaz/configify';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { PostmarkModule } from './modules/postmark/postmark.module';
     OtpModule,
     TermillModule,
     PostmarkModule,
+    ConfigifyModule.forRootAsync(),
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
