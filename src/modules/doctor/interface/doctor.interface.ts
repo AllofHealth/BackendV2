@@ -57,14 +57,18 @@ export interface DoctorType {
 
 export interface AddPatientPrescription {
   recordId: number;
-  patientAddress: string;
+  doctorName: string;
   doctorAddress: string;
-  medicineName: string;
-  quantity?: number;
-  medicineId?: string;
-  medicineGroup?: string;
-  description: string;
-  sideEffects: string;
+  institutionName: string;
+  patientName: string;
+  patientAddress: string;
+  medicine: AddMedicineType[];
+}
+
+export interface AddMedicineType {
+  productPrescribed: string;
+  productCategory: string;
+  practitionerNote: string;
 }
 
 export interface ApproveMedicalRecordAccessRequestType {
