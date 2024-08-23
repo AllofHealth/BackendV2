@@ -57,10 +57,7 @@ export interface DoctorType {
 
 export interface AddPatientPrescription {
   recordId: number;
-  doctorName: string;
   doctorAddress: string;
-  institutionName: string;
-  patientName: string;
   patientAddress: string;
   medicine: AddMedicineType[];
 }

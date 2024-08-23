@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsEmail,
   IsEthereumAddress,
   IsNotEmpty,
@@ -8,6 +9,7 @@ import {
   IsString,
   IsUrl,
 } from 'class-validator';
+import { AddMedicineType } from '../interface/doctor.interface';
 
 export class CreateDoctorDto {
   @IsNumber()
@@ -91,23 +93,15 @@ export class CreatePrescriptionDto {
 
   @IsString()
   @IsNotEmpty()
-  medicineName: string;
-
-  @IsString()
-  @IsOptional()
-  medicineId: string;
-
-  @IsString()
-  @IsOptional()
-  medicineGroup?: string;
+  patientAddress: string;
 
   @IsString()
   @IsNotEmpty()
-  description: string;
+  doctorAddress: string;
 
-  @IsString()
-  @IsNotEmpty()
-  sideEffects: string;
+  @IsArray()
+  @IsOptional()
+  medicine: AddMedicineType[];
 }
 
 export class CreateMedicalRecordDto {
