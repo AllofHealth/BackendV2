@@ -13,13 +13,13 @@ import { OtpModule } from '../otp/otp.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Admin.name, schema: AdminSchema }]),
-    HospitalModule,
-    DoctorModule,
-    PharmacistModule,
+    forwardRef(() => HospitalModule),
+    forwardRef(() => DoctorModule),
+    forwardRef(() => PharmacistModule),
     forwardRef(() => OtpModule),
   ],
   providers: [AdminService, AdminDao, AdminGuard],
   controllers: [AdminController],
-  exports: [AdminService],
+  exports: [AdminService, AdminDao],
 })
 export class AdminModule {}
