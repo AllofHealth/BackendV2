@@ -21,9 +21,9 @@
 /// <reference types="mongoose/types/utility" />
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
-/// <reference types="mongoose" />
 /// <reference types="mongoose/types/inferschematype" />
 import { HttpStatus } from '@nestjs/common';
+import { Types } from 'mongoose';
 import { DoctorDao } from '../dao/doctor.dao';
 import { AddPatientPrescription, ApproveMedicalRecordAccessRequestType, CreateDoctorType, CreateMedicalRecordType, UpdateDoctorType } from '../interface/doctor.interface';
 import { DoctorGuard } from '../guards/doctor.guard';
@@ -31,6 +31,7 @@ import { HospitalDao } from 'src/modules/hospital/dao/hospital.dao';
 import { PatientDao } from 'src/modules/patient/dao/patient.dao';
 import { PatientGuard } from 'src/modules/patient/guards/patient.guard';
 import { OtpService } from '@/modules/otp/services/otp.service';
+import { MedicineDao } from '@/modules/medicine/dao/medicine.dao';
 export declare class DoctorService {
     private readonly doctorDao;
     private readonly doctorGuard;
@@ -38,17 +39,18 @@ export declare class DoctorService {
     private readonly patientDao;
     private readonly patientGuard;
     private readonly otpService;
-    constructor(doctorDao: DoctorDao, doctorGuard: DoctorGuard, hospitalDao: HospitalDao, patientDao: PatientDao, patientGuard: PatientGuard, otpService: OtpService);
+    private readonly medicineDao;
+    constructor(doctorDao: DoctorDao, doctorGuard: DoctorGuard, hospitalDao: HospitalDao, patientDao: PatientDao, patientGuard: PatientGuard, otpService: OtpService, medicineDao: MedicineDao);
     getPendingDoctors(): Promise<{
         success: HttpStatus;
         doctors: (import("mongoose").Document<unknown, {}, import("../schema/doctor.schema").Doctor> & import("../schema/doctor.schema").Doctor & {
-            _id: import("mongoose").Types.ObjectId;
+            _id: Types.ObjectId;
         })[];
     }>;
     getApprovedDoctors(): Promise<{
         success: HttpStatus;
         doctors: (import("mongoose").Document<unknown, {}, import("../schema/doctor.schema").Doctor> & import("../schema/doctor.schema").Doctor & {
-            _id: import("mongoose").Types.ObjectId;
+            _id: Types.ObjectId;
         })[];
     }>;
     createDoctor(args: CreateDoctorType): Promise<{
@@ -58,7 +60,7 @@ export declare class DoctorService {
     } | {
         success: HttpStatus;
         doctor: import("mongoose").Document<unknown, {}, import("../schema/doctor.schema").Doctor> & import("../schema/doctor.schema").Doctor & {
-            _id: import("mongoose").Types.ObjectId;
+            _id: Types.ObjectId;
         };
         message: string;
     }>;
@@ -69,14 +71,14 @@ export declare class DoctorService {
     } | {
         success: HttpStatus;
         doctor: import("mongoose").Document<unknown, {}, import("../schema/doctor.schema").Doctor> & import("../schema/doctor.schema").Doctor & {
-            _id: import("mongoose").Types.ObjectId;
+            _id: Types.ObjectId;
         };
         message?: undefined;
     }>;
     getAllDoctors(): Promise<{
         success: HttpStatus;
         allDoctors: (import("mongoose").Document<unknown, {}, import("../schema/doctor.schema").Doctor> & import("../schema/doctor.schema").Doctor & {
-            _id: import("mongoose").Types.ObjectId;
+            _id: Types.ObjectId;
         })[];
     }>;
     updateDoctor(walletAddress: string, args: UpdateDoctorType): Promise<{
@@ -87,13 +89,14 @@ export declare class DoctorService {
         success: HttpStatus;
         message: string;
         doctor: import("mongoose").Document<unknown, {}, import("../schema/doctor.schema").Doctor> & import("../schema/doctor.schema").Doctor & {
-            _id: import("mongoose").Types.ObjectId;
+            _id: Types.ObjectId;
         };
     }>;
     deleteDoctorByAddress(address: string): Promise<{
         success: HttpStatus;
         message: string;
     }>;
+    private addMedication;
     createPrescription(args: AddPatientPrescription): Promise<{
         success: HttpStatus;
         message: string;

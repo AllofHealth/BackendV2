@@ -12,6 +12,7 @@ export declare class CreatePharmacistDto {
 export declare class UpdatePharmacistDto {
     name?: string;
     email?: string;
+    about?: string;
     profilePicture?: string;
     location?: string;
     phoneNumber?: string;

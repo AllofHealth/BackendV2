@@ -75,6 +75,10 @@ __decorate([
     __metadata("design:type", String)
 ], Doctor.prototype, "email", void 0);
 __decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Doctor.prototype, "about", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Doctor.prototype, "profilePicture", void 0);

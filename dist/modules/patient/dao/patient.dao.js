@@ -43,6 +43,8 @@ let PatientDao = class PatientDao {
                 : constants_1.PROFILE_PLACEHOLDER,
             address: patient.address,
             city: patient.city,
+            bloodGroup: patient.bloodGroup,
+            genotype: patient.genotype,
             walletAddress: patient.walletAddress,
             category: shared_1.Category.Patient,
             isVerified: false,
@@ -73,14 +75,7 @@ let PatientDao = class PatientDao {
             patientAddress: prescription.patientAddress,
             doctorAddress: prescription.doctorAddress,
             institutionName: prescription.institutionName,
-            medicineName: prescription.medicineName,
-            quantity: prescription.quantity,
-            medicineId: prescription.medicineId ? prescription.medicineId : '',
-            medicineGroup: prescription.medicineGroup
-                ? prescription.medicineGroup
-                : '',
-            description: prescription.description,
-            sideEffects: prescription.sideEffects ? prescription.sideEffects : '',
+            medicine: prescription.medicine,
         });
     }
     async createApproval(args) {

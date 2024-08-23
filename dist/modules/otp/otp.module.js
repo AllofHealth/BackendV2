@@ -17,6 +17,8 @@ const patient_module_1 = require("../patient/patient.module");
 const doctor_module_1 = require("../doctor/doctor.module");
 const pharmacist_module_1 = require("../pharmacist/pharmacist.module");
 const postmark_module_1 = require("../postmark/postmark.module");
+const hospital_module_1 = require("../hospital/hospital.module");
+const admin_module_1 = require("../admin/admin.module");
 let OtpModule = class OtpModule {
 };
 exports.OtpModule = OtpModule;
@@ -27,6 +29,8 @@ exports.OtpModule = OtpModule = __decorate([
             (0, common_1.forwardRef)(() => patient_module_1.PatientModule),
             (0, common_1.forwardRef)(() => doctor_module_1.DoctorModule),
             (0, common_1.forwardRef)(() => pharmacist_module_1.PharmacistModule),
+            (0, common_1.forwardRef)(() => hospital_module_1.HospitalModule),
+            (0, common_1.forwardRef)(() => admin_module_1.AdminModule),
             postmark_module_1.PostmarkModule,
         ],
         providers: [otp_service_1.OtpService, otp_dao_1.OtpDao],

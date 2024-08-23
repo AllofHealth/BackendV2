@@ -37,6 +37,7 @@ let HospitalDao = class HospitalDao {
             status: shared_1.ApprovalStatus.Pending,
             category: institution.type ? institution.type : shared_1.Category.General,
             regNo: institution.regNo,
+            isVerified: false,
         });
     }
     async fetchHospitalWithBlockchainId(id) {
@@ -44,6 +45,9 @@ let HospitalDao = class HospitalDao {
     }
     async fetchHospitalByRegNo(regNo) {
         return await this.hospitalModel.findOne({ regNo });
+    }
+    async fetchHospitalByAdminAddress(admin) {
+        return await this.hospitalModel.findOne({ admin });
     }
     async fetchHospitalWithId(id) {
         return await this.hospitalModel.findOne({ _id: id });

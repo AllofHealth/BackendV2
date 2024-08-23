@@ -80,6 +80,11 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateDoctorDto.prototype, "email", void 0);
 __decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateDoctorDto.prototype, "about", void 0);
+__decorate([
     (0, class_validator_1.IsUrl)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -112,27 +117,17 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], CreatePrescriptionDto.prototype, "medicineName", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], CreatePrescriptionDto.prototype, "medicineId", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], CreatePrescriptionDto.prototype, "medicineGroup", void 0);
+], CreatePrescriptionDto.prototype, "patientAddress", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], CreatePrescriptionDto.prototype, "description", void 0);
+], CreatePrescriptionDto.prototype, "doctorAddress", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], CreatePrescriptionDto.prototype, "sideEffects", void 0);
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreatePrescriptionDto.prototype, "medicine", void 0);
 class CreateMedicalRecordDto {
 }
 exports.CreateMedicalRecordDto = CreateMedicalRecordDto;

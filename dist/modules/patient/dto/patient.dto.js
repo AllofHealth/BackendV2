@@ -51,6 +51,16 @@ __decorate([
     __metadata("design:type", String)
 ], CreatePatientDto.prototype, "city", void 0);
 __decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreatePatientDto.prototype, "bloodGroup", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreatePatientDto.prototype, "genotype", void 0);
+__decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsEthereumAddress)(),
     __metadata("design:type", String)

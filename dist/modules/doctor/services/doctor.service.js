@@ -19,14 +19,16 @@ const hospital_dao_1 = require("../../hospital/dao/hospital.dao");
 const patient_dao_1 = require("../../patient/dao/patient.dao");
 const patient_guard_1 = require("../../patient/guards/patient.guard");
 const otp_service_1 = require("../../otp/services/otp.service");
+const medicine_dao_1 = require("../../medicine/dao/medicine.dao");
 let DoctorService = class DoctorService {
-    constructor(doctorDao, doctorGuard, hospitalDao, patientDao, patientGuard, otpService) {
+    constructor(doctorDao, doctorGuard, hospitalDao, patientDao, patientGuard, otpService, medicineDao) {
         this.doctorDao = doctorDao;
         this.doctorGuard = doctorGuard;
         this.hospitalDao = hospitalDao;
         this.patientDao = patientDao;
         this.patientGuard = patientGuard;
         this.otpService = otpService;
+        this.medicineDao = medicineDao;
     }
     async getPendingDoctors() {
         try {
@@ -117,7 +119,7 @@ let DoctorService = class DoctorService {
             };
             try {
                 hospital.doctors.push(doctorPreview);
-                await this.otpService.deliverOtp(args.walletAddress, doctor.email);
+                await this.otpService.deliverOtp(args.walletAddress, doctor.email, 'doctor');
             }
             catch (error) {
                 await this.doctorDao.deleteDoctor(args.walletAddress);
@@ -233,8 +235,21 @@ let DoctorService = class DoctorService {
             throw new common_1.InternalServerErrorException('Error deleting doctor');
         }
     }
+    async addMedication(args) {
+        try {
+            const medication = await this.medicineDao.createMedicine(args);
+            if (!medication) {
+                throw new common_1.HttpException({ message: 'An error occurred creating a new medication' }, common_1.HttpStatus.BAD_REQUEST);
+            }
+            return medication;
+        }
+        catch (error) {
+            console.error(error);
+            throw new common_1.HttpException({ message: 'An error occurred while adding medication' }, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
     async createPrescription(args) {
-        const { recordId, patientAddress, doctorAddress, medicineName, quantity, medicineId, medicineGroup, description, sideEffects, } = args;
+        const { recordId, patientAddress, doctorAddress, medicine } = args;
         try {
             const isPatient = await this.patientGuard.validatePatient(patientAddress);
             const isDoctor = await this.doctorGuard.validateDoctorExists(doctorAddress);
@@ -266,19 +281,19 @@ let DoctorService = class DoctorService {
                     message: 'doctor not approved',
                 };
             }
+            const medication = [];
+            medicine.forEach(async (medicine) => {
+                const newMedicine = await this.addMedication(medicine);
+                medication.push(newMedicine);
+            });
             const newPrescriptionArgs = {
-                doctorName: doctor.name,
                 recordId: recordId,
-                patientName: patient.name,
-                patientAddress: patientAddress,
+                doctorName: doctor.name,
                 doctorAddress: doctorAddress,
                 institutionName: institution.name,
-                medicineName: medicineName,
-                quantity: quantity ? quantity : 1,
-                medicineId: medicineId,
-                medicineGroup: medicineGroup,
-                description: description,
-                sideEffects: sideEffects,
+                patientName: patient.name,
+                patientAddress: patientAddress,
+                medicine: medication,
             };
             const prescription = await this.patientDao.createPrescription(newPrescriptionArgs);
             patient.prescriptions.push(prescription);
@@ -537,6 +552,7 @@ exports.DoctorService = DoctorService = __decorate([
         hospital_dao_1.HospitalDao,
         patient_dao_1.PatientDao,
         patient_guard_1.PatientGuard,
-        otp_service_1.OtpService])
+        otp_service_1.OtpService,
+        medicine_dao_1.MedicineDao])
 ], DoctorService);
 //# sourceMappingURL=doctor.service.js.map

@@ -1,3 +1,4 @@
+import { AddMedicineType } from '../interface/doctor.interface';
 export declare class CreateDoctorDto {
     id: number;
     hospitalIds: number;
@@ -13,6 +14,7 @@ export declare class CreateDoctorDto {
 export declare class UpdateDoctorDto {
     name: string;
     email: string;
+    about: string;
     profilePicture: string;
     specialty: string;
     location: string;
@@ -20,11 +22,9 @@ export declare class UpdateDoctorDto {
 }
 export declare class CreatePrescriptionDto {
     recordId: number;
-    medicineName: string;
-    medicineId: string;
-    medicineGroup?: string;
-    description: string;
-    sideEffects: string;
+    patientAddress: string;
+    doctorAddress: string;
+    medicine: AddMedicineType[];
 }
 export declare class CreateMedicalRecordDto {
     recordId: number;

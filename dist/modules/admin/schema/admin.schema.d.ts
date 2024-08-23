@@ -31,6 +31,7 @@ export declare class Admin {
     email: string;
     walletAddress: string;
     category: string;
+    isVerified: boolean;
 }
 export declare const AdminSchema: import("mongoose").Schema<Admin, import("mongoose").Model<Admin, any, any, any, import("mongoose").Document<unknown, any, Admin> & Admin & {
     _id: import("mongoose").Types.ObjectId;

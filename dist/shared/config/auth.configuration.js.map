@@ -1,0 +1,1 @@
+{"version":3,"file":"auth.configuration.js","sourceRoot":"","sources":["../../../src/shared/config/auth.configuration.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,qDAA6D;AAGtD,IAAM,iBAAiB,GAAvB,MAAM,iBAAiB;CAM7B,CAAA;AANY,8CAAiB;AAE5B;IADC,IAAA,iBAAK,EAAC,aAAa,CAAC;;oDACH;AAGlB;IADC,IAAA,iBAAK,EAAC,uBAAuB,CAAC;;uDACV;4BALV,iBAAiB;IAD7B,IAAA,yBAAa,GAAE;GACH,iBAAiB,CAM7B"}

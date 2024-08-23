@@ -170,10 +170,7 @@ export declare class PharmacistService {
     dispensePrescription(args: {
         walletAddress: string;
         prescriptionId: Types.ObjectId;
-    }): Promise<{
-        success: HttpStatus;
-        message: string;
-    }>;
+    }): Promise<void>;
     removePrescription(args: {
         walletAddress: string;
         prescriptionId: Types.ObjectId;

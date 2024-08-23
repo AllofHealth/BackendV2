@@ -45,6 +45,7 @@ export declare class Doctor {
     hospitalIds: number[];
     name: string;
     email: string;
+    about: string;
     profilePicture: string;
     specialty: string;
     location: string;

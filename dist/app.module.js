@@ -23,6 +23,7 @@ const pharmacist_module_1 = require("./modules/pharmacist/pharmacist.module");
 const otp_module_1 = require("./modules/otp/otp.module");
 const termill_module_1 = require("./modules/termill/termill.module");
 const postmark_module_1 = require("./modules/postmark/postmark.module");
+const configify_1 = require("@itgorillaz/configify");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -53,6 +54,7 @@ exports.AppModule = AppModule = __decorate([
             otp_module_1.OtpModule,
             termill_module_1.TermillModule,
             postmark_module_1.PostmarkModule,
+            configify_1.ConfigifyModule.forRootAsync(),
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, { provide: core_1.APP_GUARD, useClass: throttler_1.ThrottlerGuard }],

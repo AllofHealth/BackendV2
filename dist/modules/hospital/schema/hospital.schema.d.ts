@@ -66,6 +66,7 @@ export declare class Hospital {
     status: string;
     category: string;
     regNo: string;
+    isVerified: boolean;
 }
 export declare const HospitalSchema: import("mongoose").Schema<Hospital, import("mongoose").Model<Hospital, any, any, any, Document<unknown, any, Hospital> & Hospital & {
     _id: import("mongoose").Types.ObjectId;

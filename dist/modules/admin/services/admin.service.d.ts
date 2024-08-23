@@ -32,6 +32,7 @@ import { AdminGuard } from '../guards/admin.guard';
 import { HospitalDao } from 'src/modules/hospital/dao/hospital.dao';
 import { DoctorDao } from 'src/modules/doctor/dao/doctor.dao';
 import { PharmacistDao } from 'src/modules/pharmacist/dao/pharmacist.dao';
+import { OtpService } from '@/modules/otp/services/otp.service';
 export declare class AdminService {
     private adminModel;
     private readonly adminDao;
@@ -39,8 +40,9 @@ export declare class AdminService {
     private readonly hospitalDao;
     private readonly doctorDao;
     private readonly pharmacistDao;
+    private readonly otpService;
     private logger;
-    constructor(adminModel: Model<Admin>, adminDao: AdminDao, adminGuard: AdminGuard, hospitalDao: HospitalDao, doctorDao: DoctorDao, pharmacistDao: PharmacistDao);
+    constructor(adminModel: Model<Admin>, adminDao: AdminDao, adminGuard: AdminGuard, hospitalDao: HospitalDao, doctorDao: DoctorDao, pharmacistDao: PharmacistDao, otpService: OtpService);
     fetchAdminByAddress(walletAddress: string): Promise<(import("mongoose").Document<unknown, {}, Admin> & Admin & {
         _id: Types.ObjectId;
     }) | {

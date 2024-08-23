@@ -26,6 +26,7 @@ import { Document } from 'mongoose';
 export declare class Otp extends Document {
     walletAddress: string;
     otp: string;
+    role: string;
     expirationTime: Date;
 }
 export declare const OtpSchema: import("mongoose").Schema<Otp, import("mongoose").Model<Otp, any, any, any, Document<unknown, any, Otp> & Otp & {

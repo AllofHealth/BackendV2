@@ -19,27 +19,29 @@ let OtpController = class OtpController {
     constructor(otpService) {
         this.otpService = otpService;
     }
-    resendOTP(walletAddress) {
-        return this.otpService.resendOtp(walletAddress);
+    resendOTP(walletAddress, role) {
+        return this.otpService.resendOtp(walletAddress, role);
     }
-    verifyOTP(walletAddress, otp) {
-        return this.otpService.verifyOtp(walletAddress, otp);
+    verifyOTP(walletAddress, role, otp) {
+        return this.otpService.verifyOtp(walletAddress, otp, role);
     }
 };
 exports.OtpController = OtpController;
 __decorate([
     (0, common_1.Post)('resendOTP'),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Query)('role', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], OtpController.prototype, "resendOTP", null);
 __decorate([
     (0, common_1.Post)('verify'),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
-    __param(1, (0, common_1.Query)('otp', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Query)('role', new common_1.ValidationPipe({ transform: true }))),
+    __param(2, (0, common_1.Query)('otp', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String, String, String]),
     __metadata("design:returntype", void 0)
 ], OtpController.prototype, "verifyOTP", null);
 exports.OtpController = OtpController = __decorate([

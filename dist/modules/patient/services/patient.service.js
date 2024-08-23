@@ -97,7 +97,7 @@ let PatientService = class PatientService {
                 };
             }
             try {
-                await this.otpService.deliverOtp(walletAddress, args.email);
+                await this.otpService.deliverOtp(walletAddress, args.email, 'patient');
                 console.log('Email sent');
             }
             catch (error) {

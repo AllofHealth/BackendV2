@@ -27,13 +27,18 @@ import { Model } from 'mongoose';
 import { PatientDao } from '@/modules/patient/dao/patient.dao';
 import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
 import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
+import { RoleType } from '../interface/otp.interface';
+import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
+import { AdminDao } from '@/modules/admin/dao/admin.dao';
 export declare class OtpDao {
     private otpModel;
     private readonly patientDao;
     private readonly doctorDao;
     private readonly pharmacistDao;
-    constructor(otpModel: Model<Otp>, patientDao: PatientDao, doctorDao: DoctorDao, pharmacistDao: PharmacistDao);
-    createOtp(walletAddress: string, otp: string, expirationTime: Date): Promise<import("mongoose").Document<unknown, {}, Otp> & Otp & {
+    private readonly hospitalDao;
+    private readonly adminDao;
+    constructor(otpModel: Model<Otp>, patientDao: PatientDao, doctorDao: DoctorDao, pharmacistDao: PharmacistDao, hospitalDao: HospitalDao, adminDao: AdminDao);
+    createOtp(walletAddress: string, otp: string, expirationTime: Date, role: RoleType): Promise<import("mongoose").Document<unknown, {}, Otp> & Otp & {
         _id: import("mongoose").Types.ObjectId;
     }>;
     deleteOtp(walletAddress: string): Promise<import("mongodb").DeleteResult>;
@@ -49,5 +54,10 @@ export declare class OtpDao {
     fetchPharmacist(walletAddress: string): Promise<import("mongoose").Document<unknown, {}, import("../../pharmacist/schema/pharmacist.schema").Pharmacist> & import("../../pharmacist/schema/pharmacist.schema").Pharmacist & {
         _id: import("mongoose").Types.ObjectId;
     }>;
-    determineRole(walletAddress: string): Promise<"pharmacist" | "patient" | "doctor">;
+    fetchInstitution(walletAddress: string): Promise<import("mongoose").Document<unknown, {}, import("../../hospital/schema/hospital.schema").Hospital> & import("../../hospital/schema/hospital.schema").Hospital & {
+        _id: import("mongoose").Types.ObjectId;
+    }>;
+    fetchAdmin(walletAddress: string): Promise<import("mongoose").Document<unknown, {}, import("../../admin/schema/admin.schema").Admin> & import("../../admin/schema/admin.schema").Admin & {
+        _id: import("mongoose").Types.ObjectId;
+    }>;
 }

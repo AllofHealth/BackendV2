@@ -23,6 +23,7 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import { Document, HydratedDocument } from 'mongoose';
+import { Medicine } from '../../medicine/schema/medicine.schema';
 export type MedicalRecordPreviewDocument = MedicalRecordPreview & Document;
 export declare class MedicalRecordPreview extends Document {
     id: number;
@@ -39,22 +40,15 @@ export declare const MedicalRecordPreviewSchema: import("mongoose").Schema<Medic
     _id: import("mongoose").Types.ObjectId;
 }>;
 export declare class Prescriptions extends Document {
-    doctorName: string;
     recordId: number;
-    patientName?: string;
-    patientAddress: string;
+    doctorName: string;
     doctorAddress: string;
-    institutionName?: string;
-    medicineName: string;
-    quantity?: number;
-    medicineId?: string;
-    medicineGroup?: string;
-    description: string;
-    sideEffects: string;
+    institutionName: string;
+    patientName: string;
+    patientAddress: string;
+    medicine: Medicine[];
     date: Date;
-    status?: string;
-    dispensedDate?: Date;
-    dispensedBy?: string;
+    status: string;
 }
 export declare const PrescriptionsSchema: import("mongoose").Schema<Prescriptions, import("mongoose").Model<Prescriptions, any, any, any, Document<unknown, any, Prescriptions> & Prescriptions & {
     _id: import("mongoose").Types.ObjectId;

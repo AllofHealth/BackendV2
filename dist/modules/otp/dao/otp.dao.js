@@ -20,18 +20,23 @@ const mongoose_2 = require("mongoose");
 const patient_dao_1 = require("../../patient/dao/patient.dao");
 const doctor_dao_1 = require("../../doctor/dao/doctor.dao");
 const pharmacist_dao_1 = require("../../pharmacist/dao/pharmacist.dao");
+const hospital_dao_1 = require("../../hospital/dao/hospital.dao");
+const admin_dao_1 = require("../../admin/dao/admin.dao");
 let OtpDao = class OtpDao {
-    constructor(otpModel, patientDao, doctorDao, pharmacistDao) {
+    constructor(otpModel, patientDao, doctorDao, pharmacistDao, hospitalDao, adminDao) {
         this.otpModel = otpModel;
         this.patientDao = patientDao;
         this.doctorDao = doctorDao;
         this.pharmacistDao = pharmacistDao;
+        this.hospitalDao = hospitalDao;
+        this.adminDao = adminDao;
     }
-    async createOtp(walletAddress, otp, expirationTime) {
+    async createOtp(walletAddress, otp, expirationTime, role) {
         return await this.otpModel.create({
             walletAddress,
             otp,
             expirationTime,
+            role,
         });
     }
     async deleteOtp(walletAddress) {
@@ -49,20 +54,11 @@ let OtpDao = class OtpDao {
     async fetchPharmacist(walletAddress) {
         return await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
     }
-    async determineRole(walletAddress) {
-        const patient = await this.fetchPatient(walletAddress);
-        if (patient) {
-            return 'patient';
-        }
-        const doctor = await this.fetchDoctor(walletAddress);
-        if (doctor) {
-            return 'doctor';
-        }
-        const pharmacist = await this.fetchPharmacist(walletAddress);
-        if (pharmacist) {
-            return 'pharmacist';
-        }
-        return null;
+    async fetchInstitution(walletAddress) {
+        return await this.hospitalDao.fetchHospitalByAdminAddress(walletAddress);
+    }
+    async fetchAdmin(walletAddress) {
+        return await this.adminDao.fetchAdminByAddress(walletAddress);
     }
 };
 exports.OtpDao = OtpDao;
@@ -72,6 +68,8 @@ exports.OtpDao = OtpDao = __decorate([
     __metadata("design:paramtypes", [mongoose_2.Model,
         patient_dao_1.PatientDao,
         doctor_dao_1.DoctorDao,
-        pharmacist_dao_1.PharmacistDao])
+        pharmacist_dao_1.PharmacistDao,
+        hospital_dao_1.HospitalDao,
+        admin_dao_1.AdminDao])
 ], OtpDao);
 //# sourceMappingURL=otp.dao.js.map

@@ -124,6 +124,10 @@ __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Hospital.prototype, "regNo", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", Boolean)
+], Hospital.prototype, "isVerified", void 0);
 exports.Hospital = Hospital = __decorate([
     (0, mongoose_1.Schema)()
 ], Hospital);

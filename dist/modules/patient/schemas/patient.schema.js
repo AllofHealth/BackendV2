@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PatientSchema = exports.Patient = exports.FamilyMemberSchema = exports.FamilyMember = exports.PrescriptionsSchema = exports.Prescriptions = exports.MedicalRecordPreviewSchema = exports.MedicalRecordPreview = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
+const medicine_schema_1 = require("../../medicine/schema/medicine.schema");
 let MedicalRecordPreview = class MedicalRecordPreview extends mongoose_2.Document {
 };
 exports.MedicalRecordPreview = MedicalRecordPreview;
@@ -52,20 +53,12 @@ let Prescriptions = class Prescriptions extends mongoose_2.Document {
 exports.Prescriptions = Prescriptions;
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", String)
-], Prescriptions.prototype, "doctorName", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", Number)
 ], Prescriptions.prototype, "recordId", void 0);
 __decorate([
-    (0, mongoose_1.Prop)(),
-    __metadata("design:type", String)
-], Prescriptions.prototype, "patientName", void 0);
-__decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
-], Prescriptions.prototype, "patientAddress", void 0);
+], Prescriptions.prototype, "doctorName", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
@@ -75,29 +68,17 @@ __decorate([
     __metadata("design:type", String)
 ], Prescriptions.prototype, "institutionName", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", String)
-], Prescriptions.prototype, "medicineName", void 0);
-__decorate([
-    (0, mongoose_1.Prop)(),
-    __metadata("design:type", Number)
-], Prescriptions.prototype, "quantity", void 0);
-__decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
-], Prescriptions.prototype, "medicineId", void 0);
-__decorate([
-    (0, mongoose_1.Prop)(),
-    __metadata("design:type", String)
-], Prescriptions.prototype, "medicineGroup", void 0);
+], Prescriptions.prototype, "patientName", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
-], Prescriptions.prototype, "description", void 0);
+], Prescriptions.prototype, "patientAddress", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", String)
-], Prescriptions.prototype, "sideEffects", void 0);
+    (0, mongoose_1.Prop)({ type: [{ type: medicine_schema_1.MedicineSchema }] }),
+    __metadata("design:type", Array)
+], Prescriptions.prototype, "medicine", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ default: Date.now() }),
     __metadata("design:type", Date)
@@ -106,14 +87,6 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Prescriptions.prototype, "status", void 0);
-__decorate([
-    (0, mongoose_1.Prop)(),
-    __metadata("design:type", Date)
-], Prescriptions.prototype, "dispensedDate", void 0);
-__decorate([
-    (0, mongoose_1.Prop)(),
-    __metadata("design:type", String)
-], Prescriptions.prototype, "dispensedBy", void 0);
 exports.Prescriptions = Prescriptions = __decorate([
     (0, mongoose_1.Schema)()
 ], Prescriptions);

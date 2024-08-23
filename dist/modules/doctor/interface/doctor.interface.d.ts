@@ -51,6 +51,7 @@ export interface CreateDoctorType {
 export interface UpdateDoctorType {
     name?: string;
     email?: string;
+    about?: string;
     profilePicture?: string;
     specialty?: string;
     location?: string;
@@ -74,14 +75,14 @@ export interface DoctorType {
 }
 export interface AddPatientPrescription {
     recordId: number;
-    patientAddress: string;
     doctorAddress: string;
-    medicineName: string;
-    quantity?: number;
-    medicineId?: string;
-    medicineGroup?: string;
-    description: string;
-    sideEffects: string;
+    patientAddress: string;
+    medicine: AddMedicineType[];
+}
+export interface AddMedicineType {
+    productPrescribed: string;
+    productCategory: string;
+    practitionerNote: string;
 }
 export interface ApproveMedicalRecordAccessRequestType {
     patientAddress: string;

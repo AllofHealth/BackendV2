@@ -71,6 +71,7 @@ export declare class Pharmacist {
     numberOfApprovals: number;
     name: string;
     email?: string;
+    about?: string;
     profilePicture: string;
     location: string;
     phoneNumber: string;

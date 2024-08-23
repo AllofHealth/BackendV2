@@ -32,11 +32,7 @@ let DoctorController = class DoctorController {
             recordId: prescriptionDto.recordId,
             patientAddress,
             doctorAddress,
-            medicineName: prescriptionDto.medicineName,
-            medicineId: prescriptionDto.medicineId,
-            medicineGroup: prescriptionDto.medicineGroup,
-            description: prescriptionDto.description,
-            sideEffects: prescriptionDto.sideEffects,
+            medicine: prescriptionDto.medicine,
         });
     }
     async approveRecordAccessRequest(patientAddress, doctorAddress, recordId) {

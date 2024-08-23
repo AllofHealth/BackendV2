@@ -26,8 +26,9 @@ const pharmacist_dao_1 = require("../../pharmacist/dao/pharmacist.dao");
 const doctor_guard_1 = require("../../doctor/guards/doctor.guard");
 const pharmacist_guard_1 = require("../../pharmacist/guards/pharmacist.guard");
 const encrypt_utils_1 = require("../../../shared/utils/encrypt.utils");
+const otp_service_1 = require("../../otp/services/otp.service");
 let HospitalService = class HospitalService {
-    constructor(hospitalModel, hospitalDao, hospitalGuard, doctorDao, pharmacistDao, doctorGuard, pharmacistGuard) {
+    constructor(hospitalModel, hospitalDao, hospitalGuard, doctorDao, pharmacistDao, doctorGuard, pharmacistGuard, otpService) {
         this.hospitalModel = hospitalModel;
         this.hospitalDao = hospitalDao;
         this.hospitalGuard = hospitalGuard;
@@ -35,6 +36,7 @@ let HospitalService = class HospitalService {
         this.pharmacistDao = pharmacistDao;
         this.doctorGuard = doctorGuard;
         this.pharmacistGuard = pharmacistGuard;
+        this.otpService = otpService;
         this.logger = new my_logger_service_1.MyLoggerService('HospitalService');
     }
     async createNewHospital(args) {
@@ -52,6 +54,22 @@ let HospitalService = class HospitalService {
                 regNo: (0, encrypt_utils_1.encrypt)({ data: regNo }),
             };
             const hospital = await this.hospitalDao.createHospital(hospitalData);
+            if (!hospital) {
+                return {
+                    success: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+                    message: 'Error creating hospital',
+                };
+            }
+            try {
+                await this.otpService.deliverOtp(args.admin, args.email, 'institution');
+            }
+            catch (error) {
+                await this.hospitalDao.removeHospitalById(hospital._id);
+                return {
+                    success: common_1.HttpStatus.BAD_REQUEST,
+                    message: 'An error occurred while creating instiution',
+                };
+            }
             return {
                 success: shared_1.ErrorCodes.Success,
                 hospital,
@@ -777,6 +795,7 @@ exports.HospitalService = HospitalService = __decorate([
         doctor_dao_1.DoctorDao,
         pharmacist_dao_1.PharmacistDao,
         doctor_guard_1.DoctorGuard,
-        pharmacist_guard_1.PharmacistGuard])
+        pharmacist_guard_1.PharmacistGuard,
+        otp_service_1.OtpService])
 ], HospitalService);
 //# sourceMappingURL=hospital.service.js.map

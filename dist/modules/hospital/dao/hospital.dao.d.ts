@@ -37,6 +37,9 @@ export declare class HospitalDao {
     fetchHospitalByRegNo(regNo: string): Promise<import("mongoose").Document<unknown, {}, Hospital> & Hospital & {
         _id: Types.ObjectId;
     }>;
+    fetchHospitalByAdminAddress(admin: string): Promise<import("mongoose").Document<unknown, {}, Hospital> & Hospital & {
+        _id: Types.ObjectId;
+    }>;
     fetchHospitalWithId(id: Types.ObjectId): Promise<import("mongoose").Document<unknown, {}, Hospital> & Hospital & {
         _id: Types.ObjectId;
     }>;

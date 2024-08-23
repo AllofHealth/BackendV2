@@ -32,6 +32,8 @@ export declare class CreatePatientDto {
     profilePicture?: string;
     address: string;
     city: string;
+    bloodGroup: string;
+    genotype: string;
     walletAddress: string;
     category?: string;
 }

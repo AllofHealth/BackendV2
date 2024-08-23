@@ -29,7 +29,7 @@ let OtpService = class OtpService {
             throw new Error('error while cleaning up otp');
         }
     }
-    async generateOtp(secret) {
+    async generateOtp(secret, role) {
         const otp = otplib_1.authenticator.generate(secret);
         const expiresAt = Date.now() + this.expirationTime;
         try {
@@ -40,7 +40,7 @@ let OtpService = class OtpService {
                     message: 'otp not generated',
                 };
             }
-            const result = await this.otpDao.createOtp(secret, otp, new Date(expiresAt));
+            const result = await this.otpDao.createOtp(secret, otp, new Date(expiresAt), role);
             if (!result) {
                 return {
                     success: common_1.HttpStatus.BAD_REQUEST,
@@ -59,9 +59,8 @@ let OtpService = class OtpService {
             throw new Error('error while generating otp');
         }
     }
-    async verifyUser(walletAddress) {
+    async verifyUser(walletAddress, role) {
         try {
-            const role = await this.otpDao.determineRole(walletAddress);
             switch (role) {
                 case 'patient':
                     const patient = await this.otpDao.fetchPatient(walletAddress);
@@ -78,6 +77,16 @@ let OtpService = class OtpService {
                     pharmacist.isVerified = true;
                     await pharmacist.save();
                     break;
+                case 'institution':
+                    const institution = await this.otpDao.fetchInstitution(walletAddress);
+                    institution.isVerified = true;
+                    await institution.save();
+                    break;
+                case 'admin':
+                    const admin = await this.otpDao.fetchAdmin(walletAddress);
+                    admin.isVerified = true;
+                    await admin.save();
+                    break;
             }
         }
         catch (error) {
@@ -85,7 +94,7 @@ let OtpService = class OtpService {
             throw new Error('error while verifying user');
         }
     }
-    async verifyOtp(secret, otp) {
+    async verifyOtp(secret, otp, role) {
         let isValid = false;
         try {
             const entry = await this.otpDao.findOtp(secret);
@@ -113,11 +122,11 @@ let OtpService = class OtpService {
             }
             await this.otpDao.deleteOtp(secret);
             try {
-                await this.verifyUser(entry.walletAddress);
+                await this.verifyUser(entry.walletAddress, role);
             }
             catch (error) {
                 console.error(error);
-                await this.verifyUser(entry.walletAddress);
+                await this.verifyUser(entry.walletAddress, role);
             }
             return {
                 success: common_1.HttpStatus.OK,
@@ -130,9 +139,9 @@ let OtpService = class OtpService {
             throw new Error('error while verifying otp');
         }
     }
-    async deliverOtp(walletAddress, emailAddress) {
+    async deliverOtp(walletAddress, emailAddress, role) {
         try {
-            const { otp } = await this.generateOtp(walletAddress);
+            const { otp } = await this.generateOtp(walletAddress, role);
             console.log(otp);
             await this.postmarkService.sendEmail({
                 to: emailAddress,
@@ -145,22 +154,25 @@ let OtpService = class OtpService {
             throw new Error('an error occurred while delivering otp');
         }
     }
-    async resendOtp(walletAddress) {
+    async resendOtp(walletAddress, role) {
         await this.cleanUp(walletAddress);
         try {
-            const role = await this.otpDao.determineRole(walletAddress);
             switch (role) {
                 case 'patient':
                     const patient = await this.otpDao.fetchPatient(walletAddress);
-                    await this.deliverOtp(walletAddress, patient.email);
+                    await this.deliverOtp(walletAddress, patient.email, 'patient');
                     break;
                 case 'doctor':
                     const doctor = await this.otpDao.fetchDoctor(walletAddress);
-                    await this.deliverOtp(walletAddress, doctor.email);
+                    await this.deliverOtp(walletAddress, doctor.email, 'doctor');
                     break;
                 case 'pharmacist':
                     const pharmacist = await this.otpDao.fetchPharmacist(walletAddress);
-                    await this.deliverOtp(walletAddress, pharmacist.email);
+                    await this.deliverOtp(walletAddress, pharmacist.email, 'pharmacist');
+                    break;
+                case 'institution':
+                    const institution = await this.otpDao.fetchInstitution(walletAddress);
+                    await this.deliverOtp(walletAddress, institution.admin, 'institution');
                     break;
             }
             return {

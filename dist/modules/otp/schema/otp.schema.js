@@ -25,6 +25,10 @@ __decorate([
 ], Otp.prototype, "otp", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
+], Otp.prototype, "role", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", Date)
 ], Otp.prototype, "expirationTime", void 0);
 exports.Otp = Otp = __decorate([

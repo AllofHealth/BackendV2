@@ -24,14 +24,16 @@ const admin_guard_1 = require("../guards/admin.guard");
 const hospital_dao_1 = require("../../hospital/dao/hospital.dao");
 const doctor_dao_1 = require("../../doctor/dao/doctor.dao");
 const pharmacist_dao_1 = require("../../pharmacist/dao/pharmacist.dao");
+const otp_service_1 = require("../../otp/services/otp.service");
 let AdminService = class AdminService {
-    constructor(adminModel, adminDao, adminGuard, hospitalDao, doctorDao, pharmacistDao) {
+    constructor(adminModel, adminDao, adminGuard, hospitalDao, doctorDao, pharmacistDao, otpService) {
         this.adminModel = adminModel;
         this.adminDao = adminDao;
         this.adminGuard = adminGuard;
         this.hospitalDao = hospitalDao;
         this.doctorDao = doctorDao;
         this.pharmacistDao = pharmacistDao;
+        this.otpService = otpService;
         this.logger = new my_logger_service_1.MyLoggerService('AdminService');
     }
     async fetchAdminByAddress(walletAddress) {
@@ -65,6 +67,16 @@ let AdminService = class AdminService {
         }
         try {
             const admin = await this.adminDao.createAdmin(args);
+            try {
+                await this.otpService.deliverOtp(args.walletAddress, args.email, 'admin');
+            }
+            catch (error) {
+                await this.adminDao.removeAdminByAddress(args.walletAddress);
+                return {
+                    success: common_1.HttpStatus.BAD_REQUEST,
+                    message: 'An error occurred while creating an admin',
+                };
+            }
             return {
                 success: shared_1.ErrorCodes.Success,
                 admin,
@@ -191,6 +203,7 @@ exports.AdminService = AdminService = __decorate([
         admin_guard_1.AdminGuard,
         hospital_dao_1.HospitalDao,
         doctor_dao_1.DoctorDao,
-        pharmacist_dao_1.PharmacistDao])
+        pharmacist_dao_1.PharmacistDao,
+        otp_service_1.OtpService])
 ], AdminService);
 //# sourceMappingURL=admin.service.js.map

@@ -33,6 +33,7 @@ import { DoctorDao } from 'src/modules/doctor/dao/doctor.dao';
 import { PharmacistDao } from 'src/modules/pharmacist/dao/pharmacist.dao';
 import { DoctorGuard } from 'src/modules/doctor/guards/doctor.guard';
 import { PharmacistGuard } from 'src/modules/pharmacist/guards/pharmacist.guard';
+import { OtpService } from '@/modules/otp/services/otp.service';
 export declare class HospitalService {
     private hospitalModel;
     private readonly hospitalDao;
@@ -41,8 +42,9 @@ export declare class HospitalService {
     private readonly pharmacistDao;
     private readonly doctorGuard;
     private readonly pharmacistGuard;
+    private readonly otpService;
     private logger;
-    constructor(hospitalModel: Model<Hospital>, hospitalDao: HospitalDao, hospitalGuard: HospitalGuard, doctorDao: DoctorDao, pharmacistDao: PharmacistDao, doctorGuard: DoctorGuard, pharmacistGuard: PharmacistGuard);
+    constructor(hospitalModel: Model<Hospital>, hospitalDao: HospitalDao, hospitalGuard: HospitalGuard, doctorDao: DoctorDao, pharmacistDao: PharmacistDao, doctorGuard: DoctorGuard, pharmacistGuard: PharmacistGuard, otpService: OtpService);
     createNewHospital(args: CreateHospitalType): Promise<{
         success: HttpStatus;
         message: string;
