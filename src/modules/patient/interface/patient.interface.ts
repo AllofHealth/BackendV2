@@ -152,22 +152,19 @@ export interface UpdatePatientProfileType {
 }
 
 export interface CreatePrescriptionInterface {
-  doctorName: string;
   recordId: number;
-  patientName: string;
-  patientAddress: string;
+  doctorName: string;
   doctorAddress: string;
   institutionName: string;
-  medicineName: string;
-  quantity?: number;
-  medicineId?: string;
-  medicineGroup?: string;
-  description: string;
-  sideEffects: string;
-  date?: Date;
-  status?: string;
-  dispensedDate?: Date;
-  dispensedBy?: string;
+  patientName: string;
+  patientAddress: string;
+  medicine: AddMedicineType[];
+}
+
+export interface AddMedicineType {
+  productPrescribed: string;
+  productCategory: string;
+  practitionerNote: string;
 }
 
 export interface SharePrescriptionInterface {
