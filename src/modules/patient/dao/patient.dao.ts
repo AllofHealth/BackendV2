@@ -87,14 +87,7 @@ export class PatientDao {
       patientAddress: prescription.patientAddress,
       doctorAddress: prescription.doctorAddress,
       institutionName: prescription.institutionName,
-      medicineName: prescription.medicineName,
-      quantity: prescription.quantity,
-      medicineId: prescription.medicineId ? prescription.medicineId : '',
-      medicineGroup: prescription.medicineGroup
-        ? prescription.medicineGroup
-        : '',
-      description: prescription.description,
-      sideEffects: prescription.sideEffects ? prescription.sideEffects : '',
+      medicine: prescription.medicine,
     });
   }
 
