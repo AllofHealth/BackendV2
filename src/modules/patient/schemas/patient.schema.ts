@@ -1,5 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, HydratedDocument } from 'mongoose';
+import {
+  Medicine,
+  MedicineSchema,
+} from '../../medicine/schema/medicine.schema';
 
 export type MedicalRecordPreviewDocument = MedicalRecordPreview & Document;
 
@@ -33,52 +37,31 @@ export const MedicalRecordPreviewSchema =
 @Schema()
 export class Prescriptions extends Document {
   @Prop({ required: true })
-  doctorName: string;
-
-  @Prop({ required: true })
   recordId: number;
 
-  @Prop()
-  patientName?: string;
-
   @Prop({ required: true })
-  patientAddress: string;
+  doctorName: string;
 
   @Prop({ required: true })
   doctorAddress: string;
 
   @Prop()
-  institutionName?: string;
-
-  @Prop({ required: true })
-  medicineName: string;
+  institutionName: string;
 
   @Prop()
-  quantity?: number;
-
-  @Prop()
-  medicineId?: string;
-
-  @Prop()
-  medicineGroup?: string;
+  patientName: string;
 
   @Prop({ required: true })
-  description: string;
+  patientAddress: string;
 
-  @Prop({ required: true })
-  sideEffects: string;
+  @Prop({ type: [{ type: MedicineSchema }] })
+  medicine: Medicine[];
 
   @Prop({ default: Date.now() })
   date: Date;
 
   @Prop()
-  status?: string;
-
-  @Prop()
-  dispensedDate?: Date;
-
-  @Prop()
-  dispensedBy?: string;
+  status: string;
 }
 
 export const PrescriptionsSchema = SchemaFactory.createForClass(Prescriptions);
