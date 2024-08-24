@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Admin } from '../schema/admin.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -48,8 +48,66 @@ export class AdminService {
     }
   }
 
+  async isAdminAuthenticated(walletAddress: string) {
+    let isAuthenticated = false;
+    try {
+      const admin = await this.adminDao.fetchAdminByAddress(walletAddress);
+      if (!admin) {
+        return {
+          success: ErrorCodes.NotFound,
+          message: 'Admin not found',
+        };
+      }
+      if (admin.isAuthenticated) {
+        isAuthenticated = true;
+      }
+
+      return isAuthenticated;
+    } catch (error) {
+      console.error(error);
+      if (error instanceof MongooseError) {
+        throw new HttpException(
+          { message: error.message },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      throw new HttpException(
+        { message: 'An error occurred while fetching admin' },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
   async fetchAllAdmins() {
     return await this.adminModel.find();
+  }
+
+  async authenticateAdmin(addressToAuthenticate: string) {
+    try {
+      const admin = await this.adminDao.fetchAdminByAddress(
+        addressToAuthenticate,
+      );
+      if (!admin) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: 'admin not found',
+        };
+      }
+
+      admin.isAuthenticated = true;
+      await admin.save();
+
+      return {
+        success: HttpStatus.OK,
+        message: 'admin successfully authenticated',
+      };
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        { message: error.message },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async createNewAdmin(args: CreateAdminType) {
@@ -87,12 +145,9 @@ export class AdminService {
   }
 
   async removeAdmin(args: RemoveAdminType) {
-    const { adminAddressToAuthorize, adminAddressToRemove } = args;
+    const { adminAddressToRemove } = args;
 
-    if (
-      !(await this.adminGuard.validateAdmin(adminAddressToAuthorize)) ||
-      !(await this.adminGuard.validateAdmin(adminAddressToRemove))
-    ) {
+    if (!(await this.adminGuard.validateAdmin(adminAddressToRemove))) {
       return {
         success: HttpStatus.UNAUTHORIZED,
         message: 'Unauthorized',
@@ -113,17 +168,8 @@ export class AdminService {
 
   async approveHospital(args: {
     hospitalId: Types.ObjectId;
-    adminAddress: string;
   }): Promise<{ success: number; message: string }> {
-    const { hospitalId, adminAddress } = args;
-
-    if (!(await this.adminGuard.validateAdmin(adminAddress))) {
-      return {
-        success: HttpStatus.UNAUTHORIZED,
-        message: 'not authorized',
-      };
-    }
-
+    const { hospitalId } = args;
     try {
       const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
       if (!hospital) {
