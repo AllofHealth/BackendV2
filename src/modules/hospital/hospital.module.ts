@@ -8,6 +8,7 @@ import { HospitalGuard } from './guard/hospital.guard';
 import { DoctorModule } from 'src/modules/doctor/doctor.module';
 import { PharmacistModule } from 'src/modules/pharmacist/pharmacist.module';
 import { OtpModule } from '../otp/otp.module';
+import { EncryptionModule } from '@/shared/utils/encryption/encryption.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { OtpModule } from '../otp/otp.module';
     DoctorModule,
     forwardRef(() => PharmacistModule),
     forwardRef(() => OtpModule),
+    EncryptionModule,
   ],
   providers: [HospitalService, HospitalDao, HospitalGuard],
   controllers: [HospitalController],
