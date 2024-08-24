@@ -5,16 +5,13 @@ import {
   Get,
   Post,
   Query,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { AdminService } from '../services/admin.service';
-import {
-  ApproveHospitalDto,
-  CreateAdminDto,
-  RemoveAdminDto,
-  UpdateAdminDto,
-} from '../dto/admin.dto';
+import { CreateAdminDto, UpdateAdminDto } from '../dto/admin.dto';
 import { Types } from 'mongoose';
+import { AdminAuthGuard } from '../guards/admin.auth.guard';
 
 @Controller('admin')
 export class AdminController {
@@ -56,27 +53,35 @@ export class AdminController {
   }
 
   @Post('approveHospital')
+  @UseGuards(AdminAuthGuard)
   async approveHospital(
-    @Query('hospitalId', new ValidationPipe({ transform: true }))
-    hospitalId: Types.ObjectId,
     @Query('adminAddress', new ValidationPipe({ transform: true }))
     adminAddress: string,
+    @Query('hospitalId', new ValidationPipe({ transform: true }))
+    hospitalId: Types.ObjectId,
   ) {
-    const approveHospitalDto: ApproveHospitalDto = { hospitalId, adminAddress };
-    return await this.adminService.approveHospital(approveHospitalDto);
+    return await this.adminService.approveHospital({ hospitalId });
+  }
+
+  @Post('authenticateAdmin')
+  @UseGuards(AdminAuthGuard)
+  async authenticateAdmin(
+    @Query('adminAddress', new ValidationPipe({ transform: true }))
+    adminAddress: string,
+    @Query('adminToAuthenticate', new ValidationPipe({ transform: true }))
+    walletAddress: string,
+  ) {
+    return await this.adminService.authenticateAdmin(walletAddress);
   }
 
   @Delete('deleteAdmin')
+  @UseGuards(AdminAuthGuard)
   async deleteAdmin(
-    @Query('adminAddressToAuthorize', new ValidationPipe({ transform: true }))
+    @Query('adminAddress', new ValidationPipe({ transform: true }))
     adminAddressToAuthorize: string,
     @Query('adminAddressToRemove', new ValidationPipe({ transform: true }))
     adminAddressToRemove: string,
   ) {
-    const deleteAdminDto: RemoveAdminDto = {
-      adminAddressToAuthorize,
-      adminAddressToRemove,
-    };
-    return await this.adminService.removeAdmin(deleteAdminDto);
+    return await this.adminService.removeAdmin({ adminAddressToRemove });
   }
 }
