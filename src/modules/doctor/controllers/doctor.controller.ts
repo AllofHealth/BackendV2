@@ -5,6 +5,7 @@ import {
   Get,
   Post,
   Query,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { DoctorService } from '../services/doctor.service';
@@ -15,6 +16,7 @@ import {
   UpdateDoctorDto,
 } from '../dto/doctor.dto';
 import { Types } from 'mongoose';
+import { DoctorAuthGuard } from '../guards/doctor.auth.guard';
 
 @Controller('doctor')
 export class DoctorController {
@@ -38,11 +40,12 @@ export class DoctorController {
   }
 
   @Post('addPatientPrescription')
+  @UseGuards(DoctorAuthGuard)
   async addPatientPrescription(
-    @Query('patientAddress', new ValidationPipe({ transform: true }))
-    patientAddress: string,
     @Query('doctorAddress', new ValidationPipe({ transform: true }))
     doctorAddress: string,
+    @Query('patientAddress', new ValidationPipe({ transform: true }))
+    patientAddress: string,
     @Body(new ValidationPipe({ transform: true }))
     prescriptionDto: CreatePrescriptionDto,
   ) {
@@ -55,11 +58,12 @@ export class DoctorController {
   }
 
   @Post('approveRecordAccessRequest')
+  @UseGuards(DoctorAuthGuard)
   async approveRecordAccessRequest(
-    @Query('patientAddress', new ValidationPipe({ transform: true }))
-    patientAddress: string,
     @Query('doctorAddress', new ValidationPipe({ transform: true }))
     doctorAddress: string,
+    @Query('patientAddress', new ValidationPipe({ transform: true }))
+    patientAddress: string,
     @Query('recordId', new ValidationPipe({ transform: true }))
     recordId: Types.ObjectId,
   ) {
@@ -71,11 +75,12 @@ export class DoctorController {
   }
 
   @Post('rejectRecordAccessRequest')
+  @UseGuards(DoctorAuthGuard)
   async rejectRecordAccessRequest(
-    @Query('patientAddress', new ValidationPipe({ transform: true }))
-    patientAddress: string,
     @Query('doctorAddress', new ValidationPipe({ transform: true }))
     doctorAddress: string,
+    @Query('patientAddress', new ValidationPipe({ transform: true }))
+    patientAddress: string,
     @Query('recordId', new ValidationPipe({ transform: true }))
     recordId: Types.ObjectId,
   ) {
@@ -86,12 +91,13 @@ export class DoctorController {
     });
   }
 
-  @Post('createMedicalRecordPreview')
+  @Post('createMedicalRecord')
+  @UseGuards(DoctorAuthGuard)
   async createMedicalRecordPreview(
-    @Query('patientAddress', new ValidationPipe({ transform: true }))
-    patientAddress: string,
     @Query('doctorAddress', new ValidationPipe({ transform: true }))
     doctorAddress: string,
+    @Query('patientAddress', new ValidationPipe({ transform: true }))
+    patientAddress: string,
     @Body(new ValidationPipe({ transform: true }))
     createMedicalRecordDto: CreateMedicalRecordDto,
   ) {
@@ -104,8 +110,9 @@ export class DoctorController {
   }
 
   @Post('deleteAllApprovalRequests')
+  @UseGuards(DoctorAuthGuard)
   async deleteAllApprovalRequests(
-    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    @Query('adminAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
   ) {
     return await this.doctorService.deleteAllApprovalRequests(walletAddress);
