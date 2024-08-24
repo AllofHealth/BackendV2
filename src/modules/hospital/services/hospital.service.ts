@@ -23,8 +23,8 @@ import { DoctorDao } from 'src/modules/doctor/dao/doctor.dao';
 import { PharmacistDao } from 'src/modules/pharmacist/dao/pharmacist.dao';
 import { DoctorGuard } from 'src/modules/doctor/guards/doctor.guard';
 import { PharmacistGuard } from 'src/modules/pharmacist/guards/pharmacist.guard';
-import { encrypt } from '@/shared/utils/encrypt.utils';
 import { OtpService } from '@/modules/otp/services/otp.service';
+import { EncryptionService } from '@/shared/utils/encryption/service/encryption.service';
 
 @Injectable()
 export class HospitalService {
@@ -38,6 +38,7 @@ export class HospitalService {
     private readonly doctorGuard: DoctorGuard,
     private readonly pharmacistGuard: PharmacistGuard,
     private readonly otpService: OtpService,
+    private readonly encryptionService: EncryptionService,
   ) {}
 
   async createNewHospital(args: CreateHospitalType) {
@@ -55,7 +56,7 @@ export class HospitalService {
 
       const hospitalData: CreateHospitalType = {
         ...rest,
-        regNo: encrypt({ data: regNo }),
+        regNo: this.encryptionService.encrypt({ data: regNo }),
       };
 
       const hospital = await this.hospitalDao.createHospital(hospitalData);
@@ -297,7 +298,7 @@ export class HospitalService {
         };
       }
       const newUpdateData = {
-        encryptedRegNo: encrypt({
+        encryptedRegNo: this.encryptionService.encrypt({
           data: regNo,
         }),
         ...rest,
@@ -644,9 +645,15 @@ export class HospitalService {
         };
       }
 
+      const { regNo, ...rest } = hospital;
+      const decryptedHospital = {
+        ...rest,
+        regNo: this.encryptionService.decrypt({ data: regNo }),
+      };
+
       return {
         success: ErrorCodes.Success,
-        hospital: hospital,
+        hospital: decryptedHospital,
       };
     } catch (error) {
       console.error(error);
