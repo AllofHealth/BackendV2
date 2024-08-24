@@ -294,20 +294,11 @@ export class DoctorService {
     const { recordId, patientAddress, doctorAddress, medicine } = args;
     try {
       const isPatient = await this.patientGuard.validatePatient(patientAddress);
-      const isDoctor =
-        await this.doctorGuard.validateDoctorExists(doctorAddress);
 
       if (!isPatient) {
         return {
           success: HttpStatus.NOT_FOUND,
           message: 'Patient not found',
-        };
-      }
-
-      if (!isDoctor) {
-        return {
-          success: HttpStatus.UNAUTHORIZED,
-          message: 'unauthorized',
         };
       }
 
@@ -323,13 +314,6 @@ export class DoctorService {
         return {
           success: HttpStatus.NOT_FOUND,
           message: 'Hospital not found',
-        };
-      }
-
-      if (doctor.status !== ApprovalStatus.Approved) {
-        return {
-          success: HttpStatus.UNAUTHORIZED,
-          message: 'doctor not approved',
         };
       }
 
@@ -379,13 +363,6 @@ export class DoctorService {
         return {
           success: HttpStatus.NOT_FOUND,
           message: 'patient not found',
-        };
-      }
-
-      if (!doctor) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'doctor not found',
         };
       }
 
@@ -479,13 +456,6 @@ export class DoctorService {
         return {
           success: HttpStatus.NOT_FOUND,
           message: 'patient not found',
-        };
-      }
-
-      if (!doctor) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'doctor not found',
         };
       }
 
