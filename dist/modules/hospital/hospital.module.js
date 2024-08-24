@@ -17,6 +17,9 @@ const hospital_guard_1 = require("./guard/hospital.guard");
 const doctor_module_1 = require("../doctor/doctor.module");
 const pharmacist_module_1 = require("../pharmacist/pharmacist.module");
 const otp_module_1 = require("../otp/otp.module");
+const encryption_module_1 = require("../../shared/utils/encryption/encryption.module");
+const hospital_approved_guard_1 = require("./guard/hospital.approved.guard");
+const hospital_auth_guard_1 = require("./guard/hospital.auth.guard");
 let HospitalModule = class HospitalModule {
 };
 exports.HospitalModule = HospitalModule;
@@ -29,10 +32,17 @@ exports.HospitalModule = HospitalModule = __decorate([
             doctor_module_1.DoctorModule,
             (0, common_1.forwardRef)(() => pharmacist_module_1.PharmacistModule),
             (0, common_1.forwardRef)(() => otp_module_1.OtpModule),
+            encryption_module_1.EncryptionModule,
         ],
-        providers: [hospital_service_1.HospitalService, hospital_dao_1.HospitalDao, hospital_guard_1.HospitalGuard],
+        providers: [
+            hospital_service_1.HospitalService,
+            hospital_dao_1.HospitalDao,
+            hospital_guard_1.HospitalGuard,
+            hospital_approved_guard_1.HospitalApprovedGuard,
+            hospital_auth_guard_1.HospitalAuthGuard,
+        ],
         controllers: [hospital_controller_1.HospitalController],
-        exports: [hospital_service_1.HospitalService, hospital_dao_1.HospitalDao, hospital_guard_1.HospitalGuard],
+        exports: [hospital_service_1.HospitalService, hospital_dao_1.HospitalDao, hospital_guard_1.HospitalGuard, hospital_approved_guard_1.HospitalApprovedGuard],
     })
 ], HospitalModule);
 //# sourceMappingURL=hospital.module.js.map

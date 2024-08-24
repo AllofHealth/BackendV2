@@ -25,10 +25,10 @@ const doctor_dao_1 = require("../../doctor/dao/doctor.dao");
 const pharmacist_dao_1 = require("../../pharmacist/dao/pharmacist.dao");
 const doctor_guard_1 = require("../../doctor/guards/doctor.guard");
 const pharmacist_guard_1 = require("../../pharmacist/guards/pharmacist.guard");
-const encrypt_utils_1 = require("../../../shared/utils/encrypt.utils");
 const otp_service_1 = require("../../otp/services/otp.service");
+const encryption_service_1 = require("../../../shared/utils/encryption/service/encryption.service");
 let HospitalService = class HospitalService {
-    constructor(hospitalModel, hospitalDao, hospitalGuard, doctorDao, pharmacistDao, doctorGuard, pharmacistGuard, otpService) {
+    constructor(hospitalModel, hospitalDao, hospitalGuard, doctorDao, pharmacistDao, doctorGuard, pharmacistGuard, otpService, encryptionService) {
         this.hospitalModel = hospitalModel;
         this.hospitalDao = hospitalDao;
         this.hospitalGuard = hospitalGuard;
@@ -37,6 +37,7 @@ let HospitalService = class HospitalService {
         this.doctorGuard = doctorGuard;
         this.pharmacistGuard = pharmacistGuard;
         this.otpService = otpService;
+        this.encryptionService = encryptionService;
         this.logger = new my_logger_service_1.MyLoggerService('HospitalService');
     }
     async createNewHospital(args) {
@@ -51,7 +52,7 @@ let HospitalService = class HospitalService {
             }
             const hospitalData = {
                 ...rest,
-                regNo: (0, encrypt_utils_1.encrypt)({ data: regNo }),
+                regNo: this.encryptionService.encrypt({ data: regNo }),
             };
             const hospital = await this.hospitalDao.createHospital(hospitalData);
             if (!hospital) {
@@ -233,7 +234,7 @@ let HospitalService = class HospitalService {
                 };
             }
             const newUpdateData = {
-                encryptedRegNo: (0, encrypt_utils_1.encrypt)({
+                encryptedRegNo: this.encryptionService.encrypt({
                     data: regNo,
                 }),
                 ...rest,
@@ -515,9 +516,14 @@ let HospitalService = class HospitalService {
                     message: 'Hospital not found',
                 };
             }
+            const { regNo, ...rest } = hospital;
+            const decryptedHospital = {
+                ...rest,
+                regNo: this.encryptionService.decrypt({ data: regNo }),
+            };
             return {
                 success: shared_1.ErrorCodes.Success,
-                hospital: hospital,
+                hospital: decryptedHospital,
             };
         }
         catch (error) {
@@ -796,6 +802,7 @@ exports.HospitalService = HospitalService = __decorate([
         pharmacist_dao_1.PharmacistDao,
         doctor_guard_1.DoctorGuard,
         pharmacist_guard_1.PharmacistGuard,
-        otp_service_1.OtpService])
+        otp_service_1.OtpService,
+        encryption_service_1.EncryptionService])
 ], HospitalService);
 //# sourceMappingURL=hospital.service.js.map

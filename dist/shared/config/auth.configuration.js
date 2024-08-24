@@ -11,17 +11,28 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthConfiguration = void 0;
 const configify_1 = require("@itgorillaz/configify");
+const class_validator_1 = require("class-validator");
 let AuthConfiguration = class AuthConfiguration {
 };
 exports.AuthConfiguration = AuthConfiguration;
 __decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
     (0, configify_1.Value)('MONGODB_URI'),
     __metadata("design:type", String)
 ], AuthConfiguration.prototype, "MONGO_URI", void 0);
 __decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
     (0, configify_1.Value)('POSTMARK_SERVER_TOKEN'),
     __metadata("design:type", String)
 ], AuthConfiguration.prototype, "SERVER_TOKEN", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    (0, configify_1.Value)('ENCRYPTION_KEY'),
+    __metadata("design:type", String)
+], AuthConfiguration.prototype, "ENCRYPTION_KEY", void 0);
 exports.AuthConfiguration = AuthConfiguration = __decorate([
     (0, configify_1.Configuration)()
 ], AuthConfiguration);

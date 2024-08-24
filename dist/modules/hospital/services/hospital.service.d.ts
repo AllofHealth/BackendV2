@@ -34,6 +34,7 @@ import { PharmacistDao } from 'src/modules/pharmacist/dao/pharmacist.dao';
 import { DoctorGuard } from 'src/modules/doctor/guards/doctor.guard';
 import { PharmacistGuard } from 'src/modules/pharmacist/guards/pharmacist.guard';
 import { OtpService } from '@/modules/otp/services/otp.service';
+import { EncryptionService } from '@/shared/utils/encryption/service/encryption.service';
 export declare class HospitalService {
     private hospitalModel;
     private readonly hospitalDao;
@@ -43,8 +44,9 @@ export declare class HospitalService {
     private readonly doctorGuard;
     private readonly pharmacistGuard;
     private readonly otpService;
+    private readonly encryptionService;
     private logger;
-    constructor(hospitalModel: Model<Hospital>, hospitalDao: HospitalDao, hospitalGuard: HospitalGuard, doctorDao: DoctorDao, pharmacistDao: PharmacistDao, doctorGuard: DoctorGuard, pharmacistGuard: PharmacistGuard, otpService: OtpService);
+    constructor(hospitalModel: Model<Hospital>, hospitalDao: HospitalDao, hospitalGuard: HospitalGuard, doctorDao: DoctorDao, pharmacistDao: PharmacistDao, doctorGuard: DoctorGuard, pharmacistGuard: PharmacistGuard, otpService: OtpService, encryptionService: EncryptionService);
     createNewHospital(args: CreateHospitalType): Promise<{
         success: HttpStatus;
         message: string;
@@ -130,8 +132,40 @@ export declare class HospitalService {
         hospital?: undefined;
     } | {
         success: ErrorCodes;
-        hospital: import("mongoose").Document<unknown, {}, Hospital> & Hospital & {
+        hospital: {
+            regNo: string;
             _id: Types.ObjectId;
+            __v?: any;
+            $locals: Record<string, unknown>;
+            $op: "remove" | "save" | "validate";
+            $where: Record<string, unknown>;
+            baseModelName?: string;
+            collection: import("mongoose").Collection<import("bson").Document>;
+            db: import("mongoose").Connection;
+            errors?: import("mongoose").Error.ValidationError;
+            id: any;
+            isNew: boolean;
+            schema: import("mongoose").Schema<any, Model<any, any, any, any, any, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, {
+                [x: string]: unknown;
+            }, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<{
+                [x: string]: unknown;
+            }>> & import("mongoose").FlatRecord<{
+                [x: string]: unknown;
+            }> & Required<{
+                _id: unknown;
+            }>>;
+            name: string;
+            admin: string;
+            email: string;
+            phoneNo: string;
+            location: string;
+            profilePicture: string;
+            description: string;
+            doctors: PreviewType[];
+            pharmacists: PreviewType[];
+            status: string;
+            category: string;
+            isVerified: boolean;
         };
         message?: undefined;
     }>;

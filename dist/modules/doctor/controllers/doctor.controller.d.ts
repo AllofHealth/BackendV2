@@ -50,19 +50,19 @@ export declare class DoctorController {
             _id: Types.ObjectId;
         };
     }>;
-    addPatientPrescription(patientAddress: string, doctorAddress: string, prescriptionDto: CreatePrescriptionDto): Promise<{
+    addPatientPrescription(doctorAddress: string, patientAddress: string, prescriptionDto: CreatePrescriptionDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    approveRecordAccessRequest(patientAddress: string, doctorAddress: string, recordId: Types.ObjectId): Promise<{
+    approveRecordAccessRequest(doctorAddress: string, patientAddress: string, recordId: Types.ObjectId): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    rejectRecordAccessRequest(patientAddress: string, doctorAddress: string, recordId: Types.ObjectId): Promise<{
+    rejectRecordAccessRequest(doctorAddress: string, patientAddress: string, recordId: Types.ObjectId): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    createMedicalRecordPreview(patientAddress: string, doctorAddress: string, createMedicalRecordDto: CreateMedicalRecordDto): Promise<{
+    createMedicalRecordPreview(doctorAddress: string, patientAddress: string, createMedicalRecordDto: CreateMedicalRecordDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;

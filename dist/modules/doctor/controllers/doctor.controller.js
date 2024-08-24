@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const doctor_service_1 = require("../services/doctor.service");
 const doctor_dto_1 = require("../dto/doctor.dto");
 const mongoose_1 = require("mongoose");
+const doctor_auth_guard_1 = require("../guards/doctor.auth.guard");
 let DoctorController = class DoctorController {
     constructor(doctorService) {
         this.doctorService = doctorService;
@@ -27,7 +28,7 @@ let DoctorController = class DoctorController {
     async updateDoctor(walletAddress, updateDoctorDto) {
         return await this.doctorService.updateDoctor(walletAddress, updateDoctorDto);
     }
-    async addPatientPrescription(patientAddress, doctorAddress, prescriptionDto) {
+    async addPatientPrescription(doctorAddress, patientAddress, prescriptionDto) {
         return await this.doctorService.createPrescription({
             recordId: prescriptionDto.recordId,
             patientAddress,
@@ -35,21 +36,21 @@ let DoctorController = class DoctorController {
             medicine: prescriptionDto.medicine,
         });
     }
-    async approveRecordAccessRequest(patientAddress, doctorAddress, recordId) {
+    async approveRecordAccessRequest(doctorAddress, patientAddress, recordId) {
         return await this.doctorService.approveMedicalRecordAccessRequest({
             patientAddress: patientAddress,
             doctorAddress: doctorAddress,
             id: recordId,
         });
     }
-    async rejectRecordAccessRequest(patientAddress, doctorAddress, recordId) {
+    async rejectRecordAccessRequest(doctorAddress, patientAddress, recordId) {
         return await this.doctorService.rejectMedicalRecordAccessRequest({
             patientAddress: patientAddress,
             doctorAddress: doctorAddress,
             id: recordId,
         });
     }
-    async createMedicalRecordPreview(patientAddress, doctorAddress, createMedicalRecordDto) {
+    async createMedicalRecordPreview(doctorAddress, patientAddress, createMedicalRecordDto) {
         return await this.doctorService.createMedicalRecord({
             recordId: createMedicalRecordDto.recordId,
             principalPatientAddress: patientAddress,
@@ -97,8 +98,9 @@ __decorate([
 ], DoctorController.prototype, "updateDoctor", null);
 __decorate([
     (0, common_1.Post)('addPatientPrescription'),
-    __param(0, (0, common_1.Query)('patientAddress', new common_1.ValidationPipe({ transform: true }))),
-    __param(1, (0, common_1.Query)('doctorAddress', new common_1.ValidationPipe({ transform: true }))),
+    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard),
+    __param(0, (0, common_1.Query)('doctorAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Query)('patientAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Body)(new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, doctor_dto_1.CreatePrescriptionDto]),
@@ -106,8 +108,9 @@ __decorate([
 ], DoctorController.prototype, "addPatientPrescription", null);
 __decorate([
     (0, common_1.Post)('approveRecordAccessRequest'),
-    __param(0, (0, common_1.Query)('patientAddress', new common_1.ValidationPipe({ transform: true }))),
-    __param(1, (0, common_1.Query)('doctorAddress', new common_1.ValidationPipe({ transform: true }))),
+    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard),
+    __param(0, (0, common_1.Query)('doctorAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Query)('patientAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Query)('recordId', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, mongoose_1.Types.ObjectId]),
@@ -115,17 +118,19 @@ __decorate([
 ], DoctorController.prototype, "approveRecordAccessRequest", null);
 __decorate([
     (0, common_1.Post)('rejectRecordAccessRequest'),
-    __param(0, (0, common_1.Query)('patientAddress', new common_1.ValidationPipe({ transform: true }))),
-    __param(1, (0, common_1.Query)('doctorAddress', new common_1.ValidationPipe({ transform: true }))),
+    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard),
+    __param(0, (0, common_1.Query)('doctorAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Query)('patientAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Query)('recordId', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, mongoose_1.Types.ObjectId]),
     __metadata("design:returntype", Promise)
 ], DoctorController.prototype, "rejectRecordAccessRequest", null);
 __decorate([
-    (0, common_1.Post)('createMedicalRecordPreview'),
-    __param(0, (0, common_1.Query)('patientAddress', new common_1.ValidationPipe({ transform: true }))),
-    __param(1, (0, common_1.Query)('doctorAddress', new common_1.ValidationPipe({ transform: true }))),
+    (0, common_1.Post)('createMedicalRecord'),
+    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard),
+    __param(0, (0, common_1.Query)('doctorAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Query)('patientAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Body)(new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, doctor_dto_1.CreateMedicalRecordDto]),
@@ -133,7 +138,8 @@ __decorate([
 ], DoctorController.prototype, "createMedicalRecordPreview", null);
 __decorate([
     (0, common_1.Post)('deleteAllApprovalRequests'),
-    __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
+    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard),
+    __param(0, (0, common_1.Query)('adminAddress', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)

@@ -76,8 +76,40 @@ export declare class HospitalController {
         hospital?: undefined;
     } | {
         success: import("../../../shared").ErrorCodes;
-        hospital: import("mongoose").Document<unknown, {}, import("../schema/hospital.schema").Hospital> & import("../schema/hospital.schema").Hospital & {
+        hospital: {
+            regNo: string;
             _id: Types.ObjectId;
+            __v?: any;
+            $locals: Record<string, unknown>;
+            $op: "remove" | "save" | "validate";
+            $where: Record<string, unknown>;
+            baseModelName?: string;
+            collection: import("mongoose").Collection<import("bson").Document>;
+            db: import("mongoose").Connection;
+            errors?: import("mongoose").Error.ValidationError;
+            id: any;
+            isNew: boolean;
+            schema: import("mongoose").Schema<any, import("mongoose").Model<any, any, any, any, any, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, {
+                [x: string]: unknown;
+            }, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<{
+                [x: string]: unknown;
+            }>> & import("mongoose").FlatRecord<{
+                [x: string]: unknown;
+            }> & Required<{
+                _id: unknown;
+            }>>;
+            name: string;
+            admin: string;
+            email: string;
+            phoneNo: string;
+            location: string;
+            profilePicture: string;
+            description: string;
+            doctors: import("../interface/hospital.interface").PreviewType[];
+            pharmacists: import("../interface/hospital.interface").PreviewType[];
+            status: string;
+            category: string;
+            isVerified: boolean;
         };
         message?: undefined;
     }>;

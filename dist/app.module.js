@@ -24,6 +24,7 @@ const otp_module_1 = require("./modules/otp/otp.module");
 const termill_module_1 = require("./modules/termill/termill.module");
 const postmark_module_1 = require("./modules/postmark/postmark.module");
 const configify_1 = require("@itgorillaz/configify");
+const encryption_module_1 = require("./shared/utils/encryption/encryption.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -54,6 +55,7 @@ exports.AppModule = AppModule = __decorate([
             otp_module_1.OtpModule,
             termill_module_1.TermillModule,
             postmark_module_1.PostmarkModule,
+            encryption_module_1.EncryptionModule,
             configify_1.ConfigifyModule.forRootAsync(),
         ],
         controllers: [app_controller_1.AppController],

@@ -13,13 +13,12 @@ exports.PostmarkDao = void 0;
 const common_1 = require("@nestjs/common");
 const postmark_1 = require("postmark");
 const auth_configuration_1 = require("../../../shared/config/auth.configuration");
-const constants_1 = require("../../../shared/constants");
 let PostmarkDao = class PostmarkDao {
     constructor(config) {
         this.config = config;
     }
     provideClient() {
-        const client = new postmark_1.ServerClient(constants_1.POSTMARK_SERVER_TOKEN);
+        const client = new postmark_1.ServerClient(this.config.SERVER_TOKEN);
         return client;
     }
     async fetchTemplates() {

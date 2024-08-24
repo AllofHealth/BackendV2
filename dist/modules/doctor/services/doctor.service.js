@@ -252,17 +252,10 @@ let DoctorService = class DoctorService {
         const { recordId, patientAddress, doctorAddress, medicine } = args;
         try {
             const isPatient = await this.patientGuard.validatePatient(patientAddress);
-            const isDoctor = await this.doctorGuard.validateDoctorExists(doctorAddress);
             if (!isPatient) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
                     message: 'Patient not found',
-                };
-            }
-            if (!isDoctor) {
-                return {
-                    success: common_1.HttpStatus.UNAUTHORIZED,
-                    message: 'unauthorized',
                 };
             }
             const patient = await this.patientDao.fetchPatientByAddress(patientAddress);
@@ -273,12 +266,6 @@ let DoctorService = class DoctorService {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
                     message: 'Hospital not found',
-                };
-            }
-            if (doctor.status !== shared_1.ApprovalStatus.Approved) {
-                return {
-                    success: common_1.HttpStatus.UNAUTHORIZED,
-                    message: 'doctor not approved',
                 };
             }
             const medication = [];
@@ -317,12 +304,6 @@ let DoctorService = class DoctorService {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
                     message: 'patient not found',
-                };
-            }
-            if (!doctor) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'doctor not found',
                 };
             }
             if (!doctor.activeApprovals.length) {
@@ -394,12 +375,6 @@ let DoctorService = class DoctorService {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
                     message: 'patient not found',
-                };
-            }
-            if (!doctor) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'doctor not found',
                 };
             }
             if (!doctor.activeApprovals.length) {
