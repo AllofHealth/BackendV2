@@ -23,7 +23,10 @@ export class Admin {
   @Prop({ default: 'admin', required: true })
   category: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: false })
+  isAuthenticated: boolean;
+
+  @Prop({ required: true, default: false })
   isVerified: boolean;
 }
 
