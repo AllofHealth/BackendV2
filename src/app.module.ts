@@ -15,6 +15,7 @@ import { OtpModule } from './modules/otp/otp.module';
 import { TermillModule } from './modules/termill/termill.module';
 import { PostmarkModule } from './modules/postmark/postmark.module';
 import { ConfigifyModule } from '@itgorillaz/configify';
+import { EncryptionModule } from './shared/utils/encryption/encryption.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ConfigifyModule } from '@itgorillaz/configify';
     OtpModule,
     TermillModule,
     PostmarkModule,
+    EncryptionModule,
     ConfigifyModule.forRootAsync(),
   ],
   controllers: [AppController],
