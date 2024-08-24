@@ -39,7 +39,11 @@ __decorate([
     __metadata("design:type", String)
 ], Admin.prototype, "category", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: true, default: false }),
+    __metadata("design:type", Boolean)
+], Admin.prototype, "isAuthenticated", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true, default: false }),
     __metadata("design:type", Boolean)
 ], Admin.prototype, "isVerified", void 0);
 exports.Admin = Admin = __decorate([

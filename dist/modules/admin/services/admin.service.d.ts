@@ -49,9 +49,17 @@ export declare class AdminService {
         success: ErrorCodes;
         message: string;
     }>;
+    isAdminAuthenticated(walletAddress: string): Promise<boolean | {
+        success: ErrorCodes;
+        message: string;
+    }>;
     fetchAllAdmins(): Promise<(import("mongoose").Document<unknown, {}, Admin> & Admin & {
         _id: Types.ObjectId;
     })[]>;
+    authenticateAdmin(addressToAuthenticate: string): Promise<{
+        success: HttpStatus;
+        message: string;
+    }>;
     createNewAdmin(args: CreateAdminType): Promise<{
         success: HttpStatus;
         message: string;
@@ -72,7 +80,6 @@ export declare class AdminService {
     }>;
     approveHospital(args: {
         hospitalId: Types.ObjectId;
-        adminAddress: string;
     }): Promise<{
         success: number;
         message: string;

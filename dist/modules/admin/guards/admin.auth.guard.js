@@ -9,27 +9,28 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PostmarkDao = void 0;
+exports.AdminAuthGuard = void 0;
 const common_1 = require("@nestjs/common");
-const postmark_1 = require("postmark");
-const auth_configuration_1 = require("../../../shared/config/auth.configuration");
-const constants_1 = require("../../../shared/constants");
-let PostmarkDao = class PostmarkDao {
-    constructor(config) {
-        this.config = config;
+const admin_service_1 = require("../services/admin.service");
+let AdminAuthGuard = class AdminAuthGuard {
+    constructor(adminService) {
+        this.adminService = adminService;
     }
-    provideClient() {
-        const client = new postmark_1.ServerClient(constants_1.POSTMARK_SERVER_TOKEN);
-        return client;
-    }
-    async fetchTemplates() {
-        const client = this.provideClient();
-        return await client.getTemplates();
+    async canActivate(context) {
+        const request = context.switchToHttp().getRequest();
+        const adminAddress = request.query.adminAddress;
+        if (!adminAddress) {
+            throw new common_1.ForbiddenException('please connect wallet');
+        }
+        if (!(await this.adminService.isAdminAuthenticated(adminAddress))) {
+            throw new common_1.ForbiddenException('Not an authenticated admin');
+        }
+        return true;
     }
 };
-exports.PostmarkDao = PostmarkDao;
-exports.PostmarkDao = PostmarkDao = __decorate([
+exports.AdminAuthGuard = AdminAuthGuard;
+exports.AdminAuthGuard = AdminAuthGuard = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [auth_configuration_1.AuthConfiguration])
-], PostmarkDao);
-//# sourceMappingURL=postmark.dao.js.map
+    __metadata("design:paramtypes", [admin_service_1.AdminService])
+], AdminAuthGuard);
+//# sourceMappingURL=admin.auth.guard.js.map

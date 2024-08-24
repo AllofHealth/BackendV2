@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const admin_service_1 = require("../services/admin.service");
 const admin_dto_1 = require("../dto/admin.dto");
 const mongoose_1 = require("mongoose");
+const admin_auth_guard_1 = require("../guards/admin.auth.guard");
 let AdminController = class AdminController {
     constructor(adminService) {
         this.adminService = adminService;
@@ -39,16 +40,14 @@ let AdminController = class AdminController {
             data: updateAdminDto,
         });
     }
-    async approveHospital(hospitalId, adminAddress) {
-        const approveHospitalDto = { hospitalId, adminAddress };
-        return await this.adminService.approveHospital(approveHospitalDto);
+    async approveHospital(adminAddress, hospitalId) {
+        return await this.adminService.approveHospital({ hospitalId });
+    }
+    async authenticateAdmin(adminAddress, walletAddress) {
+        return await this.adminService.authenticateAdmin(walletAddress);
     }
     async deleteAdmin(adminAddressToAuthorize, adminAddressToRemove) {
-        const deleteAdminDto = {
-            adminAddressToAuthorize,
-            adminAddressToRemove,
-        };
-        return await this.adminService.removeAdmin(deleteAdminDto);
+        return await this.adminService.removeAdmin({ adminAddressToRemove });
     }
 };
 exports.AdminController = AdminController;
@@ -88,15 +87,26 @@ __decorate([
 ], AdminController.prototype, "updateAdmin", null);
 __decorate([
     (0, common_1.Post)('approveHospital'),
-    __param(0, (0, common_1.Query)('hospitalId', new common_1.ValidationPipe({ transform: true }))),
-    __param(1, (0, common_1.Query)('adminAddress', new common_1.ValidationPipe({ transform: true }))),
+    (0, common_1.UseGuards)(admin_auth_guard_1.AdminAuthGuard),
+    __param(0, (0, common_1.Query)('adminAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Query)('hospitalId', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [mongoose_1.Types.ObjectId, String]),
+    __metadata("design:paramtypes", [String, mongoose_1.Types.ObjectId]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "approveHospital", null);
 __decorate([
+    (0, common_1.Post)('authenticateAdmin'),
+    (0, common_1.UseGuards)(admin_auth_guard_1.AdminAuthGuard),
+    __param(0, (0, common_1.Query)('adminAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Query)('adminToAuthenticate', new common_1.ValidationPipe({ transform: true }))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "authenticateAdmin", null);
+__decorate([
     (0, common_1.Delete)('deleteAdmin'),
-    __param(0, (0, common_1.Query)('adminAddressToAuthorize', new common_1.ValidationPipe({ transform: true }))),
+    (0, common_1.UseGuards)(admin_auth_guard_1.AdminAuthGuard),
+    __param(0, (0, common_1.Query)('adminAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('adminAddressToRemove', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),

@@ -9,7 +9,6 @@ export interface AdminType extends CreateAdminType {
     category: string;
 }
 export interface RemoveAdminType {
-    adminAddressToAuthorize: string;
     adminAddressToRemove: string;
 }
 export interface UpdateAdminProfileType {

@@ -55,8 +55,52 @@ let AdminService = class AdminService {
             throw new Error('An error occurred while fetching admin');
         }
     }
+    async isAdminAuthenticated(walletAddress) {
+        let isAuthenticated = false;
+        try {
+            const admin = await this.adminDao.fetchAdminByAddress(walletAddress);
+            if (!admin) {
+                return {
+                    success: shared_1.ErrorCodes.NotFound,
+                    message: 'Admin not found',
+                };
+            }
+            if (admin.isAuthenticated) {
+                isAuthenticated = true;
+            }
+            return isAuthenticated;
+        }
+        catch (error) {
+            console.error(error);
+            if (error instanceof mongoose_2.MongooseError) {
+                throw new common_1.HttpException({ message: error.message }, common_1.HttpStatus.BAD_REQUEST);
+            }
+            throw new common_1.HttpException({ message: 'An error occurred while fetching admin' }, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
     async fetchAllAdmins() {
         return await this.adminModel.find();
+    }
+    async authenticateAdmin(addressToAuthenticate) {
+        try {
+            const admin = await this.adminDao.fetchAdminByAddress(addressToAuthenticate);
+            if (!admin) {
+                return {
+                    success: common_1.HttpStatus.NOT_FOUND,
+                    message: 'admin not found',
+                };
+            }
+            admin.isAuthenticated = true;
+            await admin.save();
+            return {
+                success: common_1.HttpStatus.OK,
+                message: 'admin successfully authenticated',
+            };
+        }
+        catch (error) {
+            console.error(error);
+            throw new common_1.HttpException({ message: error.message }, common_1.HttpStatus.BAD_REQUEST);
+        }
     }
     async createNewAdmin(args) {
         if (await this.adminDao.validateAdminExists(args.walletAddress)) {
@@ -89,9 +133,8 @@ let AdminService = class AdminService {
         }
     }
     async removeAdmin(args) {
-        const { adminAddressToAuthorize, adminAddressToRemove } = args;
-        if (!(await this.adminGuard.validateAdmin(adminAddressToAuthorize)) ||
-            !(await this.adminGuard.validateAdmin(adminAddressToRemove))) {
+        const { adminAddressToRemove } = args;
+        if (!(await this.adminGuard.validateAdmin(adminAddressToRemove))) {
             return {
                 success: common_1.HttpStatus.UNAUTHORIZED,
                 message: 'Unauthorized',
@@ -110,13 +153,7 @@ let AdminService = class AdminService {
         }
     }
     async approveHospital(args) {
-        const { hospitalId, adminAddress } = args;
-        if (!(await this.adminGuard.validateAdmin(adminAddress))) {
-            return {
-                success: common_1.HttpStatus.UNAUTHORIZED,
-                message: 'not authorized',
-            };
-        }
+        const { hospitalId } = args;
         try {
             const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
             if (!hospital) {

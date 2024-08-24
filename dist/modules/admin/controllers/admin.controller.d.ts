@@ -56,8 +56,12 @@ export declare class AdminController {
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    approveHospital(hospitalId: Types.ObjectId, adminAddress: string): Promise<{
+    approveHospital(adminAddress: string, hospitalId: Types.ObjectId): Promise<{
         success: number;
+        message: string;
+    }>;
+    authenticateAdmin(adminAddress: string, walletAddress: string): Promise<{
+        success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
     deleteAdmin(adminAddressToAuthorize: string, adminAddressToRemove: string): Promise<{

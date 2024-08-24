@@ -32,7 +32,6 @@ let AdminDao = class AdminDao {
             email: admin.email,
             walletAddress: admin.walletAddress,
             category: shared_1.Category.Admin,
-            isVerified: false,
         });
     }
     async removeAdminByAddress(walletAddress) {
