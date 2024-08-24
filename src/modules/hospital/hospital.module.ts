@@ -9,6 +9,8 @@ import { DoctorModule } from 'src/modules/doctor/doctor.module';
 import { PharmacistModule } from 'src/modules/pharmacist/pharmacist.module';
 import { OtpModule } from '../otp/otp.module';
 import { EncryptionModule } from '@/shared/utils/encryption/encryption.module';
+import { HospitalApprovedGuard } from './guard/hospital.approved.guard';
+import { HospitalAuthGuard } from './guard/hospital.auth.guard';
 
 @Module({
   imports: [
@@ -20,8 +22,14 @@ import { EncryptionModule } from '@/shared/utils/encryption/encryption.module';
     forwardRef(() => OtpModule),
     EncryptionModule,
   ],
-  providers: [HospitalService, HospitalDao, HospitalGuard],
+  providers: [
+    HospitalService,
+    HospitalDao,
+    HospitalGuard,
+    HospitalApprovedGuard,
+    HospitalAuthGuard,
+  ],
   controllers: [HospitalController],
-  exports: [HospitalService, HospitalDao, HospitalGuard],
+  exports: [HospitalService, HospitalDao, HospitalGuard, HospitalApprovedGuard],
 })
 export class HospitalModule {}
