@@ -22,9 +22,8 @@ export class DoctorGuard {
     let doctorExists: boolean = false;
 
     try {
-      const hospital = await this.hospitalDao.fetchHospitalWithBlockchainId(
-        hospitalId,
-      );
+      const hospital =
+        await this.hospitalDao.fetchHospitalWithBlockchainId(hospitalId);
       if (!hospital) {
         throw new DoctorError('Hospital not found');
       }
