@@ -5,8 +5,8 @@ import { DoctorDao } from './dao/doctor.dao';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Doctor, DoctorSchema } from './schema/doctor.schema';
 import { DoctorGuard } from './guards/doctor.guard';
-import { HospitalModule } from 'src/modules/hospital/hospital.module';
-import { PatientModule } from 'src/modules/patient/patient.module';
+import { HospitalModule } from '@/modules/hospital/hospital.module';
+import { PatientModule } from '@/modules/patient/patient.module';
 import { OtpModule } from '../otp/otp.module';
 import { MedicineModule } from '../medicine/medicine.module';
 

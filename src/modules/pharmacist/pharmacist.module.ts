@@ -10,10 +10,10 @@ import {
   PharmacistSchema,
 } from './schema/pharmacist.schema';
 import { MongooseModule } from '@nestjs/mongoose';
-import { HospitalModule } from 'src/modules/hospital/hospital.module';
+import { HospitalModule } from '@/modules/hospital/hospital.module';
 import { PharmacistDao } from './dao/pharmacist.dao';
 import { PharmacistGuard } from './guards/pharmacist.guard';
-import { PatientModule } from 'src/modules/patient/patient.module';
+import { PatientModule } from '@/modules/patient/patient.module';
 import { OtpModule } from '../otp/otp.module';
 
 @Module({

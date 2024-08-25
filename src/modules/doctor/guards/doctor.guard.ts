@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { DoctorDao } from '../dao/doctor.dao';
-import { DoctorError } from 'src/shared';
-import { PreviewType } from 'src/modules/hospital/interface/hospital.interface';
-import { HospitalDao } from 'src/modules/hospital/dao/hospital.dao';
+import { DoctorError } from '@/shared';
+import { PreviewType } from '@/modules/hospital/interface/hospital.interface';
+import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
 
 @Injectable()
 export class DoctorGuard {

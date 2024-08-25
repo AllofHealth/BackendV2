@@ -5,9 +5,9 @@ import { AdminSchema, Admin } from './schema/admin.schema';
 import { AdminDao } from './dao/admin.dao';
 import { AdminGuard } from './guards/admin.guard';
 import { MongooseModule } from '@nestjs/mongoose';
-import { HospitalModule } from 'src/modules/hospital/hospital.module';
-import { DoctorModule } from 'src/modules/doctor/doctor.module';
-import { PharmacistModule } from 'src/modules/pharmacist/pharmacist.module';
+import { HospitalModule } from '@/modules/hospital/hospital.module';
+import { DoctorModule } from '@/modules/doctor/doctor.module';
+import { PharmacistModule } from '@/modules/pharmacist/pharmacist.module';
 import { OtpModule } from '../otp/otp.module';
 
 @Module({

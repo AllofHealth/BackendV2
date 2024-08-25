@@ -3,7 +3,7 @@ import { HydratedDocument } from 'mongoose';
 import {
   Prescriptions,
   PrescriptionsSchema,
-} from 'src/modules/patient/schemas/patient.schema';
+} from '@/modules/patient/schemas/patient.schema';
 
 @Schema()
 export class ApprovalList {

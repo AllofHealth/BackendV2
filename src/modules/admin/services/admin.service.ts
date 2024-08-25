@@ -7,13 +7,13 @@ import {
   UpdateAdminProfileType,
 } from '../interface/admin.interface';
 import { Model, MongooseError, Types } from 'mongoose';
-import { AdminError, ApprovalStatus, ErrorCodes } from 'src/shared';
-import { MyLoggerService } from 'src/modules/my-logger/my-logger.service';
+import { AdminError, ApprovalStatus, ErrorCodes } from '@/shared';
+import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
 import { AdminDao } from '../dao/admin.dao';
 import { AdminGuard } from '../guards/admin.guard';
-import { HospitalDao } from 'src/modules/hospital/dao/hospital.dao';
-import { DoctorDao } from 'src/modules/doctor/dao/doctor.dao';
-import { PharmacistDao } from 'src/modules/pharmacist/dao/pharmacist.dao';
+import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
+import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
+import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
 import { OtpService } from '@/modules/otp/services/otp.service';
 
 @Injectable()

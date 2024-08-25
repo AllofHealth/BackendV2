@@ -5,8 +5,8 @@ import {
   CreateHospitalType,
   UpdateHospitalProfileType,
 } from '../interface/hospital.interface';
-import { HOSPITAL_PLACEHOLDER } from 'src/shared/constants';
-import { ApprovalStatus, Category } from 'src/shared';
+import { HOSPITAL_PLACEHOLDER } from '@/shared/constants';
+import { ApprovalStatus, Category } from '@/shared';
 
 export class HospitalDao {
   constructor(

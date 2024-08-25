@@ -4,6 +4,7 @@ import {
   Get,
   Post,
   Query,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { HospitalService } from '../services/hospital.service';
@@ -12,6 +13,8 @@ import {
   CreateHospitalDto,
   UpdateHospitalProfileDto,
 } from '../dto/hospital.dto';
+import { HospitalAuthGuard } from '../guard/hospital.auth.guard';
+import { HospitalApprovedGuard } from '../guard/hospital.approved.guard';
 
 @Controller('hospital')
 export class HospitalController {
@@ -25,6 +28,7 @@ export class HospitalController {
   }
 
   @Post('joinHospital')
+  @UseGuards(HospitalApprovedGuard)
   async joinHospital(
     @Query('hospitalId', new ValidationPipe({ transform: true }))
     hospitalId: Types.ObjectId,
@@ -38,65 +42,64 @@ export class HospitalController {
   }
 
   @Post('approvePractitioner')
+  @UseGuards(HospitalAuthGuard)
   async approvePractitioner(
-    @Query('hospitalId', new ValidationPipe({ transform: true }))
-    hospitalId: Types.ObjectId,
     @Query('adminAddress', new ValidationPipe({ transform: true }))
     adminAddress: string,
+    @Query('hospitalId', new ValidationPipe({ transform: true }))
+    hospitalId: Types.ObjectId,
     @Query('practitionerAddress', new ValidationPipe({ transform: true }))
     practitionerAddress: string,
   ) {
-    return await this.hospitalService.approvePractitioner(adminAddress, {
+    return await this.hospitalService.approvePractitioner({
       hospitalId,
       walletAddress: practitionerAddress,
     });
   }
 
   @Post('removePractitioner')
+  @UseGuards(HospitalAuthGuard)
   async removePractitioner(
-    @Query('hospitalId', new ValidationPipe({ transform: true }))
-    hospitalId: Types.ObjectId,
     @Query('adminAddress', new ValidationPipe({ transform: true }))
     adminAddress: string,
+    @Query('hospitalId', new ValidationPipe({ transform: true }))
+    hospitalId: Types.ObjectId,
     @Query('practitionerAddress', new ValidationPipe({ transform: true }))
     practitionerAddress: string,
   ) {
-    return await this.hospitalService.removePractitionerFromHospital(
-      adminAddress,
-      {
-        hospitalId,
-        walletAddress: practitionerAddress,
-      },
-    );
+    return await this.hospitalService.removePractitionerFromHospital({
+      hospitalId,
+      walletAddress: practitionerAddress,
+    });
   }
 
   @Post('delegateAdmin')
+  @UseGuards(HospitalAuthGuard)
   async delegateAdmin(
-    @Body(ValidationPipe)
-    args: {
-      newAdminAddress: string;
-      adminAddress: string;
-      hospitalId: Types.ObjectId;
-    },
+    @Query('adminAddress', new ValidationPipe({ transform: true }))
+    adminAddress: string,
+    @Query('newAdminAddress', new ValidationPipe({ transform: true }))
+    newAdminAddress: string,
+    @Query('hospitalId', new ValidationPipe({ transform: true }))
+    hospitalId: Types.ObjectId,
   ) {
     return await this.hospitalService.delegateAdminPosition(
-      args.newAdminAddress,
-      args.adminAddress,
-      args.hospitalId,
+      newAdminAddress,
+      hospitalId,
     );
   }
 
   @Post('updateHospital')
+  @UseGuards(HospitalAuthGuard)
   async updateHospital(
-    @Query('hospitalId', new ValidationPipe({ transform: true }))
-    hospitalId: Types.ObjectId,
     @Query('adminAddress', new ValidationPipe({ transform: true }))
     adminAddress: string,
+    @Query('hospitalId', new ValidationPipe({ transform: true }))
+    hospitalId: Types.ObjectId,
     @Body() updateHospitalDto: UpdateHospitalProfileDto,
   ) {
     return await this.hospitalService.updateHospitalProfile(
       hospitalId,
-      adminAddress,
       updateHospitalDto,
     );
   }

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PatientService } from './services/patient.service';
 import { PatientController } from './controllers/patient.controller';
 import {
@@ -14,15 +14,15 @@ import {
 import { PatientDao } from './dao/patient.dao';
 import { PatientGuard } from './guards/patient.guard';
 import { MongooseModule } from '@nestjs/mongoose';
-import { PharmacistModule } from 'src/modules/pharmacist/pharmacist.module';
-import { DoctorModule } from 'src/modules/doctor/doctor.module';
-import { OtpModule } from 'src/modules/otp/otp.module';
+import { PharmacistModule } from '@/modules/pharmacist/pharmacist.module';
+import { DoctorModule } from '@/modules/doctor/doctor.module';
+import { OtpModule } from '@/modules/otp/otp.module';
 import {
   Approval,
   ApprovalSchema,
   Doctor,
   DoctorSchema,
-} from 'src/modules/doctor/schema/doctor.schema';
+} from '@/modules/doctor/schema/doctor.schema';
 
 @Module({
   imports: [
@@ -43,8 +43,8 @@ import {
     MongooseModule.forFeature([
       { name: MedicalRecordPreview.name, schema: MedicalRecordPreviewSchema },
     ]),
-    PharmacistModule,
-    DoctorModule,
+    forwardRef(() => PharmacistModule),
+    forwardRef(() => DoctorModule),
     OtpModule,
   ],
   providers: [PatientService, PatientDao, PatientGuard],

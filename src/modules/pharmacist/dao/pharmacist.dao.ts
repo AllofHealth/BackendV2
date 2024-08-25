@@ -8,8 +8,8 @@ import {
   UpdateMedicineType,
   UpdatePharmacistType,
 } from '../interface/pharmacist.interface';
-import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
-import { ApprovalStatus } from 'src/shared';
+import { PROFILE_PLACEHOLDER } from '@/shared/constants';
+import { ApprovalStatus } from '@/shared';
 
 export class PharmacistDao {
   constructor(

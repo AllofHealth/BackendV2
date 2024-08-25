@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { HospitalDao } from '../dao/hospital.dao';
-import { HospitalError } from 'src/shared';
+import { HospitalError } from '@/shared';
 import { HospitalType } from '../interface/hospital.interface';
 import { Types } from 'mongoose';
 

@@ -1,5 +1,5 @@
 import { Controller, Post, Query, ValidationPipe } from '@nestjs/common';
-import { OtpService } from 'src/modules/otp/services/otp.service';
+import { OtpService } from '@/modules/otp/services/otp.service';
 import { RoleType } from '../../interface/otp.interface';
 
 @Controller('otp')

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AdminDao } from '../dao/admin.dao';
-import { AdminError } from 'src/shared';
+import { AdminError } from '@/shared';
 
 @Injectable()
 export class AdminGuard {

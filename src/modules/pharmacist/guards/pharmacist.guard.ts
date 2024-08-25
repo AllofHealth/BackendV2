@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { HospitalDao } from 'src/modules/hospital/dao/hospital.dao';
-import { PreviewType } from 'src/modules/hospital/interface/hospital.interface';
-import { PharmacistError } from 'src/shared';
+import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
+import { PreviewType } from '@/modules/hospital/interface/hospital.interface';
+import { PharmacistError } from '@/shared';
 import { PharmacistDao } from '../dao/pharmacist.dao';
 
 @Injectable()
@@ -26,9 +26,8 @@ export class PharmacistGuard {
     let pharmacistExists: boolean = false;
 
     try {
-      const hospital = await this.hospitalDao.fetchHospitalWithBlockchainId(
-        hospitalId,
-      );
+      const hospital =
+        await this.hospitalDao.fetchHospitalWithBlockchainId(hospitalId);
       if (!hospital) {
         throw new PharmacistError('Hospital not found');
       }
@@ -54,9 +53,8 @@ export class PharmacistGuard {
   async validatePharmacistExists(address: string) {
     let pharmacistExists: boolean = false;
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        address,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(address);
       if (pharmacist) {
         pharmacistExists = true;
       }

@@ -16,13 +16,14 @@ export class HospitalAuthGuard implements CanActivate {
     const { adminAddress, hospitalId } = request.query;
 
     if (!adminAddress && !hospitalId) {
-      throw new ForbiddenException('Invald request');
+      throw new ForbiddenException('Invalid request');
     }
 
     const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
     if (
-      hospital.status !== ApprovalStatus.Approved &&
-      hospital.admin !== adminAddress
+      !hospital ||
+      (hospital.status !== ApprovalStatus.Approved &&
+        hospital.admin !== adminAddress)
     ) {
       throw new ForbiddenException('Institution not approved or Invalid admin');
     }

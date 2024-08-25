@@ -5,8 +5,8 @@ import {
   CreateDoctorType,
   UpdateDoctorType,
 } from '../interface/doctor.interface';
-import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
-import { ApprovalStatus, Category } from 'src/shared';
+import { PROFILE_PLACEHOLDER } from '@/shared/constants';
+import { ApprovalStatus, Category } from '@/shared';
 
 export class DoctorDao {
   constructor(

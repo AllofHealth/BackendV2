@@ -12,11 +12,11 @@ import {
   Category,
   ErrorCodes,
   PharmacistError,
-} from 'src/shared';
-import { HospitalDao } from 'src/modules/hospital/dao/hospital.dao';
+} from '@/shared';
+import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
 import { MongooseError, Types } from 'mongoose';
-import { MEDICINE_PLACEHOLDER } from 'src/shared/constants';
-import { PatientDao } from 'src/modules/patient/dao/patient.dao';
+import { MEDICINE_PLACEHOLDER } from '@/shared/constants';
+import { PatientDao } from '@/modules/patient/dao/patient.dao';
 import { OtpService } from '@/modules/otp/services/otp.service';
 
 @Injectable()
@@ -650,7 +650,6 @@ export class PharmacistService {
     //       message: 'pharmacist not found',
     //     };
     //   }
-
     //   const prescription = pharmacist.sharedPrescriptions.find(
     //     (p) => p._id.toString() === prescriptionId.toString(),
     //   );
@@ -660,7 +659,6 @@ export class PharmacistService {
     //       message: 'prescription not found',
     //     };
     //   }
-
     //   const patient = await this.patientDao.fetchPatientByAddress(
     //     prescription.patientAddress,
     //   );
@@ -670,7 +668,6 @@ export class PharmacistService {
     //       message: 'patient not found',
     //     };
     //   }
-
     //   const inventory = pharmacist.inventory;
     //   const medicine = inventory.medicines.find(
     //     (m) => m.name === prescription.medicineName,
@@ -686,7 +683,6 @@ export class PharmacistService {
     //       message: 'medicine not found in inventory, removing prescription',
     //     };
     //   }
-
     //   const patientPrescription = patient.prescriptions.find(
     //     (p) => p._id.toString() === prescriptionId.toString(),
     //   );
@@ -696,11 +692,9 @@ export class PharmacistService {
     //       message: 'prescription not found in patient prescriptions',
     //     };
     //   }
-
     //   const prescriptionQuantity = prescription.quantity
     //     ? prescription.quantity
     //     : 1;
-
     //   if (medicine.quantity < prescriptionQuantity) {
     //     return {
     //       success: HttpStatus.BAD_REQUEST,
@@ -708,20 +702,17 @@ export class PharmacistService {
     //         'quantity of medicine in inventory is less than prescribed quantity',
     //     };
     //   }
-
     //   medicine.quantity -= prescriptionQuantity;
     //   inventory.numberOfMedicine -= prescriptionQuantity;
     //   patientPrescription.status = 'dispensed';
     //   patientPrescription.dispensedDate = new Date();
     //   patientPrescription.dispensedBy = walletAddress;
     //   await patient.save();
-
     //   await this.pharmacistDao.pullOnePrescription(
     //     walletAddress,
     //     prescriptionId,
     //   );
     //   await pharmacist.save();
-
     //   return {
     //     success: HttpStatus.OK,
     //     message: 'Prescription dispensed successfully',

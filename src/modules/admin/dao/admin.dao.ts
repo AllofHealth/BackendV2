@@ -1,8 +1,8 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Admin } from '../schema/admin.schema';
 import { Model } from 'mongoose';
-import { PROFILE_PLACEHOLDER } from 'src/shared/constants';
-import { AdminError, Category } from 'src/shared';
+import { PROFILE_PLACEHOLDER } from '@/shared/constants';
+import { AdminError, Category } from '@/shared';
 import {
   CreateAdminType,
   UpdateAdminProfileType,

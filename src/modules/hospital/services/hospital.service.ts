@@ -16,13 +16,13 @@ import {
   RemovePractitionerType,
   UpdateHospitalProfileType,
 } from '../interface/hospital.interface';
-import { ApprovalStatus, ErrorCodes, HospitalError } from 'src/shared';
-import { MyLoggerService } from 'src/modules/my-logger/my-logger.service';
+import { ApprovalStatus, ErrorCodes, HospitalError } from '@/shared';
+import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
 import { HospitalDao } from '../dao/hospital.dao';
-import { DoctorDao } from 'src/modules/doctor/dao/doctor.dao';
-import { PharmacistDao } from 'src/modules/pharmacist/dao/pharmacist.dao';
-import { DoctorGuard } from 'src/modules/doctor/guards/doctor.guard';
-import { PharmacistGuard } from 'src/modules/pharmacist/guards/pharmacist.guard';
+import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
+import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
+import { DoctorGuard } from '@/modules/doctor/guards/doctor.guard';
+import { PharmacistGuard } from '@/modules/pharmacist/guards/pharmacist.guard';
 import { OtpService } from '@/modules/otp/services/otp.service';
 import { EncryptionService } from '@/shared/utils/encryption/service/encryption.service';
 
@@ -232,22 +232,12 @@ export class HospitalService {
 
   async delegateAdminPosition(
     newAdminAddress: string,
-    adminAddress: string,
     hospitalId: Types.ObjectId,
   ): Promise<{ success: number; message: string }> {
     try {
       const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
       if (!hospital) {
         throw new HospitalError("Hospital doesn't exist");
-      }
-
-      if (
-        !(await this.hospitalGuard.validateHospitalAdmin(
-          hospital,
-          adminAddress,
-        ))
-      ) {
-        throw new HospitalError('not authorized');
       }
 
       const isAffiliated =
@@ -275,10 +265,8 @@ export class HospitalService {
       throw new Error('Error delegating admin position');
     }
   }
-
   async updateHospitalProfile(
     hospitalId: Types.ObjectId,
-    adminAddress: string,
     updateData: UpdateHospitalProfileType,
   ) {
     const { regNo, ...rest } = updateData;
@@ -288,13 +276,6 @@ export class HospitalService {
         return {
           success: HttpStatus.NOT_FOUND,
           message: 'hospital not found',
-        };
-      }
-
-      if (hospital.admin !== adminAddress) {
-        return {
-          success: HttpStatus.UNAUTHORIZED,
-          message: 'not authorized',
         };
       }
       const newUpdateData = {
@@ -433,10 +414,7 @@ export class HospitalService {
     }
   }
 
-  async removePractitionerFromHospital(
-    adminAddress: string,
-    args: RemovePractitionerType,
-  ) {
+  async removePractitionerFromHospital(args: RemovePractitionerType) {
     const { hospitalId, walletAddress } = args;
     try {
       const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
@@ -449,13 +427,6 @@ export class HospitalService {
           hospital.id,
           walletAddress,
         );
-
-      if (adminAddress !== hospital.admin) {
-        return {
-          success: HttpStatus.UNAUTHORIZED,
-          message: 'unauthorized, not the admin',
-        };
-      }
 
       if (!isDoctor && !isPharmacist) {
         return {
@@ -496,10 +467,7 @@ export class HospitalService {
     }
   }
 
-  async approvePractitioner(
-    hospitalAdmin: string,
-    args: ApprovePractitionerType,
-  ) {
+  async approvePractitioner(args: ApprovePractitionerType) {
     const { hospitalId, walletAddress } = args;
     try {
       const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
@@ -508,12 +476,6 @@ export class HospitalService {
         walletAddress,
       );
 
-      if (hospital.admin !== hospitalAdmin) {
-        return {
-          success: HttpStatus.UNAUTHORIZED,
-          message: 'unauthorized, contact hospital admin',
-        };
-      }
       const isPharmacist =
         await this.pharmacistGuard.validatePharmacistExistsInHospital(
           hospital.id,
