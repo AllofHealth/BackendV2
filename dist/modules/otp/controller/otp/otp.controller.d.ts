@@ -1,4 +1,4 @@
-import { OtpService } from 'src/modules/otp/services/otp.service';
+import { OtpService } from '@/modules/otp/services/otp.service';
 import { RoleType } from '../../interface/otp.interface';
 export declare class OtpController {
     private readonly otpService;

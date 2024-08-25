@@ -27,9 +27,9 @@ import { Types } from 'mongoose';
 import { DoctorDao } from '../dao/doctor.dao';
 import { AddPatientPrescription, ApproveMedicalRecordAccessRequestType, CreateDoctorType, CreateMedicalRecordType, UpdateDoctorType } from '../interface/doctor.interface';
 import { DoctorGuard } from '../guards/doctor.guard';
-import { HospitalDao } from 'src/modules/hospital/dao/hospital.dao';
-import { PatientDao } from 'src/modules/patient/dao/patient.dao';
-import { PatientGuard } from 'src/modules/patient/guards/patient.guard';
+import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
+import { PatientDao } from '@/modules/patient/dao/patient.dao';
+import { PatientGuard } from '@/modules/patient/guards/patient.guard';
 import { OtpService } from '@/modules/otp/services/otp.service';
 import { MedicineDao } from '@/modules/medicine/dao/medicine.dao';
 export declare class DoctorService {

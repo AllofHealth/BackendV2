@@ -43,23 +43,19 @@ export declare class HospitalController {
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    approvePractitioner(hospitalId: Types.ObjectId, adminAddress: string, practitionerAddress: string): Promise<{
+    approvePractitioner(adminAddress: string, hospitalId: Types.ObjectId, practitionerAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    removePractitioner(hospitalId: Types.ObjectId, adminAddress: string, practitionerAddress: string): Promise<{
+    removePractitioner(adminAddress: string, hospitalId: Types.ObjectId, practitionerAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    delegateAdmin(args: {
-        newAdminAddress: string;
-        adminAddress: string;
-        hospitalId: Types.ObjectId;
-    }): Promise<{
+    delegateAdmin(adminAddress: string, newAdminAddress: string, hospitalId: Types.ObjectId): Promise<{
         success: number;
         message: string;
     }>;
-    updateHospital(hospitalId: Types.ObjectId, adminAddress: string, updateHospitalDto: UpdateHospitalProfileDto): Promise<{
+    updateHospital(adminAddress: string, hospitalId: Types.ObjectId, updateHospitalDto: UpdateHospitalProfileDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
         updatedHospital?: undefined;

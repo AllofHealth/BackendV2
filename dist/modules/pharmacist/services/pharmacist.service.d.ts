@@ -26,10 +26,10 @@ import { HttpStatus } from '@nestjs/common';
 import { PharmacistDao } from '../dao/pharmacist.dao';
 import { CreatePharmacistType, MedicineType, UpdateMedicineType, UpdatePharmacistType } from '../interface/pharmacist.interface';
 import { PharmacistGuard } from '../guards/pharmacist.guard';
-import { ErrorCodes } from 'src/shared';
-import { HospitalDao } from 'src/modules/hospital/dao/hospital.dao';
+import { ErrorCodes } from '@/shared';
+import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
 import { Types } from 'mongoose';
-import { PatientDao } from 'src/modules/patient/dao/patient.dao';
+import { PatientDao } from '@/modules/patient/dao/patient.dao';
 import { OtpService } from '@/modules/otp/services/otp.service';
 export declare class PharmacistService {
     private readonly pharmacistDao;

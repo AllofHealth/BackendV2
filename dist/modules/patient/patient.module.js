@@ -41,8 +41,8 @@ exports.PatientModule = PatientModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: patient_schema_1.MedicalRecordPreview.name, schema: patient_schema_1.MedicalRecordPreviewSchema },
             ]),
-            pharmacist_module_1.PharmacistModule,
-            doctor_module_1.DoctorModule,
+            (0, common_1.forwardRef)(() => pharmacist_module_1.PharmacistModule),
+            (0, common_1.forwardRef)(() => doctor_module_1.DoctorModule),
             otp_module_1.OtpModule,
         ],
         providers: [patient_service_1.PatientService, patient_dao_1.PatientDao, patient_guard_1.PatientGuard],

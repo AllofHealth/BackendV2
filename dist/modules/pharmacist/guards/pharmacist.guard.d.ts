@@ -1,4 +1,4 @@
-import { HospitalDao } from 'src/modules/hospital/dao/hospital.dao';
+import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
 import { PharmacistDao } from '../dao/pharmacist.dao';
 export declare class PharmacistGuard {
     private readonly hospitalDao;

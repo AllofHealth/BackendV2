@@ -17,6 +17,8 @@ const common_1 = require("@nestjs/common");
 const hospital_service_1 = require("../services/hospital.service");
 const mongoose_1 = require("mongoose");
 const hospital_dto_1 = require("../dto/hospital.dto");
+const hospital_auth_guard_1 = require("../guard/hospital.auth.guard");
+const hospital_approved_guard_1 = require("../guard/hospital.approved.guard");
 let HospitalController = class HospitalController {
     constructor(hospitalService) {
         this.hospitalService = hospitalService;
@@ -30,23 +32,23 @@ let HospitalController = class HospitalController {
             walletAddress: joinHospitalDto,
         });
     }
-    async approvePractitioner(hospitalId, adminAddress, practitionerAddress) {
-        return await this.hospitalService.approvePractitioner(adminAddress, {
+    async approvePractitioner(adminAddress, hospitalId, practitionerAddress) {
+        return await this.hospitalService.approvePractitioner({
             hospitalId,
             walletAddress: practitionerAddress,
         });
     }
-    async removePractitioner(hospitalId, adminAddress, practitionerAddress) {
-        return await this.hospitalService.removePractitionerFromHospital(adminAddress, {
+    async removePractitioner(adminAddress, hospitalId, practitionerAddress) {
+        return await this.hospitalService.removePractitionerFromHospital({
             hospitalId,
             walletAddress: practitionerAddress,
         });
     }
-    async delegateAdmin(args) {
-        return await this.hospitalService.delegateAdminPosition(args.newAdminAddress, args.adminAddress, args.hospitalId);
+    async delegateAdmin(adminAddress, newAdminAddress, hospitalId) {
+        return await this.hospitalService.delegateAdminPosition(newAdminAddress, hospitalId);
     }
-    async updateHospital(hospitalId, adminAddress, updateHospitalDto) {
-        return await this.hospitalService.updateHospitalProfile(hospitalId, adminAddress, updateHospitalDto);
+    async updateHospital(adminAddress, hospitalId, updateHospitalDto) {
+        return await this.hospitalService.updateHospitalProfile(hospitalId, updateHospitalDto);
     }
     async getHospitalById(hospitalId) {
         return await this.hospitalService.fetchHospitalById(hospitalId);
@@ -95,6 +97,7 @@ __decorate([
 ], HospitalController.prototype, "createHospital", null);
 __decorate([
     (0, common_1.Post)('joinHospital'),
+    (0, common_1.UseGuards)(hospital_approved_guard_1.HospitalApprovedGuard),
     __param(0, (0, common_1.Query)('hospitalId', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
@@ -103,36 +106,42 @@ __decorate([
 ], HospitalController.prototype, "joinHospital", null);
 __decorate([
     (0, common_1.Post)('approvePractitioner'),
-    __param(0, (0, common_1.Query)('hospitalId', new common_1.ValidationPipe({ transform: true }))),
-    __param(1, (0, common_1.Query)('adminAddress', new common_1.ValidationPipe({ transform: true }))),
+    (0, common_1.UseGuards)(hospital_auth_guard_1.HospitalAuthGuard),
+    __param(0, (0, common_1.Query)('adminAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Query)('hospitalId', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Query)('practitionerAddress', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [mongoose_1.Types.ObjectId, String, String]),
+    __metadata("design:paramtypes", [String, mongoose_1.Types.ObjectId, String]),
     __metadata("design:returntype", Promise)
 ], HospitalController.prototype, "approvePractitioner", null);
 __decorate([
     (0, common_1.Post)('removePractitioner'),
-    __param(0, (0, common_1.Query)('hospitalId', new common_1.ValidationPipe({ transform: true }))),
-    __param(1, (0, common_1.Query)('adminAddress', new common_1.ValidationPipe({ transform: true }))),
+    (0, common_1.UseGuards)(hospital_auth_guard_1.HospitalAuthGuard),
+    __param(0, (0, common_1.Query)('adminAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Query)('hospitalId', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Query)('practitionerAddress', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [mongoose_1.Types.ObjectId, String, String]),
+    __metadata("design:paramtypes", [String, mongoose_1.Types.ObjectId, String]),
     __metadata("design:returntype", Promise)
 ], HospitalController.prototype, "removePractitioner", null);
 __decorate([
     (0, common_1.Post)('delegateAdmin'),
-    __param(0, (0, common_1.Body)(common_1.ValidationPipe)),
+    (0, common_1.UseGuards)(hospital_auth_guard_1.HospitalAuthGuard),
+    __param(0, (0, common_1.Query)('adminAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Query)('newAdminAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(2, (0, common_1.Query)('hospitalId', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [String, String, mongoose_1.Types.ObjectId]),
     __metadata("design:returntype", Promise)
 ], HospitalController.prototype, "delegateAdmin", null);
 __decorate([
     (0, common_1.Post)('updateHospital'),
-    __param(0, (0, common_1.Query)('hospitalId', new common_1.ValidationPipe({ transform: true }))),
-    __param(1, (0, common_1.Query)('adminAddress', new common_1.ValidationPipe({ transform: true }))),
+    (0, common_1.UseGuards)(hospital_auth_guard_1.HospitalAuthGuard),
+    __param(0, (0, common_1.Query)('adminAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Query)('hospitalId', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [mongoose_1.Types.ObjectId, String, hospital_dto_1.UpdateHospitalProfileDto]),
+    __metadata("design:paramtypes", [String, mongoose_1.Types.ObjectId, hospital_dto_1.UpdateHospitalProfileDto]),
     __metadata("design:returntype", Promise)
 ], HospitalController.prototype, "updateHospital", null);
 __decorate([

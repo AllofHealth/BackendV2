@@ -27,12 +27,12 @@ import { Hospital } from '../schema/hospital.schema';
 import { Model, Types } from 'mongoose';
 import { HospitalGuard } from '../guard/hospital.guard';
 import { ApprovePractitionerType, CreateHospitalType, HospitalType, JoinHospitalType, PreviewType, RemovePractitionerType, UpdateHospitalProfileType } from '../interface/hospital.interface';
-import { ErrorCodes } from 'src/shared';
+import { ErrorCodes } from '@/shared';
 import { HospitalDao } from '../dao/hospital.dao';
-import { DoctorDao } from 'src/modules/doctor/dao/doctor.dao';
-import { PharmacistDao } from 'src/modules/pharmacist/dao/pharmacist.dao';
-import { DoctorGuard } from 'src/modules/doctor/guards/doctor.guard';
-import { PharmacistGuard } from 'src/modules/pharmacist/guards/pharmacist.guard';
+import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
+import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
+import { DoctorGuard } from '@/modules/doctor/guards/doctor.guard';
+import { PharmacistGuard } from '@/modules/pharmacist/guards/pharmacist.guard';
 import { OtpService } from '@/modules/otp/services/otp.service';
 import { EncryptionService } from '@/shared/utils/encryption/service/encryption.service';
 export declare class HospitalService {
@@ -81,11 +81,11 @@ export declare class HospitalService {
         message: string;
     }>;
     removePharmacistFromHospital(hospitalId: Types.ObjectId, pharmacistAddress: string): Promise<import("mongoose").UpdateWriteOpResult>;
-    delegateAdminPosition(newAdminAddress: string, adminAddress: string, hospitalId: Types.ObjectId): Promise<{
+    delegateAdminPosition(newAdminAddress: string, hospitalId: Types.ObjectId): Promise<{
         success: number;
         message: string;
     }>;
-    updateHospitalProfile(hospitalId: Types.ObjectId, adminAddress: string, updateData: UpdateHospitalProfileType): Promise<{
+    updateHospitalProfile(hospitalId: Types.ObjectId, updateData: UpdateHospitalProfileType): Promise<{
         success: HttpStatus;
         message: string;
         updatedHospital?: undefined;
@@ -100,11 +100,11 @@ export declare class HospitalService {
         success: HttpStatus;
         message: string;
     }>;
-    removePractitionerFromHospital(adminAddress: string, args: RemovePractitionerType): Promise<{
+    removePractitionerFromHospital(args: RemovePractitionerType): Promise<{
         success: HttpStatus;
         message: string;
     }>;
-    approvePractitioner(hospitalAdmin: string, args: ApprovePractitionerType): Promise<{
+    approvePractitioner(args: ApprovePractitionerType): Promise<{
         success: HttpStatus;
         message: string;
     }>;

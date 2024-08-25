@@ -26,12 +26,12 @@ import { HttpStatus } from '@nestjs/common';
 import { Admin } from '../schema/admin.schema';
 import { CreateAdminType, RemoveAdminType, UpdateAdminProfileType } from '../interface/admin.interface';
 import { Model, Types } from 'mongoose';
-import { ErrorCodes } from 'src/shared';
+import { ErrorCodes } from '@/shared';
 import { AdminDao } from '../dao/admin.dao';
 import { AdminGuard } from '../guards/admin.guard';
-import { HospitalDao } from 'src/modules/hospital/dao/hospital.dao';
-import { DoctorDao } from 'src/modules/doctor/dao/doctor.dao';
-import { PharmacistDao } from 'src/modules/pharmacist/dao/pharmacist.dao';
+import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
+import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
+import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
 import { OtpService } from '@/modules/otp/services/otp.service';
 export declare class AdminService {
     private adminModel;

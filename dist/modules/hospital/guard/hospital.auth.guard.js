@@ -21,11 +21,12 @@ let HospitalAuthGuard = class HospitalAuthGuard {
         const request = context.switchToHttp().getRequest();
         const { adminAddress, hospitalId } = request.query;
         if (!adminAddress && !hospitalId) {
-            throw new common_1.ForbiddenException('Invald request');
+            throw new common_1.ForbiddenException('Invalid request');
         }
         const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
-        if (hospital.status !== shared_1.ApprovalStatus.Approved &&
-            hospital.admin !== adminAddress) {
+        if (!hospital ||
+            (hospital.status !== shared_1.ApprovalStatus.Approved &&
+                hospital.admin !== adminAddress)) {
             throw new common_1.ForbiddenException('Institution not approved or Invalid admin');
         }
         return true;

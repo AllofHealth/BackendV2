@@ -23,7 +23,7 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import { HydratedDocument } from 'mongoose';
-import { Prescriptions } from 'src/modules/patient/schemas/patient.schema';
+import { Prescriptions } from '@/modules/patient/schemas/patient.schema';
 export declare class ApprovalList {
     patientId: number;
     name: string;

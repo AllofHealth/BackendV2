@@ -189,14 +189,11 @@ let HospitalService = class HospitalService {
             throw new shared_1.HospitalError('Error removing pharmacist');
         }
     }
-    async delegateAdminPosition(newAdminAddress, adminAddress, hospitalId) {
+    async delegateAdminPosition(newAdminAddress, hospitalId) {
         try {
             const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
             if (!hospital) {
                 throw new shared_1.HospitalError("Hospital doesn't exist");
-            }
-            if (!(await this.hospitalGuard.validateHospitalAdmin(hospital, adminAddress))) {
-                throw new shared_1.HospitalError('not authorized');
             }
             const isAffiliated = (await this.returnDoctorFromHospital(hospital, newAdminAddress)) ||
                 (await this.returnPharmacistFromHospital(hospital, newAdminAddress));
@@ -217,7 +214,7 @@ let HospitalService = class HospitalService {
             throw new Error('Error delegating admin position');
         }
     }
-    async updateHospitalProfile(hospitalId, adminAddress, updateData) {
+    async updateHospitalProfile(hospitalId, updateData) {
         const { regNo, ...rest } = updateData;
         try {
             const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
@@ -225,12 +222,6 @@ let HospitalService = class HospitalService {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
                     message: 'hospital not found',
-                };
-            }
-            if (hospital.admin !== adminAddress) {
-                return {
-                    success: common_1.HttpStatus.UNAUTHORIZED,
-                    message: 'not authorized',
                 };
             }
             const newUpdateData = {
@@ -347,18 +338,12 @@ let HospitalService = class HospitalService {
             throw new shared_1.HospitalError('An error occurred while joining hospital');
         }
     }
-    async removePractitionerFromHospital(adminAddress, args) {
+    async removePractitionerFromHospital(args) {
         const { hospitalId, walletAddress } = args;
         try {
             const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
             const isDoctor = await this.doctorGuard.validateDoctorExistsInHospital(hospital.id, walletAddress);
             const isPharmacist = await this.pharmacistGuard.validatePharmacistExistsInHospital(hospital.id, walletAddress);
-            if (adminAddress !== hospital.admin) {
-                return {
-                    success: common_1.HttpStatus.UNAUTHORIZED,
-                    message: 'unauthorized, not the admin',
-                };
-            }
             if (!isDoctor && !isPharmacist) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
@@ -396,17 +381,11 @@ let HospitalService = class HospitalService {
             throw new shared_1.HospitalError('An error occurred while removing practitioner');
         }
     }
-    async approvePractitioner(hospitalAdmin, args) {
+    async approvePractitioner(args) {
         const { hospitalId, walletAddress } = args;
         try {
             const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
             const isDoctor = await this.doctorGuard.validateDoctorExistsInHospital(hospital.id, walletAddress);
-            if (hospital.admin !== hospitalAdmin) {
-                return {
-                    success: common_1.HttpStatus.UNAUTHORIZED,
-                    message: 'unauthorized, contact hospital admin',
-                };
-            }
             const isPharmacist = await this.pharmacistGuard.validatePharmacistExistsInHospital(hospital.id, walletAddress);
             if (!isDoctor && !isPharmacist) {
                 return {
