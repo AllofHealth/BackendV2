@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   ForbiddenException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { DoctorDao } from '../dao/doctor.dao';
 import { ApprovalStatus } from '@/shared';
@@ -22,7 +23,7 @@ export class DoctorAuthGuard implements CanActivate {
 
     const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
     if (!doctor) {
-      throw new ForbiddenException('Doctor not found');
+      throw new UnauthorizedException();
     }
     if (doctor.status !== ApprovalStatus.Approved) {
       throw new ForbiddenException('Doctor not approved by any institution');
