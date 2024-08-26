@@ -23,7 +23,7 @@ jobs:
         run: npm install
 
       - name: Copy Environment Variables
-        run: echo "${{ secrets.ENV_FILE }}" > .env.production
+        run: echo "${{ secrets.ENV_FILE }}" > .env.production && echo "${{ secrets.ENV_FILE }}" > .env
 
     #   - name: Build Application
     #     run: npm run build
