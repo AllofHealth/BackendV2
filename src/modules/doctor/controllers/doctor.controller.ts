@@ -28,8 +28,9 @@ export class DoctorController {
   }
 
   @Post('updateDoctor')
+  @UseGuards(DoctorAuthGuard)
   async updateDoctor(
-    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    @Query('doctorAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
     @Body() updateDoctorDto: UpdateDoctorDto,
   ) {
@@ -142,6 +143,7 @@ export class DoctorController {
   }
 
   @Get('allRecordRequests')
+  @UseGuards(DoctorAuthGuard)
   async getActiveApprovals(
     @Query('doctorAddress', new ValidationPipe({ transform: true }))
     doctorAddress: string,
