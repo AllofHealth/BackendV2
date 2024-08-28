@@ -5,6 +5,7 @@ import {
   Get,
   Post,
   Query,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { PatientService } from '../services/patient.service';
@@ -18,6 +19,10 @@ import {
   UpdatePatientProfileDto,
 } from '../dto/patient.dto';
 import { Types } from 'mongoose';
+import {
+  PatientAuthGuard,
+  PatientVerificationGuard,
+} from '../guards/patient.auth.guard';
 
 @Controller('patient')
 export class PatientController {
@@ -44,6 +49,7 @@ export class PatientController {
   }
 
   @Post('createFamilyMember')
+  @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async createFamilyMember(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -57,6 +63,7 @@ export class PatientController {
   }
 
   @Post('updateFamilyMember')
+  @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async updateFamilyMember(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -73,6 +80,7 @@ export class PatientController {
   }
 
   @Post('sharePrescription')
+  @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async sharePrescription(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -89,6 +97,7 @@ export class PatientController {
   }
 
   @Post('removePrescription')
+  @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async removePrescription(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -102,33 +111,35 @@ export class PatientController {
   }
 
   @Post('approveMedicalRecordAccess')
+  @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async approveMedicalRecordAccess(
-    @Query('doctorAddress', new ValidationPipe({ transform: true }))
-    doctorAddress: string,
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
     @Body(new ValidationPipe({ transform: true }))
     createApprovalDto: CreateApprovalDto,
   ) {
     return await this.patientService.approveMedicalRecordAccess({
       recordId: createApprovalDto.recordId,
-      patientAddress: createApprovalDto.patientAddress,
-      doctorAddress: doctorAddress,
+      patientAddress: walletAddress,
+      doctorAddress: createApprovalDto.doctorAddress,
       approvalType: createApprovalDto.approvalType,
       approvalDurationInSecs: createApprovalDto.approvalDurationInSec,
     });
   }
 
   @Post('approveFamilyMemberRecordAccess')
+  @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async approveFamilyMemberRecordAccess(
-    @Query('doctorAddress', new ValidationPipe({ transform: true }))
-    doctorAddress: string,
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
     @Body(new ValidationPipe({ transform: true }))
     createApprovalDto: CreateFamilyMemberApprovalDto,
   ) {
     return await this.patientService.approveMedicalRecordAccessForFamilyMember({
       recordId: createApprovalDto.recordId,
       familyMemberId: createApprovalDto.familyMemberId,
-      patientAddress: createApprovalDto.principalPatientAddress,
-      doctorAddress,
+      patientAddress: walletAddress,
+      doctorAddress: createApprovalDto.doctorAddress,
       approvalType: createApprovalDto.approvalType,
       approvalDurationInSecs: createApprovalDto.approvalDurationInSec,
     });
@@ -140,6 +151,7 @@ export class PatientController {
   }
 
   @Get('allFamilyMembers')
+  @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async getAllFamilyMembers(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -169,6 +181,7 @@ export class PatientController {
   }
 
   @Get('allPrescriptions')
+  @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async getAllPrescriptions(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -177,6 +190,7 @@ export class PatientController {
   }
 
   @Get('prescriptionById')
+  @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async getPrescription(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -190,6 +204,7 @@ export class PatientController {
   }
 
   @Get('allMedicalRecords')
+  @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async getAllMedicalRecords(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -198,8 +213,9 @@ export class PatientController {
   }
 
   @Get('familyMemberMedicalRecords')
+  @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async getFamilyMemberMedicalRecords(
-    @Query('principalPatientAddress', new ValidationPipe({ transform: true }))
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
     principalPatientAddress: string,
     @Query('familyMemberId', new ValidationPipe({ transform: true }))
     familyMemberId: number,
@@ -211,6 +227,7 @@ export class PatientController {
   }
 
   @Get('medicalRecordById')
+  @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async getMedicalRecord(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
