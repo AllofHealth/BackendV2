@@ -16,7 +16,10 @@ import {
   UpdateDoctorDto,
 } from '../dto/doctor.dto';
 import { Types } from 'mongoose';
-import { DoctorAuthGuard } from '../guards/doctor.auth.guard';
+import {
+  DoctorAuthGuard,
+  DoctorVerificationGuard,
+} from '../guards/doctor.auth.guard';
 
 @Controller('doctor')
 export class DoctorController {
@@ -28,7 +31,7 @@ export class DoctorController {
   }
 
   @Post('updateDoctor')
-  @UseGuards(DoctorAuthGuard)
+  @UseGuards(DoctorAuthGuard, DoctorVerificationGuard)
   async updateDoctor(
     @Query('doctorAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -41,7 +44,7 @@ export class DoctorController {
   }
 
   @Post('addPatientPrescription')
-  @UseGuards(DoctorAuthGuard)
+  @UseGuards(DoctorAuthGuard, DoctorVerificationGuard)
   async addPatientPrescription(
     @Query('doctorAddress', new ValidationPipe({ transform: true }))
     doctorAddress: string,
@@ -59,7 +62,7 @@ export class DoctorController {
   }
 
   @Post('approveRecordAccessRequest')
-  @UseGuards(DoctorAuthGuard)
+  @UseGuards(DoctorAuthGuard, DoctorVerificationGuard)
   async approveRecordAccessRequest(
     @Query('doctorAddress', new ValidationPipe({ transform: true }))
     doctorAddress: string,
@@ -76,7 +79,7 @@ export class DoctorController {
   }
 
   @Post('rejectRecordAccessRequest')
-  @UseGuards(DoctorAuthGuard)
+  @UseGuards(DoctorAuthGuard, DoctorVerificationGuard)
   async rejectRecordAccessRequest(
     @Query('doctorAddress', new ValidationPipe({ transform: true }))
     doctorAddress: string,
@@ -93,7 +96,7 @@ export class DoctorController {
   }
 
   @Post('createMedicalRecord')
-  @UseGuards(DoctorAuthGuard)
+  @UseGuards(DoctorAuthGuard, DoctorVerificationGuard)
   async createMedicalRecordPreview(
     @Query('doctorAddress', new ValidationPipe({ transform: true }))
     doctorAddress: string,
@@ -111,7 +114,7 @@ export class DoctorController {
   }
 
   @Post('deleteAllApprovalRequests')
-  @UseGuards(DoctorAuthGuard)
+  @UseGuards(DoctorAuthGuard, DoctorVerificationGuard)
   async deleteAllApprovalRequests(
     @Query('adminAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -143,7 +146,7 @@ export class DoctorController {
   }
 
   @Get('allRecordRequests')
-  @UseGuards(DoctorAuthGuard)
+  @UseGuards(DoctorAuthGuard, DoctorVerificationGuard)
   async getActiveApprovals(
     @Query('doctorAddress', new ValidationPipe({ transform: true }))
     doctorAddress: string,
