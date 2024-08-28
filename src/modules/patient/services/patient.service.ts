@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { Patient } from '../schemas/patient.schema';
 import {
   ApprovalInputType,
@@ -99,8 +99,9 @@ export class PatientService {
     const { walletAddress } = args;
 
     try {
-      const patientExist =
-        await this.patientGuard.validatePatient(walletAddress);
+      const patientExist = await this.patientGuard.validatePatient(
+        walletAddress,
+      );
       if (patientExist) {
         return {
           success: HttpStatus.CREATED,
@@ -150,15 +151,9 @@ export class PatientService {
       genotype,
     } = familyMember;
     try {
-      const patient =
-        await this.patientDao.fetchPatientByAddress(walletAddress);
-
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'patient not found',
-        };
-      }
+      const patient = await this.patientDao.fetchPatientByAddress(
+        walletAddress,
+      );
 
       const sanitizeRelationship = relationship.toLowerCase();
       const sanitizedArgs = {
@@ -184,8 +179,9 @@ export class PatientService {
         };
       }
 
-      const newFamilyMember =
-        await this.patientDao.createFamilyMembers(sanitizedArgs);
+      const newFamilyMember = await this.patientDao.createFamilyMembers(
+        sanitizedArgs,
+      );
       patient.familyMembers.push(newFamilyMember);
       await patient.save();
       return {
@@ -194,20 +190,18 @@ export class PatientService {
       };
     } catch (error) {
       console.error(error);
-      throw new PatientError('An error occurred while adding family member');
+      throw new HttpException(
+        { message: 'An error occurred while adding family member' },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
   async listFamilyMember(walletAddress: string) {
     try {
-      const patient =
-        await this.patientDao.fetchPatientByAddress(walletAddress);
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'Patient not found',
-        };
-      }
+      const patient = await this.patientDao.fetchPatientByAddress(
+        walletAddress,
+      );
       const familyMembers = patient.familyMembers;
       if (!familyMembers) {
         return {
@@ -217,21 +211,25 @@ export class PatientService {
         };
       }
       return {
-        success: HttpStatus.FOUND,
+        success: HttpStatus.OK,
         members: familyMembers,
         message: 'Family members found',
       };
     } catch (error) {
       console.error(error);
-      throw new Error('An error occurred while listing family member');
+      throw new HttpException(
+        { message: 'An error occurred while fetching family members' },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
   async getFamilyMemberById(args: { walletAddress: string; memberId: number }) {
     const { walletAddress, memberId } = args;
     try {
-      const patient =
-        await this.patientDao.fetchPatientByAddress(walletAddress);
+      const patient = await this.patientDao.fetchPatientByAddress(
+        walletAddress,
+      );
       if (!patient) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -264,8 +262,9 @@ export class PatientService {
   }) {
     const { walletAddress, familyMemberId, updateData } = args;
     try {
-      const patientExist =
-        await this.patientGuard.validatePatient(walletAddress);
+      const patientExist = await this.patientGuard.validatePatient(
+        walletAddress,
+      );
       if (!patientExist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -273,8 +272,9 @@ export class PatientService {
         };
       }
 
-      const patient =
-        await this.patientDao.fetchPatientByAddress(walletAddress);
+      const patient = await this.patientDao.fetchPatientByAddress(
+        walletAddress,
+      );
 
       const familyMemberExists = patient.familyMembers.find(
         (member) => member.id === familyMemberId,
@@ -310,8 +310,9 @@ export class PatientService {
 
   async fetchPatientByWalletAddress(walletAddress: string) {
     try {
-      const patientExist =
-        await this.patientGuard.validatePatient(walletAddress);
+      const patientExist = await this.patientGuard.validatePatient(
+        walletAddress,
+      );
 
       if (!patientExist) {
         return {
@@ -319,8 +320,9 @@ export class PatientService {
           message: 'Patient not found',
         };
       }
-      const patient =
-        await this.patientDao.fetchPatientByAddress(walletAddress);
+      const patient = await this.patientDao.fetchPatientByAddress(
+        walletAddress,
+      );
       return {
         success: ErrorCodes.Success,
         patient,
@@ -335,8 +337,9 @@ export class PatientService {
 
   async updatePatient(walletAddress: string, args: UpdatePatientProfileType) {
     try {
-      const patientExist =
-        await this.patientGuard.validatePatient(walletAddress);
+      const patientExist = await this.patientGuard.validatePatient(
+        walletAddress,
+      );
       if (!patientExist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -358,8 +361,9 @@ export class PatientService {
 
   async deletePatientByAddress(walletAddress: string) {
     try {
-      const patientExists =
-        await this.patientGuard.validatePatient(walletAddress);
+      const patientExists = await this.patientGuard.validatePatient(
+        walletAddress,
+      );
       if (!patientExists) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -379,8 +383,9 @@ export class PatientService {
 
   async fetchAllPrescriptions(walletAddress: string) {
     try {
-      const patient =
-        await this.patientDao.fetchPatientByAddress(walletAddress);
+      const patient = await this.patientDao.fetchPatientByAddress(
+        walletAddress,
+      );
 
       if (!patient) {
         return {
@@ -439,10 +444,12 @@ export class PatientService {
   async sharePrescription(args: SharePrescriptionInterface) {
     const { walletAddress, pharmacistAddress, prescriptionId } = args;
     try {
-      const isPharmacist =
-        await this.pharmacistGuard.validatePharmacistExists(pharmacistAddress);
-      const patient =
-        await this.patientDao.fetchPatientByAddress(walletAddress);
+      const isPharmacist = await this.pharmacistGuard.validatePharmacistExists(
+        pharmacistAddress,
+      );
+      const patient = await this.patientDao.fetchPatientByAddress(
+        walletAddress,
+      );
       if (!isPharmacist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -469,8 +476,9 @@ export class PatientService {
         };
       }
 
-      const pharmacist =
-        await this.pharmacistDao.fetchPharmacistByAddress(pharmacistAddress);
+      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
+        pharmacistAddress,
+      );
       try {
         pharmacist.sharedPrescriptions.push(prescription.prescriptions[0]);
         await pharmacist.save();
@@ -496,8 +504,9 @@ export class PatientService {
     prescriptionId: Types.ObjectId,
   ) {
     try {
-      const patient =
-        await this.patientDao.fetchPatientByAddress(walletAddress);
+      const patient = await this.patientDao.fetchPatientByAddress(
+        walletAddress,
+      );
       if (!patient) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -538,8 +547,9 @@ export class PatientService {
     } = args;
 
     try {
-      const patient =
-        await this.patientDao.fetchPatientByAddress(patientAddress);
+      const patient = await this.patientDao.fetchPatientByAddress(
+        patientAddress,
+      );
       if (!patient) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -608,8 +618,9 @@ export class PatientService {
       approvalDurationInSecs,
     } = args;
     try {
-      const patient =
-        await this.patientDao.fetchPatientByAddress(patientAddress);
+      const patient = await this.patientDao.fetchPatientByAddress(
+        patientAddress,
+      );
       if (!patient) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -687,8 +698,9 @@ export class PatientService {
 
   async fetchAllMedicalRecords(patientAddress: string) {
     try {
-      const patient =
-        await this.patientDao.fetchPatientByAddress(patientAddress);
+      const patient = await this.patientDao.fetchPatientByAddress(
+        patientAddress,
+      );
       if (!patient) {
         return {
           success: HttpStatus.NOT_FOUND,
