@@ -186,7 +186,7 @@ export class CreateApprovalDto {
 
   @IsString()
   @IsEthereumAddress()
-  patientAddress: string;
+  doctorAddress: string;
 
   @IsString()
   @IsNotEmpty()
@@ -206,7 +206,7 @@ export class CreateFamilyMemberApprovalDto {
 
   @IsString()
   @IsEthereumAddress()
-  principalPatientAddress: string;
+  doctorAddress: string;
 
   @IsString()
   @IsNotEmpty()
