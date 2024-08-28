@@ -5,6 +5,7 @@ import {
   Get,
   Post,
   Query,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { PharmacistService } from '../services/pharmacist.service';
@@ -15,6 +16,10 @@ import {
   UpdatePharmacistDto,
 } from '../dto/pharmacist.dto';
 import { Types } from 'mongoose';
+import {
+  PharmacistAuthGuard,
+  PharmacistVerificationGuard,
+} from '../guards/pharmacist.auth.guard';
 
 @Controller('pharmacist')
 export class PharmacistController {
@@ -28,6 +33,7 @@ export class PharmacistController {
   }
 
   @Post('updatePharmacist')
+  @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
   async updatePharmacist(
     @Query('walletAddress') walletAddress: string,
     @Body() updatePharmacistDto: UpdatePharmacistDto,
@@ -39,6 +45,7 @@ export class PharmacistController {
   }
 
   @Post('addMedicine')
+  @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
   async addMedicine(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -48,6 +55,7 @@ export class PharmacistController {
   }
 
   @Post('removeMedicine')
+  @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
   async removeMedicine(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -61,6 +69,7 @@ export class PharmacistController {
   }
 
   @Post('updateMedicine')
+  @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
   async updateMedicine(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -76,6 +85,7 @@ export class PharmacistController {
   }
 
   @Post('dispensePrescription')
+  @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
   async dispensePrescription(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -89,6 +99,7 @@ export class PharmacistController {
   }
 
   @Post('removePrescription')
+  @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
   async removePrescription(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -129,6 +140,7 @@ export class PharmacistController {
   }
 
   @Get('getMedicine')
+  @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
   async getMedicine(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -142,6 +154,7 @@ export class PharmacistController {
   }
 
   @Get('getAllMedicines')
+  @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
   async getAllMedicines(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -150,6 +163,7 @@ export class PharmacistController {
   }
 
   @Get('getInventory')
+  @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
   async getInventory(
     @Query('walletAddress', new ValidationPipe()) walletAddress: string,
   ) {
@@ -157,6 +171,7 @@ export class PharmacistController {
   }
 
   @Get('getAllSharedPrescriptions')
+  @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
   async getAllSharedPrescriptions(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
@@ -167,6 +182,7 @@ export class PharmacistController {
   }
 
   @Get('getSharedPrescription')
+  @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
   async getSharedPrescription(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
