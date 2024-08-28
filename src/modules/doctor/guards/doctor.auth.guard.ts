@@ -26,7 +26,22 @@ export class DoctorAuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
     if (doctor.status !== ApprovalStatus.Approved) {
-      throw new ForbiddenException('Doctor not approved by any institution');
+      throw new UnauthorizedException('Doctor not approved by any institution');
+    }
+
+    return true;
+  }
+}
+
+export class DoctorVerificationGuard implements CanActivate {
+  constructor(private readonly doctorDao: DoctorDao) {}
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const doctorAddress = request.query.doctorAddress;
+
+    const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
+    if (!doctor.isVerified) {
+      throw new ForbiddenException('please complete verification');
     }
 
     return true;
