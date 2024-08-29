@@ -4,10 +4,9 @@ export interface MedicineType {
   name: string;
   price: number;
   quantity: number;
-  description: string;
   sideEffects?: string;
   image?: string;
-  medicineGroup: string;
+  category: string;
   _id?: mongoose.Types.ObjectId;
 }
 
