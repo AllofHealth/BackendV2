@@ -34,6 +34,9 @@ export class ApprovalList {
 
 export const ApprovalListSchema = SchemaFactory.createForClass(ApprovalList);
 
+/**
+ * @todo: refactor this schema
+ */
 @Schema()
 export class Medicine {
   @Prop({ required: true })
@@ -45,9 +48,6 @@ export class Medicine {
   @Prop({ required: true })
   quantity: number;
 
-  @Prop({ required: true })
-  description: string;
-
   @Prop()
   sideEffects?: string;
 
@@ -55,7 +55,7 @@ export class Medicine {
   image?: string;
 
   @Prop({ required: true })
-  medicineGroup: string;
+  category: string;
 }
 
 export const MedicineSchema = SchemaFactory.createForClass(Medicine);
@@ -66,7 +66,7 @@ export class Inventory {
   numberOfMedicine?: number;
 
   @Prop()
-  numberOfMedicineGroup?: number;
+  numberOfCategories?: number;
 
   @Prop()
   numberOfMedicineSold?: number;
