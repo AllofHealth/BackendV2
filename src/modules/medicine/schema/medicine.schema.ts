@@ -1,3 +1,4 @@
+import { drugClasses } from '@/shared/constants';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
@@ -19,12 +20,15 @@ export class Receipt extends Document {
 export const ReceiptSchema = SchemaFactory.createForClass(Receipt);
 
 @Schema()
-export class Medicine extends Document {
+export class Medication extends Document {
   @Prop({ required: true })
   productPrescribed: string;
 
   @Prop({ required: true })
   productCategory: string;
+
+  @Prop({ required: true })
+  productDosage: string;
 
   @Prop()
   practitionerNote: string;
@@ -39,4 +43,13 @@ export class Medicine extends Document {
   receipt: Receipt;
 }
 
-export const MedicineSchema = SchemaFactory.createForClass(Medicine);
+export const MedicineSchema = SchemaFactory.createForClass(Medication);
+
+@Schema()
+export class MedicineCategories {
+  @Prop({ default: drugClasses })
+  category?: string[];
+}
+
+export const MedicineCategoriesSchema =
+  SchemaFactory.createForClass(MedicineCategories);
