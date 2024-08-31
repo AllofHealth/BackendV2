@@ -6,8 +6,13 @@ export interface MedicineType {
   quantity: number;
   sideEffects?: string;
   image?: string;
-  category: string;
   _id?: mongoose.Types.ObjectId;
+}
+
+export interface ProductType {
+  category: string;
+  description?: string;
+  medications: MedicineType[];
 }
 
 export interface UpdateMedicineType {
@@ -21,10 +26,10 @@ export interface UpdateMedicineType {
 }
 
 export interface InventoryType {
-  numberOfMedicine: number;
-  numberOfMedicineGroup: number;
-  numberOfMedicineSold: number;
-  medicines: MedicineType[];
+  numberOfMedicine?: number;
+  numberOfMedicineGroup?: number;
+  numberOfMedicineSold?: number;
+  products?: ProductType[];
 }
 export interface CreatePharmacistType {
   id: number;
