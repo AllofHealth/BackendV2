@@ -8,6 +8,8 @@ import {
   MedicineSchema,
   Pharmacist,
   PharmacistSchema,
+  Product,
+  ProductSchema,
 } from './schema/pharmacist.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { HospitalModule } from '@/modules/hospital/hospital.module';
@@ -27,6 +29,7 @@ import { OtpModule } from '../otp/otp.module';
     MongooseModule.forFeature([
       { name: Inventory.name, schema: InventorySchema },
     ]),
+    MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
     forwardRef(() => HospitalModule),
     forwardRef(() => PatientModule),
     forwardRef(() => OtpModule),
