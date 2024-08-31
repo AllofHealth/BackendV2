@@ -22,7 +22,7 @@ import { PatientDao } from '@/modules/patient/dao/patient.dao';
 import { PatientGuard } from '@/modules/patient/guards/patient.guard';
 import { OtpService } from '@/modules/otp/services/otp.service';
 import { MedicineDao } from '@/modules/medicine/dao/medicine.dao';
-import { Medicine } from '@/modules/medicine/schema/medicine.schema';
+import { Medication } from '@/modules/medicine/schema/medicine.schema';
 
 @Injectable()
 export class DoctorService {
@@ -222,8 +222,9 @@ export class DoctorService {
 
   async updateDoctor(walletAddress: string, args: UpdateDoctorType) {
     try {
-      const doctorExist =
-        await this.doctorGuard.validateDoctorExists(walletAddress);
+      const doctorExist = await this.doctorGuard.validateDoctorExists(
+        walletAddress,
+      );
       if (!doctorExist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -302,13 +303,15 @@ export class DoctorService {
         };
       }
 
-      const patient =
-        await this.patientDao.fetchPatientByAddress(patientAddress);
+      const patient = await this.patientDao.fetchPatientByAddress(
+        patientAddress,
+      );
       const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
       const hospitalId = doctor.hospitalIds[0];
 
-      const institution =
-        await this.hospitalDao.fetchHospitalWithBlockchainId(hospitalId);
+      const institution = await this.hospitalDao.fetchHospitalWithBlockchainId(
+        hospitalId,
+      );
 
       if (!institution) {
         return {
@@ -317,7 +320,7 @@ export class DoctorService {
         };
       }
 
-      const medication: Medicine[] = [];
+      const medication: Medication[] = [];
 
       medicine.forEach(async (medicine) => {
         const newMedicine = await this.addMedication(medicine);
@@ -334,8 +337,9 @@ export class DoctorService {
         medicine: medication,
       };
 
-      const prescription =
-        await this.patientDao.createPrescription(newPrescriptionArgs);
+      const prescription = await this.patientDao.createPrescription(
+        newPrescriptionArgs,
+      );
       patient.prescriptions.push(prescription);
 
       await patient.save();
@@ -355,8 +359,9 @@ export class DoctorService {
   ) {
     const { patientAddress, doctorAddress, id } = args;
     try {
-      const patient =
-        await this.patientDao.fetchPatientByAddress(patientAddress);
+      const patient = await this.patientDao.fetchPatientByAddress(
+        patientAddress,
+      );
       const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
 
       if (!patient) {
@@ -411,8 +416,9 @@ export class DoctorService {
 
   async fetchAllActiveApprovals(doctorAddress: string) {
     try {
-      const isDoctor =
-        await this.doctorGuard.validateDoctorExists(doctorAddress);
+      const isDoctor = await this.doctorGuard.validateDoctorExists(
+        doctorAddress,
+      );
 
       if (!isDoctor) {
         return {
@@ -448,8 +454,9 @@ export class DoctorService {
   ) {
     const { patientAddress, doctorAddress, id } = args;
     try {
-      const patient =
-        await this.patientDao.fetchPatientByAddress(patientAddress);
+      const patient = await this.patientDao.fetchPatientByAddress(
+        patientAddress,
+      );
       const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
 
       if (!patient) {
@@ -489,8 +496,12 @@ export class DoctorService {
   }
 
   async createMedicalRecord(args: CreateMedicalRecordType) {
-    const { recordId, principalPatientAddress, doctorAddress, diagnosis } =
-      args;
+    const {
+      recordId,
+      principalPatientAddress,
+      doctorAddress,
+      diagnosis,
+    } = args;
     try {
       const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
       const hospital = await this.hospitalDao.fetchHospitalWithBlockchainId(
@@ -579,11 +590,10 @@ export class DoctorService {
           };
         }
 
-        const familyMemberSchema =
-          await this.patientDao.fetchPatientFamilyMember(
-            principalPatientAddress,
-            approvalRequest.patientId,
-          );
+        const familyMemberSchema = await this.patientDao.fetchPatientFamilyMember(
+          principalPatientAddress,
+          approvalRequest.patientId,
+        );
         if (!familyMember) {
           return {
             success: HttpStatus.NOT_FOUND,
