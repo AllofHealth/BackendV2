@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PharmacistSchema = exports.Pharmacist = exports.InventorySchema = exports.Inventory = exports.MedicineSchema = exports.Medicine = exports.ApprovalListSchema = exports.ApprovalList = void 0;
+exports.PharmacistSchema = exports.Pharmacist = exports.InventorySchema = exports.Inventory = exports.ProductSchema = exports.Product = exports.MedicineSchema = exports.Medicine = exports.ApprovalListSchema = exports.ApprovalList = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const patient_schema_1 = require("../../patient/schemas/patient.schema");
 let ApprovalList = class ApprovalList {
@@ -67,10 +67,6 @@ __decorate([
     __metadata("design:type", Number)
 ], Medicine.prototype, "quantity", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", String)
-], Medicine.prototype, "description", void 0);
-__decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Medicine.prototype, "sideEffects", void 0);
@@ -78,14 +74,29 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Medicine.prototype, "image", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", String)
-], Medicine.prototype, "medicineGroup", void 0);
 exports.Medicine = Medicine = __decorate([
     (0, mongoose_1.Schema)()
 ], Medicine);
 exports.MedicineSchema = mongoose_1.SchemaFactory.createForClass(Medicine);
+let Product = class Product {
+};
+exports.Product = Product;
+__decorate([
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
+], Product.prototype, "category", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Product.prototype, "description", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [{ type: exports.MedicineSchema }] }),
+    __metadata("design:type", Array)
+], Product.prototype, "medications", void 0);
+exports.Product = Product = __decorate([
+    (0, mongoose_1.Schema)()
+], Product);
+exports.ProductSchema = mongoose_1.SchemaFactory.createForClass(Product);
 let Inventory = class Inventory {
 };
 exports.Inventory = Inventory;
@@ -96,15 +107,15 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
-], Inventory.prototype, "numberOfMedicineGroup", void 0);
+], Inventory.prototype, "numberOfCategories", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], Inventory.prototype, "numberOfMedicineSold", void 0);
 __decorate([
-    (0, mongoose_1.Prop)([exports.MedicineSchema]),
+    (0, mongoose_1.Prop)({ type: [{ type: exports.ProductSchema }], unique: true }),
     __metadata("design:type", Array)
-], Inventory.prototype, "medicines", void 0);
+], Inventory.prototype, "products", void 0);
 exports.Inventory = Inventory = __decorate([
     (0, mongoose_1.Schema)()
 ], Inventory);

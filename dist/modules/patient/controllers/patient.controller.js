@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const patient_service_1 = require("../services/patient.service");
 const patient_dto_1 = require("../dto/patient.dto");
 const mongoose_1 = require("mongoose");
+const patient_auth_guard_1 = require("../guards/patient.auth.guard");
 let PatientController = class PatientController {
     constructor(patientService) {
         this.patientService = patientService;
@@ -50,21 +51,21 @@ let PatientController = class PatientController {
     async removePrescription(walletAddress, prescriptionId) {
         return await this.patientService.removePrescriptions(walletAddress, prescriptionId);
     }
-    async approveMedicalRecordAccess(doctorAddress, createApprovalDto) {
+    async approveMedicalRecordAccess(walletAddress, createApprovalDto) {
         return await this.patientService.approveMedicalRecordAccess({
             recordId: createApprovalDto.recordId,
-            patientAddress: createApprovalDto.patientAddress,
-            doctorAddress: doctorAddress,
+            patientAddress: walletAddress,
+            doctorAddress: createApprovalDto.doctorAddress,
             approvalType: createApprovalDto.approvalType,
             approvalDurationInSecs: createApprovalDto.approvalDurationInSec,
         });
     }
-    async approveFamilyMemberRecordAccess(doctorAddress, createApprovalDto) {
+    async approveFamilyMemberRecordAccess(walletAddress, createApprovalDto) {
         return await this.patientService.approveMedicalRecordAccessForFamilyMember({
             recordId: createApprovalDto.recordId,
             familyMemberId: createApprovalDto.familyMemberId,
-            patientAddress: createApprovalDto.principalPatientAddress,
-            doctorAddress,
+            patientAddress: walletAddress,
+            doctorAddress: createApprovalDto.doctorAddress,
             approvalType: createApprovalDto.approvalType,
             approvalDurationInSecs: createApprovalDto.approvalDurationInSec,
         });
@@ -127,6 +128,7 @@ __decorate([
 ], PatientController.prototype, "updatePatient", null);
 __decorate([
     (0, common_1.Post)('createFamilyMember'),
+    (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Body)(new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
@@ -135,6 +137,7 @@ __decorate([
 ], PatientController.prototype, "createFamilyMember", null);
 __decorate([
     (0, common_1.Post)('updateFamilyMember'),
+    (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('familyMemberId', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Body)(new common_1.ValidationPipe({ transform: true }))),
@@ -144,6 +147,7 @@ __decorate([
 ], PatientController.prototype, "updateFamilyMember", null);
 __decorate([
     (0, common_1.Post)('sharePrescription'),
+    (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('pharmacistAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Body)(new common_1.ValidationPipe({ transform: true }))),
@@ -153,6 +157,7 @@ __decorate([
 ], PatientController.prototype, "sharePrescription", null);
 __decorate([
     (0, common_1.Post)('removePrescription'),
+    (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('prescriptionId', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
@@ -161,7 +166,8 @@ __decorate([
 ], PatientController.prototype, "removePrescription", null);
 __decorate([
     (0, common_1.Post)('approveMedicalRecordAccess'),
-    __param(0, (0, common_1.Query)('doctorAddress', new common_1.ValidationPipe({ transform: true }))),
+    (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
+    __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Body)(new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, patient_dto_1.CreateApprovalDto]),
@@ -169,7 +175,8 @@ __decorate([
 ], PatientController.prototype, "approveMedicalRecordAccess", null);
 __decorate([
     (0, common_1.Post)('approveFamilyMemberRecordAccess'),
-    __param(0, (0, common_1.Query)('doctorAddress', new common_1.ValidationPipe({ transform: true }))),
+    (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
+    __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Body)(new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, patient_dto_1.CreateFamilyMemberApprovalDto]),
@@ -183,6 +190,7 @@ __decorate([
 ], PatientController.prototype, "getAllPatients", null);
 __decorate([
     (0, common_1.Get)('allFamilyMembers'),
+    (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -205,6 +213,7 @@ __decorate([
 ], PatientController.prototype, "getPatientByAddress", null);
 __decorate([
     (0, common_1.Get)('allPrescriptions'),
+    (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -212,6 +221,7 @@ __decorate([
 ], PatientController.prototype, "getAllPrescriptions", null);
 __decorate([
     (0, common_1.Get)('prescriptionById'),
+    (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('prescriptionId', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
@@ -220,6 +230,7 @@ __decorate([
 ], PatientController.prototype, "getPrescription", null);
 __decorate([
     (0, common_1.Get)('allMedicalRecords'),
+    (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -227,7 +238,8 @@ __decorate([
 ], PatientController.prototype, "getAllMedicalRecords", null);
 __decorate([
     (0, common_1.Get)('familyMemberMedicalRecords'),
-    __param(0, (0, common_1.Query)('principalPatientAddress', new common_1.ValidationPipe({ transform: true }))),
+    (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
+    __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('familyMemberId', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Number]),
@@ -235,6 +247,7 @@ __decorate([
 ], PatientController.prototype, "getFamilyMemberMedicalRecords", null);
 __decorate([
     (0, common_1.Get)('medicalRecordById'),
+    (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('recordId')),
     __metadata("design:type", Function),

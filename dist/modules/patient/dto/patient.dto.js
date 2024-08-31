@@ -238,7 +238,7 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsEthereumAddress)(),
     __metadata("design:type", String)
-], CreateApprovalDto.prototype, "patientAddress", void 0);
+], CreateApprovalDto.prototype, "doctorAddress", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
@@ -265,7 +265,7 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsEthereumAddress)(),
     __metadata("design:type", String)
-], CreateFamilyMemberApprovalDto.prototype, "principalPatientAddress", void 0);
+], CreateFamilyMemberApprovalDto.prototype, "doctorAddress", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),

@@ -32,6 +32,7 @@ exports.PharmacistModule = PharmacistModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: pharmacist_schema_1.Inventory.name, schema: pharmacist_schema_1.InventorySchema },
             ]),
+            mongoose_1.MongooseModule.forFeature([{ name: pharmacist_schema_1.Product.name, schema: pharmacist_schema_1.ProductSchema }]),
             (0, common_1.forwardRef)(() => hospital_module_1.HospitalModule),
             (0, common_1.forwardRef)(() => patient_module_1.PatientModule),
             (0, common_1.forwardRef)(() => otp_module_1.OtpModule),

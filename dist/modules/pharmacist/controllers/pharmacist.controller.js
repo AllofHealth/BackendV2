@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const pharmacist_service_1 = require("../services/pharmacist.service");
 const pharmacist_dto_1 = require("../dto/pharmacist.dto");
 const mongoose_1 = require("mongoose");
+const pharmacist_auth_guard_1 = require("../guards/pharmacist.auth.guard");
 let PharmacistController = class PharmacistController {
     constructor(pharmacistService) {
         this.pharmacistService = pharmacistService;
@@ -92,6 +93,7 @@ __decorate([
 ], PharmacistController.prototype, "createPharmacist", null);
 __decorate([
     (0, common_1.Post)('updatePharmacist'),
+    (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -100,6 +102,7 @@ __decorate([
 ], PharmacistController.prototype, "updatePharmacist", null);
 __decorate([
     (0, common_1.Post)('addMedicine'),
+    (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Body)(new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
@@ -108,6 +111,7 @@ __decorate([
 ], PharmacistController.prototype, "addMedicine", null);
 __decorate([
     (0, common_1.Post)('removeMedicine'),
+    (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('medicineId', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
@@ -116,6 +120,7 @@ __decorate([
 ], PharmacistController.prototype, "removeMedicine", null);
 __decorate([
     (0, common_1.Post)('updateMedicine'),
+    (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('medicineId', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Body)()),
@@ -125,6 +130,7 @@ __decorate([
 ], PharmacistController.prototype, "updateMedicine", null);
 __decorate([
     (0, common_1.Post)('dispensePrescription'),
+    (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('prescriptionId', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
@@ -133,6 +139,7 @@ __decorate([
 ], PharmacistController.prototype, "dispensePrescription", null);
 __decorate([
     (0, common_1.Post)('removePrescription'),
+    (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('prescriptionId', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
@@ -173,6 +180,7 @@ __decorate([
 ], PharmacistController.prototype, "deletePharmacistByAddress", null);
 __decorate([
     (0, common_1.Get)('getMedicine'),
+    (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('medicineId', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
@@ -181,6 +189,7 @@ __decorate([
 ], PharmacistController.prototype, "getMedicine", null);
 __decorate([
     (0, common_1.Get)('getAllMedicines'),
+    (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -188,6 +197,7 @@ __decorate([
 ], PharmacistController.prototype, "getAllMedicines", null);
 __decorate([
     (0, common_1.Get)('getInventory'),
+    (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe())),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -195,6 +205,7 @@ __decorate([
 ], PharmacistController.prototype, "getInventory", null);
 __decorate([
     (0, common_1.Get)('getAllSharedPrescriptions'),
+    (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -202,6 +213,7 @@ __decorate([
 ], PharmacistController.prototype, "getAllSharedPrescriptions", null);
 __decorate([
     (0, common_1.Get)('getSharedPrescription'),
+    (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('prescriptionId', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),

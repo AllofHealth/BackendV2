@@ -120,12 +120,6 @@ let PatientService = class PatientService {
         const { id, name, relationship, email, address, age, dob, bloodGroup, genotype, } = familyMember;
         try {
             const patient = await this.patientDao.fetchPatientByAddress(walletAddress);
-            if (!patient) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'patient not found',
-                };
-            }
             const sanitizeRelationship = relationship.toLowerCase();
             const sanitizedArgs = {
                 id,
@@ -156,18 +150,12 @@ let PatientService = class PatientService {
         }
         catch (error) {
             console.error(error);
-            throw new shared_1.PatientError('An error occurred while adding family member');
+            throw new common_1.HttpException({ message: 'An error occurred while adding family member' }, common_1.HttpStatus.BAD_REQUEST);
         }
     }
     async listFamilyMember(walletAddress) {
         try {
             const patient = await this.patientDao.fetchPatientByAddress(walletAddress);
-            if (!patient) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'Patient not found',
-                };
-            }
             const familyMembers = patient.familyMembers;
             if (!familyMembers) {
                 return {
@@ -177,14 +165,14 @@ let PatientService = class PatientService {
                 };
             }
             return {
-                success: common_1.HttpStatus.FOUND,
+                success: common_1.HttpStatus.OK,
                 members: familyMembers,
                 message: 'Family members found',
             };
         }
         catch (error) {
             console.error(error);
-            throw new Error('An error occurred while listing family member');
+            throw new common_1.HttpException({ message: 'An error occurred while fetching family members' }, common_1.HttpStatus.BAD_REQUEST);
         }
     }
     async getFamilyMemberById(args) {

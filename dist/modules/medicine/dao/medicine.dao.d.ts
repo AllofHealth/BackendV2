@@ -22,13 +22,20 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import { Medicine } from '../schema/medicine.schema';
+import { Medication, MedicineCategories } from '../schema/medicine.schema';
 import { Model } from 'mongoose';
 import { CreateMedicineInterface } from '../interface/medicine.interface';
 export declare class MedicineDao {
     private readonly medicine;
-    constructor(medicine: Model<Medicine>);
-    createMedicine(args: CreateMedicineInterface): Promise<import("mongoose").Document<unknown, {}, Medicine> & Medicine & {
+    private readonly categories;
+    constructor(medicine: Model<Medication>, categories: Model<MedicineCategories>);
+    createMedicine(args: CreateMedicineInterface): Promise<import("mongoose").Document<unknown, {}, Medication> & Medication & {
+        _id: import("mongoose").Types.ObjectId;
+    }>;
+    getAllCategories(): Promise<(import("mongoose").Document<unknown, {}, MedicineCategories> & MedicineCategories & {
+        _id: import("mongoose").Types.ObjectId;
+    })[]>;
+    createCategories(): Promise<import("mongoose").Document<unknown, {}, MedicineCategories> & MedicineCategories & {
         _id: import("mongoose").Types.ObjectId;
     }>;
 }

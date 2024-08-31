@@ -16,7 +16,6 @@ const pharmacist_guard_1 = require("../guards/pharmacist.guard");
 const shared_1 = require("../../../shared");
 const hospital_dao_1 = require("../../hospital/dao/hospital.dao");
 const mongoose_1 = require("mongoose");
-const constants_1 = require("../../../shared/constants");
 const patient_dao_1 = require("../../patient/dao/patient.dao");
 const otp_service_1 = require("../../otp/services/otp.service");
 let PharmacistService = class PharmacistService {
@@ -204,206 +203,16 @@ let PharmacistService = class PharmacistService {
         }
     }
     async addMedicine(walletAddress, args) {
-        const { name, price, quantity, description, sideEffects, image, medicineGroup, } = args;
-        try {
-            const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
-            if (!pharmacist) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'Pharmacist does not exist',
-                };
-            }
-            if (pharmacist.status !== shared_1.ApprovalStatus.Approved) {
-                return {
-                    success: common_1.HttpStatus.FORBIDDEN,
-                    message: 'Pharmacist is not approved',
-                };
-            }
-            const inventory = pharmacist.inventory;
-            if (!inventory) {
-                const medicine = await this.pharmacistDao.createMedicine({
-                    name,
-                    price,
-                    quantity,
-                    description,
-                    sideEffects: sideEffects ? sideEffects : 'No side effects',
-                    image: image ? image : constants_1.MEDICINE_PLACEHOLDER,
-                    medicineGroup,
-                });
-                const newInventory = await this.pharmacistDao.createInventory({
-                    numberOfMedicine: quantity,
-                    numberOfMedicineGroup: 1,
-                    numberOfMedicineSold: 0,
-                    medicines: [medicine],
-                });
-                pharmacist.inventory = newInventory;
-                await pharmacist.save();
-                return {
-                    success: common_1.HttpStatus.OK,
-                    message: 'Medicine added successfully',
-                };
-            }
-            const existingMedicine = inventory.medicines.find((medicine) => medicine.name === name && medicine.medicineGroup === medicineGroup);
-            if (existingMedicine) {
-                existingMedicine.price = price;
-                existingMedicine.description = description;
-                existingMedicine.sideEffects = sideEffects
-                    ? sideEffects
-                    : 'No side effects';
-                existingMedicine.quantity += quantity;
-                inventory.numberOfMedicine += quantity;
-            }
-            else {
-                const medicine = await this.pharmacistDao.createMedicine({
-                    name,
-                    price,
-                    quantity,
-                    description,
-                    sideEffects: sideEffects ? sideEffects : 'No side effects',
-                    image: image ? image : constants_1.MEDICINE_PLACEHOLDER,
-                    medicineGroup,
-                });
-                inventory.numberOfMedicineGroup += 1;
-                inventory.numberOfMedicine += quantity;
-                inventory.medicines.push(medicine);
-            }
-            await pharmacist.save();
-            return {
-                success: common_1.HttpStatus.OK,
-                message: 'Medicine added successfully',
-            };
-        }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.PharmacistError('Error adding medicine');
-        }
     }
     async deleteMedicine(walletAddress, medicineId) {
-        try {
-            const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
-            if (!pharmacist) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'pharmacist not found',
-                };
-            }
-            const inventory = pharmacist.inventory;
-            if (!inventory) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'inventory not found',
-                };
-            }
-            const medicine = await this.pharmacistDao.findMedicineById(medicineId);
-            if (!medicine) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'medicine not found',
-                };
-            }
-            const medicineExistInInventory = inventory.medicines.find((medicine) => medicine._id.toString() === medicineId.toString());
-            if (!medicineExistInInventory) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'medicine not found in inventory',
-                };
-            }
-            inventory.numberOfMedicine -= medicine.quantity;
-            await this.pharmacistDao.pullMedicineById(walletAddress, medicineId);
-            await this.pharmacistDao.deleteMedicineById(medicineId);
-            await pharmacist.save();
-            return {
-                success: common_1.HttpStatus.OK,
-                message: 'Medicine deleted successfully',
-            };
-        }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.PharmacistError('Error deleting medicine');
-        }
     }
     async fetchMedicine(walletAddress, medicineId) {
-        try {
-            const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
-            if (!pharmacist) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'pharmacist not found',
-                };
-            }
-            const inventory = pharmacist.inventory;
-            if (!inventory) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'inventory not found',
-                };
-            }
-            const medicine = await this.pharmacistDao.findMedicineById(medicineId);
-            if (!medicine) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'medicine not found',
-                };
-            }
-            const medicineExistInInventory = inventory.medicines.find((medicine) => medicine._id.toString() === medicineId.toString());
-            if (!medicineExistInInventory) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'medicine not found in inventory',
-                };
-            }
-            return {
-                success: common_1.HttpStatus.OK,
-                medicine,
-            };
-        }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.PharmacistError('Error fetching medicine');
-        }
     }
     async fetchAllMedicine(walletAddress) {
-        try {
-            const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
-            if (!pharmacist) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'pharmacist not found',
-                };
-            }
-            const inventory = pharmacist.inventory;
-            if (!inventory) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'inventory not found',
-                };
-            }
-            const medicines = inventory.medicines;
-            if (medicines.length === 0) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    medicines: [],
-                };
-            }
-            return {
-                success: common_1.HttpStatus.OK,
-                medicines,
-            };
-        }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.PharmacistError('Error fetching all medicine');
-        }
     }
     async fetchInventory(walletAddress) {
         try {
             const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
-            if (!pharmacist) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'pharmacist not found',
-                };
-            }
             const inventory = pharmacist.inventory;
             if (!inventory) {
                 return {
@@ -422,41 +231,6 @@ let PharmacistService = class PharmacistService {
         }
     }
     async updateMedicine(walletAddress, medicineId, args) {
-        try {
-            const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
-            if (!pharmacist) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'pharmacist not found',
-                };
-            }
-            const inventory = pharmacist.inventory;
-            if (!inventory) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'inventory not found',
-                };
-            }
-            const medicine = inventory.medicines.find((medicine) => medicine._id.toString() === medicineId.toString());
-            if (!medicine) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'medicine not found',
-                };
-            }
-            const updateMedicine = await this.pharmacistDao.updateMedicine(walletAddress, medicineId, args);
-            await pharmacist.save();
-            const totalNumberOfMedicine = inventory.medicines.reduce((total, medicine) => total + medicine.quantity, 0);
-            inventory.numberOfMedicine = totalNumberOfMedicine;
-            await pharmacist.save();
-            return {
-                success: common_1.HttpStatus.OK,
-                updateMedicine,
-            };
-        }
-        catch (error) {
-            console.error('Error updating medicine');
-        }
     }
     async fetchAllSharedPrescriptions(walletAddress) {
         try {

@@ -22,15 +22,19 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import { Inventory, Medicine, Pharmacist } from '../schema/pharmacist.schema';
+import { Inventory, Medicine, Pharmacist, Product } from '../schema/pharmacist.schema';
 import { Model, Types } from 'mongoose';
-import { CreatePharmacistType, InventoryType, MedicineType, UpdateMedicineType, UpdatePharmacistType } from '../interface/pharmacist.interface';
+import { CreatePharmacistType, InventoryType, MedicineType, ProductType, UpdateMedicineType, UpdatePharmacistType } from '../interface/pharmacist.interface';
 export declare class PharmacistDao {
     private readonly pharmacistModel;
     private readonly medicineModel;
     private readonly inventoryModel;
-    constructor(pharmacistModel: Model<Pharmacist>, medicineModel: Model<Medicine>, inventoryModel: Model<Inventory>);
+    private readonly productModel;
+    constructor(pharmacistModel: Model<Pharmacist>, medicineModel: Model<Medicine>, inventoryModel: Model<Inventory>, productModel: Model<Product>);
     createNewPharmacist(pharmacist: CreatePharmacistType): Promise<import("mongoose").Document<unknown, {}, Pharmacist> & Pharmacist & {
+        _id: Types.ObjectId;
+    }>;
+    createProduct(args: ProductType): Promise<import("mongoose").Document<unknown, {}, Product> & Product & {
         _id: Types.ObjectId;
     }>;
     createMedicine(args: MedicineType): Promise<import("mongoose").Document<unknown, {}, Medicine> & Medicine & {

@@ -5,3 +5,8 @@ export declare class DoctorAuthGuard implements CanActivate {
     constructor(doctorDao: DoctorDao);
     canActivate(context: ExecutionContext): Promise<boolean>;
 }
+export declare class DoctorVerificationGuard implements CanActivate {
+    private readonly doctorDao;
+    constructor(doctorDao: DoctorDao);
+    canActivate(context: ExecutionContext): Promise<boolean>;
+}

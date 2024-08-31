@@ -64,11 +64,11 @@ export declare class PatientController {
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    approveMedicalRecordAccess(doctorAddress: string, createApprovalDto: CreateApprovalDto): Promise<{
+    approveMedicalRecordAccess(walletAddress: string, createApprovalDto: CreateApprovalDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    approveFamilyMemberRecordAccess(doctorAddress: string, createApprovalDto: CreateFamilyMemberApprovalDto): Promise<{
+    approveFamilyMemberRecordAccess(walletAddress: string, createApprovalDto: CreateFamilyMemberApprovalDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
@@ -76,10 +76,6 @@ export declare class PatientController {
         _id: Types.ObjectId;
     })[]>;
     getAllFamilyMembers(walletAddress: string): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
-        members?: undefined;
-    } | {
         success: import("@nestjs/common").HttpStatus;
         members: import("../schemas/patient.schema").FamilyMember[];
         message: string;

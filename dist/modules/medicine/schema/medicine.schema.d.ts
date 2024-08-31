@@ -34,16 +34,25 @@ export declare const ReceiptSchema: import("mongoose").Schema<Receipt, import("m
 }, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Receipt, Document<unknown, {}, import("mongoose").FlatRecord<Receipt>> & import("mongoose").FlatRecord<Receipt> & {
     _id: import("mongoose").Types.ObjectId;
 }>;
-export declare class Medicine extends Document {
+export declare class Medication extends Document {
     productPrescribed: string;
     productCategory: string;
+    productDosage: string;
     practitionerNote: string;
     date: Date;
     isDispensed: boolean;
     receipt: Receipt;
 }
-export declare const MedicineSchema: import("mongoose").Schema<Medicine, import("mongoose").Model<Medicine, any, any, any, Document<unknown, any, Medicine> & Medicine & {
+export declare const MedicineSchema: import("mongoose").Schema<Medication, import("mongoose").Model<Medication, any, any, any, Document<unknown, any, Medication> & Medication & {
     _id: import("mongoose").Types.ObjectId;
-}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Medicine, Document<unknown, {}, import("mongoose").FlatRecord<Medicine>> & import("mongoose").FlatRecord<Medicine> & {
+}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Medication, Document<unknown, {}, import("mongoose").FlatRecord<Medication>> & import("mongoose").FlatRecord<Medication> & {
+    _id: import("mongoose").Types.ObjectId;
+}>;
+export declare class MedicineCategories {
+    category?: string[];
+}
+export declare const MedicineCategoriesSchema: import("mongoose").Schema<MedicineCategories, import("mongoose").Model<MedicineCategories, any, any, any, Document<unknown, any, MedicineCategories> & MedicineCategories & {
+    _id: import("mongoose").Types.ObjectId;
+}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, MedicineCategories, Document<unknown, {}, import("mongoose").FlatRecord<MedicineCategories>> & import("mongoose").FlatRecord<MedicineCategories> & {
     _id: import("mongoose").Types.ObjectId;
 }>;

@@ -90,7 +90,8 @@ __decorate([
 ], DoctorController.prototype, "createDoctor", null);
 __decorate([
     (0, common_1.Post)('updateDoctor'),
-    __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
+    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard, doctor_auth_guard_1.DoctorVerificationGuard),
+    __param(0, (0, common_1.Query)('doctorAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, doctor_dto_1.UpdateDoctorDto]),
@@ -98,7 +99,7 @@ __decorate([
 ], DoctorController.prototype, "updateDoctor", null);
 __decorate([
     (0, common_1.Post)('addPatientPrescription'),
-    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard),
+    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard, doctor_auth_guard_1.DoctorVerificationGuard),
     __param(0, (0, common_1.Query)('doctorAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('patientAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Body)(new common_1.ValidationPipe({ transform: true }))),
@@ -108,7 +109,7 @@ __decorate([
 ], DoctorController.prototype, "addPatientPrescription", null);
 __decorate([
     (0, common_1.Post)('approveRecordAccessRequest'),
-    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard),
+    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard, doctor_auth_guard_1.DoctorVerificationGuard),
     __param(0, (0, common_1.Query)('doctorAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('patientAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Query)('recordId', new common_1.ValidationPipe({ transform: true }))),
@@ -118,7 +119,7 @@ __decorate([
 ], DoctorController.prototype, "approveRecordAccessRequest", null);
 __decorate([
     (0, common_1.Post)('rejectRecordAccessRequest'),
-    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard),
+    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard, doctor_auth_guard_1.DoctorVerificationGuard),
     __param(0, (0, common_1.Query)('doctorAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('patientAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Query)('recordId', new common_1.ValidationPipe({ transform: true }))),
@@ -128,7 +129,7 @@ __decorate([
 ], DoctorController.prototype, "rejectRecordAccessRequest", null);
 __decorate([
     (0, common_1.Post)('createMedicalRecord'),
-    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard),
+    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard, doctor_auth_guard_1.DoctorVerificationGuard),
     __param(0, (0, common_1.Query)('doctorAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Query)('patientAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Body)(new common_1.ValidationPipe({ transform: true }))),
@@ -138,7 +139,7 @@ __decorate([
 ], DoctorController.prototype, "createMedicalRecordPreview", null);
 __decorate([
     (0, common_1.Post)('deleteAllApprovalRequests'),
-    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard),
+    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard, doctor_auth_guard_1.DoctorVerificationGuard),
     __param(0, (0, common_1.Query)('adminAddress', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -171,6 +172,7 @@ __decorate([
 ], DoctorController.prototype, "getPendingDoctors", null);
 __decorate([
     (0, common_1.Get)('allRecordRequests'),
+    (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard, doctor_auth_guard_1.DoctorVerificationGuard),
     __param(0, (0, common_1.Query)('doctorAddress', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

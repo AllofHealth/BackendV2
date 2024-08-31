@@ -50,23 +50,9 @@ export declare class PharmacistController {
             _id: Types.ObjectId;
         };
     }>;
-    addMedicine(walletAddress: string, medicine: AddMedicineDto): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
-    }>;
-    removeMedicine(walletAddress: string, medicineId: Types.ObjectId): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
-    }>;
-    updateMedicine(walletAddress: string, medicineId: Types.ObjectId, medicine: UpdateMedicineDto): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
-        updateMedicine?: undefined;
-    } | {
-        success: import("@nestjs/common").HttpStatus;
-        updateMedicine: import("../schema/pharmacist.schema").Medicine;
-        message?: undefined;
-    }>;
+    addMedicine(walletAddress: string, medicine: AddMedicineDto): Promise<void>;
+    removeMedicine(walletAddress: string, medicineId: Types.ObjectId): Promise<void>;
+    updateMedicine(walletAddress: string, medicineId: Types.ObjectId, medicine: UpdateMedicineDto): Promise<void>;
     dispensePrescription(walletAddress: string, prescriptionId: Types.ObjectId): Promise<void>;
     removePrescription(walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
         success: import("@nestjs/common").HttpStatus;
@@ -108,38 +94,14 @@ export declare class PharmacistController {
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    getMedicine(walletAddress: string, medicineId: Types.ObjectId): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
-        medicine?: undefined;
-    } | {
-        success: import("@nestjs/common").HttpStatus;
-        medicine: import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Medicine> & import("../schema/pharmacist.schema").Medicine & {
-            _id: Types.ObjectId;
-        };
-        message?: undefined;
-    }>;
-    getAllMedicines(walletAddress: string): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
-        medicines?: undefined;
-    } | {
-        success: import("@nestjs/common").HttpStatus;
-        medicines: import("../schema/pharmacist.schema").Medicine[];
-        message?: undefined;
-    }>;
+    getMedicine(walletAddress: string, medicineId: Types.ObjectId): Promise<void>;
+    getAllMedicines(walletAddress: string): Promise<void>;
     getInventory(walletAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
-        message: string;
-        inventory?: undefined;
-    } | {
-        success: import("@nestjs/common").HttpStatus;
         inventory: {};
-        message?: undefined;
     } | {
         success: import("@nestjs/common").HttpStatus;
         inventory: import("../schema/pharmacist.schema").Inventory;
-        message?: undefined;
     }>;
     getAllSharedPrescriptions(walletAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;

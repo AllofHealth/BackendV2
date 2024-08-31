@@ -401,7 +401,7 @@ let DoctorService = class DoctorService {
         }
     }
     async createMedicalRecord(args) {
-        const { recordId, principalPatientAddress, doctorAddress, diagnosis } = args;
+        const { recordId, principalPatientAddress, doctorAddress, diagnosis, } = args;
         try {
             const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
             const hospital = await this.hospitalDao.fetchHospitalWithBlockchainId(doctor.hospitalIds[0]);

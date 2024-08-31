@@ -77,14 +77,14 @@ export declare class SharePrescriptionDto {
 }
 export declare class CreateApprovalDto {
     recordId?: number[];
-    patientAddress: string;
+    doctorAddress: string;
     approvalType: string;
     approvalDurationInSec: number;
 }
 export declare class CreateFamilyMemberApprovalDto {
     familyMemberId: number;
     recordId?: number[];
-    principalPatientAddress: string;
+    doctorAddress: string;
     approvalType: string;
     approvalDurationInSec: number;
 }

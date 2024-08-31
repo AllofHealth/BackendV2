@@ -65,10 +65,6 @@ export declare class PatientService {
     }>;
     listFamilyMember(walletAddress: string): Promise<{
         success: HttpStatus;
-        message: string;
-        members?: undefined;
-    } | {
-        success: HttpStatus;
         members: import("../schemas/patient.schema").FamilyMember[];
         message: string;
     }>;
