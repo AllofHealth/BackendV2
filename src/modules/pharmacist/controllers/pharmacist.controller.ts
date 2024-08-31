@@ -18,6 +18,7 @@ import {
 import { Types } from 'mongoose';
 import {
   PharmacistAuthGuard,
+  PharmacistExist,
   PharmacistVerificationGuard,
 } from '../guards/pharmacist.auth.guard';
 
@@ -133,6 +134,7 @@ export class PharmacistController {
   }
 
   @Delete('deletePharmacist')
+  @UseGuards(PharmacistExist)
   async deletePharmacistByAddress(
     @Query('walletAddress') walletAddress: string,
   ) {
