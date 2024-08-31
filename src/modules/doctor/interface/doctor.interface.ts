@@ -65,6 +65,7 @@ export interface AddPatientPrescription {
 export interface AddMedicineType {
   productPrescribed: string;
   productCategory: string;
+  productDosage: string;
   practitionerNote: string;
 }
 
