@@ -30,14 +30,13 @@ export class PharmacistService {
   ) {}
 
   async createPharmacist(args: CreatePharmacistType) {
-    const pharmacistExists = await this.pharmacistGuard.validatePharmacistExists(
-      args.walletAddress,
-    );
+    const pharmacistExists =
+      await this.pharmacistGuard.validatePharmacistExists(args.walletAddress);
     if (pharmacistExists) {
-      return {
-        success: ErrorCodes.Error,
-        message: 'Pharmacist already exists',
-      };
+      throw new HttpException(
+        { message: 'pharmacist already exists' },
+        HttpStatus.CONFLICT,
+      );
     }
 
     if (
@@ -46,7 +45,10 @@ export class PharmacistService {
         args.walletAddress,
       )
     ) {
-      throw new PharmacistError('Pharmacist already exists in hospital');
+      throw new HttpException(
+        { message: 'address already exists in this institution' },
+        HttpStatus.CONFLICT,
+      );
     }
 
     try {
@@ -55,7 +57,10 @@ export class PharmacistService {
       );
 
       if (!hospital) {
-        throw new PharmacistError("Hospital doesn't exist");
+        throw new HttpException(
+          { message: 'institution not found' },
+          HttpStatus.NOT_FOUND,
+        );
       }
 
       await this.pharmacistDao.createNewPharmacist(args);
@@ -89,21 +94,26 @@ export class PharmacistService {
       await hospital.save();
 
       return {
-        success: ErrorCodes.Success,
+        success: HttpStatus.OK,
         pharmacist,
         message: 'Pharmacist created successfully',
       };
     } catch (error) {
       console.error(error);
-      if (error instanceof MongooseError)
-        throw new MongooseError(error.message);
-      throw new PharmacistError('An error ocurred while creating pharmacist');
+      throw new HttpException(
+        {
+          message: 'an error occurred while creating pharmacist',
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async getPendingPharmacists() {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistWithPendingStatus();
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistWithPendingStatus();
 
       if (!pharmacist || pharmacist.length === 0) {
         return {
@@ -124,7 +134,8 @@ export class PharmacistService {
 
   async getApprovedPharmacists() {
     try {
-      const pharmacists = await this.pharmacistDao.fetchPharmacistsWithApprovedStatus();
+      const pharmacists =
+        await this.pharmacistDao.fetchPharmacistsWithApprovedStatus();
 
       if (!pharmacists || pharmacists.length === 0) {
         return {
@@ -145,9 +156,8 @@ export class PharmacistService {
 
   async getPharmacistByAddress(address: string) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        address,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(address);
 
       if (!pharmacist) {
         return {
@@ -210,21 +220,13 @@ export class PharmacistService {
 
   async deletePharmacist(walletAddress: string) {
     try {
-      const pharmacistExist = await this.pharmacistGuard.validatePharmacistExists(
-        walletAddress,
-      );
-      if (!pharmacistExist) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'pharmacist not found',
-        };
-      }
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
 
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
+      await this.hospitalDao.pullManyPharmacists(
+        pharmacist.hospitalIds,
         walletAddress,
       );
-      const hospitalIds = pharmacist.hospitalIds;
-      await this.hospitalDao.pullManyPharmacists(hospitalIds, walletAddress);
       await this.pharmacistDao.deletePharmacist(walletAddress);
       return {
         success: HttpStatus.OK,
@@ -232,9 +234,13 @@ export class PharmacistService {
       };
     } catch (error) {
       console.error(error);
-      if (error instanceof MongooseError)
-        throw new MongooseError(error.message);
-      throw new PharmacistError('Error deleting pharmacist');
+      throw new HttpException(
+        {
+          message: 'an error occurred while deleting pharmacist',
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -466,9 +472,8 @@ export class PharmacistService {
 
   async fetchInventory(walletAddress: string) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
 
       const inventory = pharmacist.inventory;
       if (!inventory) {
@@ -548,9 +553,8 @@ export class PharmacistService {
    */
   async fetchAllSharedPrescriptions(walletAddress: string) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
       if (!pharmacist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -585,9 +589,8 @@ export class PharmacistService {
   }) {
     const { walletAddress, prescriptionId } = args;
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
       if (!pharmacist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -717,9 +720,8 @@ export class PharmacistService {
   }) {
     const { walletAddress, prescriptionId } = args;
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
       if (!pharmacist) {
         return {
           success: HttpStatus.NOT_FOUND,
