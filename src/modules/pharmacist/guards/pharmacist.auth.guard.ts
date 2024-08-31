@@ -43,3 +43,23 @@ export class PharmacistVerificationGuard implements CanActivate {
     return true;
   }
 }
+
+export class PharmacistExist implements CanActivate {
+  constructor(private readonly pharmacistDao: PharmacistDao) {}
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const pharmacistAddress = request.query.walletAddress;
+
+    if (!pharmacistAddress) {
+      throw new ForbiddenException('Invalid request');
+    }
+
+    const pharmacist =
+      await this.pharmacistDao.fetchPharmacistByAddress(pharmacistAddress);
+
+    if (!pharmacist)
+      throw new UnauthorizedException('no associated pharmacist');
+
+    return true;
+  }
+}
