@@ -8,7 +8,6 @@ import {
 import { Model, Types } from 'mongoose';
 import {
   CreatePharmacistType,
-  InventoryType,
   MedicineType,
   ProductType,
   UpdateMedicineType,
@@ -62,10 +61,8 @@ export class PharmacistDao {
     });
   }
 
-  async createInventory(args: InventoryType) {
-    return await this.inventoryModel.create({
-      medicines: args.products,
-    });
+  async createInventory() {
+    return await this.inventoryModel.create();
   }
 
   async fetchProductById(productId: Types.ObjectId, walletAddress: string) {
