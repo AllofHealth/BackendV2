@@ -52,7 +52,11 @@ export class PharmacistController {
     walletAddress: string,
     @Body(new ValidationPipe({ transform: true })) medicine: AddMedicineDto,
   ) {
-    return await this.pharmacistService.addMedicine(walletAddress, medicine);
+    return await this.pharmacistService.addMedicine(
+      walletAddress,
+      medicine.category,
+      medicine,
+    );
   }
 
   @Post('removeMedicine')
