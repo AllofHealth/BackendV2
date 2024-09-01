@@ -84,10 +84,6 @@ export class AddMedicineDto {
   @IsNotEmpty()
   quantity: number;
 
-  @IsString()
-  @IsNotEmpty()
-  description: string;
-
   @IsOptional()
   @IsString()
   sideEffects?: string;
@@ -98,7 +94,7 @@ export class AddMedicineDto {
 
   @IsString()
   @IsNotEmpty()
-  medicineGroup: string;
+  category: string;
 }
 
 export class UpdateMedicineDto {
@@ -116,17 +112,9 @@ export class UpdateMedicineDto {
 
   @IsOptional()
   @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsString()
   sideEffects?: string;
 
   @IsOptional()
   @IsString()
   image?: string;
-
-  @IsOptional()
-  @IsString()
-  medicineGroup?: string;
 }
