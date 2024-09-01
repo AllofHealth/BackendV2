@@ -17,6 +17,7 @@ import { PharmacistDao } from './dao/pharmacist.dao';
 import { PharmacistGuard } from './guards/pharmacist.guard';
 import { PatientModule } from '@/modules/patient/patient.module';
 import { OtpModule } from '../otp/otp.module';
+import { MedicineModule } from '../medicine/medicine.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { OtpModule } from '../otp/otp.module';
     forwardRef(() => HospitalModule),
     forwardRef(() => PatientModule),
     forwardRef(() => OtpModule),
+    MedicineModule,
   ],
   providers: [PharmacistService, PharmacistDao, PharmacistGuard],
   controllers: [PharmacistController],
