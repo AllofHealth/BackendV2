@@ -26,7 +26,7 @@ import { MedicineController } from './controller/medicine.controller';
     ]),
   ],
   providers: [MedicineDao, MedicineService],
-  exports: [MedicineDao],
+  exports: [MedicineDao, MedicineService],
   controllers: [MedicineController],
 })
 export class MedicineModule {}
