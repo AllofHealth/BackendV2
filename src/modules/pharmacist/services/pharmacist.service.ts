@@ -39,9 +39,8 @@ export class PharmacistService {
   ) {}
 
   async createPharmacist(args: CreatePharmacistType) {
-    const pharmacistExists = await this.pharmacistGuard.validatePharmacistExists(
-      args.walletAddress,
-    );
+    const pharmacistExists =
+      await this.pharmacistGuard.validatePharmacistExists(args.walletAddress);
     if (pharmacistExists) {
       throw new HttpException(
         { message: 'pharmacist already exists' },
@@ -122,7 +121,8 @@ export class PharmacistService {
 
   async getPendingPharmacists() {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistWithPendingStatus();
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistWithPendingStatus();
 
       if (!pharmacist || pharmacist.length === 0) {
         return {
@@ -143,7 +143,8 @@ export class PharmacistService {
 
   async getApprovedPharmacists() {
     try {
-      const pharmacists = await this.pharmacistDao.fetchPharmacistsWithApprovedStatus();
+      const pharmacists =
+        await this.pharmacistDao.fetchPharmacistsWithApprovedStatus();
 
       if (!pharmacists || pharmacists.length === 0) {
         return {
@@ -164,9 +165,8 @@ export class PharmacistService {
 
   async getPharmacistByAddress(address: string) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        address,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(address);
 
       if (!pharmacist) {
         return {
@@ -229,9 +229,8 @@ export class PharmacistService {
 
   async deletePharmacist(walletAddress: string) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
 
       await this.hospitalDao.pullManyPharmacists(
         pharmacist.hospitalIds,
@@ -324,9 +323,8 @@ export class PharmacistService {
     args: MedicineType,
   ) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
 
       const inventory = await this.initInventory();
       pharmacist.inventory = inventory;
@@ -361,9 +359,8 @@ export class PharmacistService {
     args: MedicineType,
   ) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
 
       if (!pharmacist.inventory) {
         await this.handleNoInventoryCreated(walletAddress, category, args);
@@ -433,7 +430,22 @@ export class PharmacistService {
   }
 
   async fetchMedicine(args: FetchMedicineInterface) {
+    const { walletAddress, productId, medicineId } = args;
+
     try {
+      const medicine = await this.pharmacistDao.findMedicineById(
+        walletAddress,
+        medicineId,
+        productId,
+      );
+      if (!medicine) {
+        throw new HttpException(
+          { message: 'an error occurred while fetching medicine' },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      return medicine;
     } catch (error) {
       console.error(error);
       throw new HttpException(
@@ -482,9 +494,8 @@ export class PharmacistService {
 
   async fetchInventory(walletAddress: string) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
 
       const inventory = pharmacist.inventory;
       if (!inventory) {
@@ -514,9 +525,8 @@ export class PharmacistService {
 
   async fetchAllSharedPrescriptions(walletAddress: string) {
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
 
       const prescriptions = pharmacist.sharedPrescriptions;
       if (!prescriptions) {
@@ -542,9 +552,8 @@ export class PharmacistService {
   }) {
     const { walletAddress, prescriptionId } = args;
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
       const prescription = pharmacist.sharedPrescriptions.find(
         (prescription) =>
           prescription._id.toString() === prescriptionId.toString(),
@@ -664,9 +673,8 @@ export class PharmacistService {
   }) {
     const { walletAddress, prescriptionId } = args;
     try {
-      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
-        walletAddress,
-      );
+      const pharmacist =
+        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
       const prescription = pharmacist.sharedPrescriptions.find(
         (p) => p._id.toString() === prescriptionId.toString(),
       );
