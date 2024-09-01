@@ -80,7 +80,7 @@ export class Inventory {
   numberOfMedicineSold?: number;
 
   @Prop({ type: [{ type: ProductSchema }], unique: true })
-  products: Product[];
+  products?: Product[];
 }
 
 export const InventorySchema = SchemaFactory.createForClass(Inventory);
