@@ -2,6 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PharmacistDao } from '../dao/pharmacist.dao';
 import {
   CreatePharmacistType,
+  DeleteMedicineInterface,
+  FetchMedicineInterface,
   MedicineType,
   ProductType,
   UpdateMedicineType,
@@ -37,8 +39,9 @@ export class PharmacistService {
   ) {}
 
   async createPharmacist(args: CreatePharmacistType) {
-    const pharmacistExists =
-      await this.pharmacistGuard.validatePharmacistExists(args.walletAddress);
+    const pharmacistExists = await this.pharmacistGuard.validatePharmacistExists(
+      args.walletAddress,
+    );
     if (pharmacistExists) {
       throw new HttpException(
         { message: 'pharmacist already exists' },
@@ -119,8 +122,7 @@ export class PharmacistService {
 
   async getPendingPharmacists() {
     try {
-      const pharmacist =
-        await this.pharmacistDao.fetchPharmacistWithPendingStatus();
+      const pharmacist = await this.pharmacistDao.fetchPharmacistWithPendingStatus();
 
       if (!pharmacist || pharmacist.length === 0) {
         return {
@@ -141,8 +143,7 @@ export class PharmacistService {
 
   async getApprovedPharmacists() {
     try {
-      const pharmacists =
-        await this.pharmacistDao.fetchPharmacistsWithApprovedStatus();
+      const pharmacists = await this.pharmacistDao.fetchPharmacistsWithApprovedStatus();
 
       if (!pharmacists || pharmacists.length === 0) {
         return {
@@ -163,8 +164,9 @@ export class PharmacistService {
 
   async getPharmacistByAddress(address: string) {
     try {
-      const pharmacist =
-        await this.pharmacistDao.fetchPharmacistByAddress(address);
+      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
+        address,
+      );
 
       if (!pharmacist) {
         return {
@@ -227,8 +229,9 @@ export class PharmacistService {
 
   async deletePharmacist(walletAddress: string) {
     try {
-      const pharmacist =
-        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
+        walletAddress,
+      );
 
       await this.hospitalDao.pullManyPharmacists(
         pharmacist.hospitalIds,
@@ -321,8 +324,9 @@ export class PharmacistService {
     args: MedicineType,
   ) {
     try {
-      const pharmacist =
-        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
+        walletAddress,
+      );
 
       const inventory = await this.initInventory();
       pharmacist.inventory = inventory;
@@ -350,14 +354,16 @@ export class PharmacistService {
       console.error(error);
     }
   }
+
   async addMedicine(
     walletAddress: string,
     category: string,
     args: MedicineType,
   ) {
     try {
-      const pharmacist =
-        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
+        walletAddress,
+      );
 
       if (!pharmacist.inventory) {
         await this.handleNoInventoryCreated(walletAddress, category, args);
@@ -403,102 +409,38 @@ export class PharmacistService {
     }
   }
 
-  /**
-   * @todo: use new impl guard for authorization and validation
-   */
-  async deleteMedicine(walletAddress: string, medicineId: Types.ObjectId) {
-    // try {
-    //   const pharmacist =
-    //     await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
-    //   if (!pharmacist) {
-    //     return {
-    //       success: HttpStatus.NOT_FOUND,
-    //       message: 'pharmacist not found',
-    //     };
-    //   }
-    //   const inventory = pharmacist.inventory;
-    //   if (!inventory) {
-    //     return {
-    //       success: HttpStatus.NOT_FOUND,
-    //       message: 'inventory not found',
-    //     };
-    //   }
-    //   const medicine = await this.pharmacistDao.findMedicineById(medicineId);
-    //   if (!medicine) {
-    //     return {
-    //       success: HttpStatus.NOT_FOUND,
-    //       message: 'medicine not found',
-    //     };
-    //   }
-    //   const medicineExistInInventory = inventory.medicines.find(
-    //     (medicine: MedicineType) =>
-    //       medicine._id.toString() === medicineId.toString(),
-    //   );
-    //   if (!medicineExistInInventory) {
-    //     return {
-    //       success: HttpStatus.NOT_FOUND,
-    //       message: 'medicine not found in inventory',
-    //     };
-    //   }
-    //   inventory.numberOfMedicine -= medicine.quantity;
-    //   await this.pharmacistDao.pullMedicineById(walletAddress, medicineId);
-    //   await this.pharmacistDao.deleteMedicineById(medicineId);
-    //   await pharmacist.save();
-    //   return {
-    //     success: HttpStatus.OK,
-    //     message: 'Medicine deleted successfully',
-    //   };
-    // } catch (error) {
-    //   console.error(error);
-    //   throw new PharmacistError('Error deleting medicine');
-    // }
+  async deleteMedicine(args: DeleteMedicineInterface) {
+    const { walletAddress, productId, medicineId } = args;
+    try {
+      const result = await this.pharmacistDao.pullMedicineById(
+        walletAddress,
+        productId,
+        medicineId,
+      );
+
+      return {
+        success: HttpStatus.OK,
+        message: 'successfully deleted medication from inventory',
+        result,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        { message: 'an error occurred while deleting medication' },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  /**
-   * @todo: use new impl guard for authorization and validation
-   */
-  async fetchMedicine(walletAddress: string, medicineId: Types.ObjectId) {
-    // try {
-    //   const pharmacist =
-    //     await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
-    //   if (!pharmacist) {
-    //     return {
-    //       success: HttpStatus.NOT_FOUND,
-    //       message: 'pharmacist not found',
-    //     };
-    //   }
-    //   const inventory = pharmacist.inventory;
-    //   if (!inventory) {
-    //     return {
-    //       success: HttpStatus.NOT_FOUND,
-    //       message: 'inventory not found',
-    //     };
-    //   }
-    //   const medicine = await this.pharmacistDao.findMedicineById(medicineId);
-    //   if (!medicine) {
-    //     return {
-    //       success: HttpStatus.NOT_FOUND,
-    //       message: 'medicine not found',
-    //     };
-    //   }
-    //   const medicineExistInInventory = inventory.medicines.find(
-    //     (medicine: MedicineType) =>
-    //       medicine._id.toString() === medicineId.toString(),
-    //   );
-    //   if (!medicineExistInInventory) {
-    //     return {
-    //       success: HttpStatus.NOT_FOUND,
-    //       message: 'medicine not found in inventory',
-    //     };
-    //   }
-    //   return {
-    //     success: HttpStatus.OK,
-    //     medicine,
-    //   };
-    // } catch (error) {
-    //   console.error(error);
-    //   throw new PharmacistError('Error fetching medicine');
-    // }
+  async fetchMedicine(args: FetchMedicineInterface) {
+    try {
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        { message: 'an error occurred while fetching medication' },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   /**
@@ -540,8 +482,9 @@ export class PharmacistService {
 
   async fetchInventory(walletAddress: string) {
     try {
-      const pharmacist =
-        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
+      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
+        walletAddress,
+      );
 
       const inventory = pharmacist.inventory;
       if (!inventory) {
@@ -565,77 +508,22 @@ export class PharmacistService {
    * @todo: use new impl guard for authorization and validation
    */
   async updateMedicine(
-    walletAddress: string,
-    medicineId: Types.ObjectId,
-    args: UpdateMedicineType,
-  ) {
-    // try {
-    //   const pharmacist =
-    //     await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
-    //   if (!pharmacist) {
-    //     return {
-    //       success: HttpStatus.NOT_FOUND,
-    //       message: 'pharmacist not found',
-    //     };
-    //   }
-    //   const inventory = pharmacist.inventory;
-    //   if (!inventory) {
-    //     return {
-    //       success: HttpStatus.NOT_FOUND,
-    //       message: 'inventory not found',
-    //     };
-    //   }
-    //   const medicine = inventory.products.find(
-    //     (medicine: MedicineType) =>
-    //       medicine._id.toString() === medicineId.toString(),
-    //   );
-    //   if (!medicine) {
-    //     return {
-    //       success: HttpStatus.NOT_FOUND,
-    //       message: 'medicine not found',
-    //     };
-    //   }
-    //   const updateMedicine = await this.pharmacistDao.updateMedicine(
-    //     walletAddress,
-    //     medicineId,
-    //     args,
-    //   );
-    //   await pharmacist.save();
-    //   const totalNumberOfMedicine = inventory.medicines.reduce(
-    //     (total, medicine) => total + medicine.quantity,
-    //     0,
-    //   );
-    //   inventory.numberOfMedicine = totalNumberOfMedicine;
-    //   await pharmacist.save();
-    //   return {
-    //     success: HttpStatus.OK,
-    //     updateMedicine,
-    //   };
-    // } catch (error) {
-    //   console.error('Error updating medicine');
-    // }
-  }
+    args: FetchMedicineInterface,
+    update: UpdateMedicineType,
+  ) {}
 
-  /**
-   * @todo: use new impl guard for authorization and validation
-   */
   async fetchAllSharedPrescriptions(walletAddress: string) {
     try {
-      const pharmacist =
-        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
-      if (!pharmacist) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'pharmacist not found',
-        };
-      }
+      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
+        walletAddress,
+      );
 
       const prescriptions = pharmacist.sharedPrescriptions;
       if (!prescriptions) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'prescriptions not found',
-        };
+        throw new HttpException(
+          { message: 'prescription not found' },
+          HttpStatus.NOT_FOUND,
+        );
       }
 
       return {
@@ -648,34 +536,25 @@ export class PharmacistService {
     }
   }
 
-  /**
-   * @todo: use new impl guard for authorization and validation
-   */
   async fetchPrescriptionById(args: {
     walletAddress: string;
     prescriptionId: Types.ObjectId;
   }) {
     const { walletAddress, prescriptionId } = args;
     try {
-      const pharmacist =
-        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
-      if (!pharmacist) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'pharmacist not found',
-        };
-      }
-
+      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
+        walletAddress,
+      );
       const prescription = pharmacist.sharedPrescriptions.find(
         (prescription) =>
           prescription._id.toString() === prescriptionId.toString(),
       );
 
       if (!prescription) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'prescription not found',
-        };
+        throw new HttpException(
+          { message: 'prescription not found' },
+          HttpStatus.NOT_FOUND,
+        );
       }
 
       return {
@@ -779,33 +658,24 @@ export class PharmacistService {
     // }
   }
 
-  /**
-   * @todo: use new impl guard for authorization and validation
-   */
   async removePrescription(args: {
     walletAddress: string;
     prescriptionId: Types.ObjectId;
   }) {
     const { walletAddress, prescriptionId } = args;
     try {
-      const pharmacist =
-        await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
-      if (!pharmacist) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'pharmacist not found',
-        };
-      }
-
+      const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(
+        walletAddress,
+      );
       const prescription = pharmacist.sharedPrescriptions.find(
         (p) => p._id.toString() === prescriptionId.toString(),
       );
 
       if (!prescription) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'prescription not found',
-        };
+        throw new HttpException(
+          { message: 'prescription not found' },
+          HttpStatus.NOT_FOUND,
+        );
       }
 
       await this.pharmacistDao.pullOnePrescription(
