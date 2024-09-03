@@ -10,10 +10,11 @@ import {
   CreatePharmacistType,
   MedicineType,
   ProductType,
+  UpdateInventoryType,
   UpdateMedicineType,
   UpdatePharmacistType,
 } from '../interface/pharmacist.interface';
-import { PROFILE_PLACEHOLDER } from '@/shared/constants';
+import { MEDICINE_PLACEHOLDER, PROFILE_PLACEHOLDER } from '@/shared/constants';
 import { ApprovalStatus } from '@/shared';
 
 export class PharmacistDao {
@@ -57,7 +58,7 @@ export class PharmacistDao {
       price: args.price,
       quantity: args.quantity,
       sideEffects: args.sideEffects ? args.sideEffects : 'none',
-      image: args.image,
+      image: args.image ? args.image : MEDICINE_PLACEHOLDER,
     });
   }
 
@@ -156,6 +157,22 @@ export class PharmacistDao {
     }
 
     return null;
+  }
+
+  async updateInventory(args: {
+    walletAddress: string;
+    update: UpdateInventoryType;
+  }) {
+    const updates = Object.keys(args.update).reduce((acc, key) => {
+      acc[`inventory.${key}`] = args.update[key];
+      return acc;
+    }, {});
+
+    return await this.pharmacistModel.findOneAndUpdate(
+      { walletAddress: args.walletAddress },
+      { $set: updates },
+      { new: true, runValidators: true },
+    );
   }
 
   async findMedicineById(
