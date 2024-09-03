@@ -15,6 +15,9 @@ export class Receipt extends Document {
 
   @Prop({ required: true })
   quantity: string;
+
+  @Prop({ required: true })
+  price: string;
 }
 
 export const ReceiptSchema = SchemaFactory.createForClass(Receipt);
