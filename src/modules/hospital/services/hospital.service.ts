@@ -607,10 +607,9 @@ export class HospitalService {
         };
       }
 
-      const { regNo, ...rest } = hospital;
       const decryptedHospital = {
-        ...rest,
-        regNo: this.encryptionService.decrypt({ data: regNo }),
+        ...hospital.toObject(),
+        regNo: this.encryptionService.decrypt({ data: hospital.regNo }),
       };
 
       return {
