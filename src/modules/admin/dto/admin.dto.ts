@@ -3,7 +3,6 @@ import {
   IsEthereumAddress,
   IsMongoId,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -20,9 +19,6 @@ export class ApproveHospitalDto {
 }
 
 export class CreateAdminDto {
-  @IsNumber()
-  id: number;
-
   @IsString()
   @IsNotEmpty()
   name: string;
