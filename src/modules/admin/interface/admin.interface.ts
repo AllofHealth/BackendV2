@@ -1,5 +1,4 @@
 export interface CreateAdminType {
-  id: number;
   name: string;
   profilePicture?: string;
   email: string;
@@ -18,4 +17,9 @@ export interface UpdateAdminProfileType {
   name?: string;
   profilePicture?: string;
   email?: string;
+}
+
+export interface AuthenticateAdminInterface {
+  addressToAuthenticate: string;
+  blockchainId: number;
 }
