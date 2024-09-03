@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { MedicineDao } from '../dao/medicine.dao';
+import { CreateReceiptInterface } from '../interface/medicine.interface';
 
 @Injectable()
 export class MedicineService {
@@ -44,6 +45,26 @@ export class MedicineService {
       console.error(error);
       throw new HttpException(
         'cannot create categories',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async createReceipt(args: CreateReceiptInterface) {
+    try {
+      const receipt = await this.medicineDao.createReceipt(args);
+      if (!receipt) {
+        throw new HttpException('error creating receipt', HttpStatus.CONFLICT);
+      }
+
+      return {
+        status: HttpStatus.OK,
+        receipt,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        'cannot create receipt',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
