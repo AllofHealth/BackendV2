@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { MedicineDao } from '../dao/medicine.dao';
 import { CreateReceiptInterface } from '../interface/medicine.interface';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class MedicineService {
@@ -90,6 +91,18 @@ export class MedicineService {
       console.error(error);
       throw new HttpException(
         'cannot fetch categories',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async deletePrescriptionReceipt(id: Types.ObjectId) {
+    try {
+      return this.medicineDao.deleteReceipt(id);
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        { message: 'an error occurred while deleting receipt' },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
