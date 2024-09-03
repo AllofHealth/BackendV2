@@ -70,8 +70,12 @@ export class AdminController {
     adminAddress: string,
     @Query('adminToAuthenticate', new ValidationPipe({ transform: true }))
     walletAddress: string,
+    @Query('blockchainId') id: number,
   ) {
-    return await this.adminService.authenticateAdmin(walletAddress);
+    return await this.adminService.authenticateAdmin({
+      addressToAuthenticate: walletAddress,
+      blockchainId: id,
+    });
   }
 
   @Delete('deleteAdmin')
