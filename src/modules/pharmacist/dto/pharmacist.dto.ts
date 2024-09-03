@@ -39,10 +39,6 @@ export class CreatePharmacistDto {
   @IsNotEmpty()
   @IsEthereumAddress()
   walletAddress: string;
-
-  @IsOptional()
-  @IsString()
-  status?: string;
 }
 
 export class UpdatePharmacistDto {
