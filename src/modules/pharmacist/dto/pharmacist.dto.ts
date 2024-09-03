@@ -118,3 +118,21 @@ export class UpdateMedicineDto {
   @IsString()
   image?: string;
 }
+
+export class DispenseMedicationDto {
+  @IsNotEmpty()
+  @IsString()
+  productToDispense: string;
+
+  @IsNotEmpty()
+  @IsString()
+  directions: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  quantity: number;
+
+  @IsNotEmpty()
+  @IsString()
+  medicineId: string;
+}
