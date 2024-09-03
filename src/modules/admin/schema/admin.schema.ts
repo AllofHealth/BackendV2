@@ -5,7 +5,7 @@ export type AdminDocument = HydratedDocument<Admin>;
 
 @Schema()
 export class Admin {
-  @Prop({ required: true, unique: true })
+  @Prop({ unique: true })
   id: number;
 
   @Prop({ required: true })
