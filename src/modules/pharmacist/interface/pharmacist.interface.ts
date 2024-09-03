@@ -13,6 +13,7 @@ export interface ProductType {
   category: string;
   description?: string;
   medications: MedicineType[];
+  _id?: mongoose.Types.ObjectId;
 }
 
 export interface DeleteMedicineInterface {
@@ -33,12 +34,40 @@ export interface UpdateMedicineType {
   medicineGroup?: string;
 }
 
+export interface DispenseHelper {
+  walletAddress: string;
+  category: string;
+  productPrescribed: string;
+}
+
+export interface DispenseMedicineInterface {
+  patientAddress: string;
+  pharmacistAddress: string;
+  productToDispense: string;
+  directions: string;
+  quantity: number;
+  medicineId: Types.ObjectId;
+}
+
+export interface ReturnMedicationStatus {
+  medicineExist?: boolean;
+  categoryExist?: boolean;
+  availableMedications?: MedicineType[];
+}
+
 export interface InventoryType {
   numberOfMedicine?: number;
-  numberOfMedicineGroup?: number;
+  numberOfCategories?: number;
   numberOfMedicineSold?: number;
   products?: ProductType[];
 }
+
+export interface UpdateInventoryType {
+  numberOfMedicine?: number;
+  numberOfCategories?: number;
+  numberOfMedicineSold?: number;
+}
+
 export interface CreatePharmacistType {
   id: number;
   hospitalIds?: number;
