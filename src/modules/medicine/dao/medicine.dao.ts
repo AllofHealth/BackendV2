@@ -5,7 +5,7 @@ import {
   MedicineCategories,
   Receipt,
 } from '../schema/medicine.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import {
   CreateMedicineInterface,
   CreateReceiptInterface,
@@ -41,5 +41,9 @@ export class MedicineDao {
 
   async createCategories() {
     return await this.categories.create({ category: drugClasses });
+  }
+
+  async deleteReceipt(id: Types.ObjectId) {
+    return this.receipt.deleteOne({ _id: id });
   }
 }
