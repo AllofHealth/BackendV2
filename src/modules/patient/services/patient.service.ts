@@ -399,14 +399,6 @@ export class PatientService {
     prescriptionId: Types.ObjectId,
   ) {
     try {
-      const isPatient = await this.patientGuard.validatePatient(walletAddress);
-      if (!isPatient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'patient not found',
-        };
-      }
-
       const prescription = await this.patientModel.findOne(
         { walletAddress, 'prescriptions._id': prescriptionId },
         { 'prescriptions.$': 1 },
