@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Admin } from '../schema/admin.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import {
+  AuthenticateAdminInterface,
   CreateAdminType,
   RemoveAdminType,
   UpdateAdminProfileType,
@@ -82,7 +83,8 @@ export class AdminService {
     return await this.adminModel.find();
   }
 
-  async authenticateAdmin(addressToAuthenticate: string) {
+  async authenticateAdmin(args: AuthenticateAdminInterface) {
+    const { addressToAuthenticate, blockchainId } = args;
     try {
       const admin = await this.adminDao.fetchAdminByAddress(
         addressToAuthenticate,
@@ -95,6 +97,7 @@ export class AdminService {
       }
 
       admin.isAuthenticated = true;
+      admin.id = blockchainId;
       await admin.save();
 
       return {
