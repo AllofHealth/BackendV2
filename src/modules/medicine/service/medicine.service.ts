@@ -50,7 +50,7 @@ export class MedicineService {
     }
   }
 
-  async createReceipt(args: CreateReceiptInterface) {
+  async createPrescriptionReceipt(args: CreateReceiptInterface) {
     try {
       const receipt = await this.medicineDao.createReceipt(args);
       if (!receipt) {
