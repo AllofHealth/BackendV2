@@ -12,6 +12,7 @@ import { PharmacistService } from '../services/pharmacist.service';
 import {
   AddMedicineDto,
   CreatePharmacistDto,
+  DispenseMedicationDto,
   UpdateMedicineDto,
   UpdatePharmacistDto,
 } from '../dto/pharmacist.dto';
@@ -64,13 +65,16 @@ export class PharmacistController {
   async removeMedicine(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
+    @Query('productId', new ValidationPipe({ transform: true }))
+    productId: Types.ObjectId,
     @Query('medicineId', new ValidationPipe({ transform: true }))
     medicineId: Types.ObjectId,
   ) {
-    return await this.pharmacistService.deleteMedicine(
+    return await this.pharmacistService.deleteMedicine({
       walletAddress,
+      productId,
       medicineId,
-    );
+    });
   }
 
   @Post('updateMedicine')
@@ -80,26 +84,36 @@ export class PharmacistController {
     walletAddress: string,
     @Query('medicineId', new ValidationPipe({ transform: true }))
     medicineId: Types.ObjectId,
-    @Body() medicine: UpdateMedicineDto,
+    @Query('productId', new ValidationPipe({ transform: true }))
+    productId: Types.ObjectId,
+    @Body() data: UpdateMedicineDto,
   ) {
     return await this.pharmacistService.updateMedicine(
-      walletAddress,
-      medicineId,
-      medicine,
+      {
+        walletAddress,
+        productId,
+        medicineId,
+      },
+      data,
     );
   }
 
   @Post('dispensePrescription')
   @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
   async dispensePrescription(
-    @Query('walletAddress', new ValidationPipe({ transform: true }))
-    walletAddress: string,
-    @Query('prescriptionId', new ValidationPipe({ transform: true }))
-    prescriptionId: Types.ObjectId,
+    @Query('patientAddress', new ValidationPipe({ transform: true }))
+    patientAddress: string,
+    @Query('pharmacistAddress', new ValidationPipe({ transform: true }))
+    pharmacistAddress: string,
+    @Body() dispenseDto: DispenseMedicationDto,
   ) {
     return await this.pharmacistService.dispensePrescription({
-      walletAddress,
-      prescriptionId,
+      patientAddress,
+      pharmacistAddress,
+      productToDispense: dispenseDto.productToDispense,
+      directions: dispenseDto.directions,
+      quantity: dispenseDto.quantity,
+      medicineId: new Types.ObjectId(dispenseDto.medicineId),
     });
   }
 
@@ -150,22 +164,37 @@ export class PharmacistController {
   async getMedicine(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
+    @Query('productId', new ValidationPipe({ transform: true }))
+    productId: Types.ObjectId,
     @Query('medicineId', new ValidationPipe({ transform: true }))
     medicineId: Types.ObjectId,
   ) {
-    return await this.pharmacistService.fetchMedicine(
+    return await this.pharmacistService.fetchMedicine({
       walletAddress,
+      productId,
       medicineId,
-    );
+    });
   }
 
-  @Get('getAllMedicines')
+  @Get('getProduct')
   @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
-  async getAllMedicines(
+  async fetchProduct(
+    @Query('walletAddress') walletAddress: string,
+    @Query('productId') productId: Types.ObjectId,
+  ) {
+    return await this.pharmacistService.fetchProduct({
+      walletAddress,
+      productId,
+    });
+  }
+
+  @Get('getAllProducts')
+  @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
+  async getAllProducts(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
   ) {
-    return await this.pharmacistService.fetchAllMedicine(walletAddress);
+    return await this.pharmacistService.fetchAllProducts(walletAddress);
   }
 
   @Get('getInventory')
