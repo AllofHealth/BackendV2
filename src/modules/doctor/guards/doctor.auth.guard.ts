@@ -33,6 +33,7 @@ export class DoctorAuthGuard implements CanActivate {
   }
 }
 
+@Injectable()
 export class DoctorVerificationGuard implements CanActivate {
   constructor(private readonly doctorDao: DoctorDao) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
