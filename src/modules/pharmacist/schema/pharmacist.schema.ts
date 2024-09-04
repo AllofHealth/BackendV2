@@ -36,7 +36,7 @@ export const ApprovalListSchema = SchemaFactory.createForClass(ApprovalList);
 
 @Schema()
 export class Medicine {
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   name: string;
 
   @Prop({ required: true })
