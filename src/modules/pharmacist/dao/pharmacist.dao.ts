@@ -63,7 +63,12 @@ export class PharmacistDao {
   }
 
   async createInventory() {
-    return await this.inventoryModel.create();
+    const inventory = await this.inventoryModel.create({
+      numberOfMedicines: 0,
+      numberOfCategories: 0,
+      products: [Product],
+    });
+    return inventory;
   }
 
   async fetchProductById(productId: Types.ObjectId, walletAddress: string) {
