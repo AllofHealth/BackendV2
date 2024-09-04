@@ -29,6 +29,7 @@ export class PharmacistAuthGuard implements CanActivate {
   }
 }
 
+@Injectable()
 export class PharmacistVerificationGuard implements CanActivate {
   constructor(private readonly pharmacistDao: PharmacistDao) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -44,6 +45,7 @@ export class PharmacistVerificationGuard implements CanActivate {
   }
 }
 
+@Injectable()
 export class PharmacistExist implements CanActivate {
   constructor(private readonly pharmacistDao: PharmacistDao) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
