@@ -183,7 +183,7 @@ let PharmacistService = class PharmacistService {
             console.error(error);
             throw new common_1.HttpException({
                 message: 'an error occurred while deleting pharmacist',
-                error: error.message,
+                error: error,
             }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -193,7 +193,9 @@ let PharmacistService = class PharmacistService {
             await this.medicineService.addNewCategory(category);
             return 'none';
         }
-        return drugCategory.description;
+        const description = drugCategory.description;
+        console.log(description);
+        return description;
     }
     capitalizeFirstLetter(word) {
         if (!word)
@@ -221,7 +223,7 @@ let PharmacistService = class PharmacistService {
             const inventory = await this.pharmacistDao.createInventory();
             if (!inventory)
                 throw new common_1.HttpException('an error occurred while creating inventory', common_1.HttpStatus.BAD_REQUEST);
-            return inventory[0];
+            return inventory;
         }
         catch (error) {
             console.error(error);
@@ -243,6 +245,7 @@ let PharmacistService = class PharmacistService {
                 description: await this.fetchClassDescription(category),
                 medications: [medicine],
             });
+            console.log(product);
             if (!product) {
                 throw new common_1.HttpException({
                     message: 'an error occurred while adding medication to inventory',
@@ -280,6 +283,7 @@ let PharmacistService = class PharmacistService {
             const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
             if (!pharmacist.inventory) {
                 await this.handleNoInventoryCreated(walletAddress, category, args);
+                await pharmacist.save();
             }
             else {
                 const medicine = await this.initMedication(args);
@@ -383,7 +387,10 @@ let PharmacistService = class PharmacistService {
         }
         catch (error) {
             console.error(error);
-            throw new common_1.HttpException({ message: 'an error occurred while fetching product' }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new common_1.HttpException({
+                message: 'an error occurred while fetching product',
+                error: error.message,
+            }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async fetchInventory(walletAddress) {

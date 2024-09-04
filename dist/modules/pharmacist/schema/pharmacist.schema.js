@@ -55,7 +55,7 @@ let Medicine = class Medicine {
 };
 exports.Medicine = Medicine;
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: true, unique: true }),
     __metadata("design:type", String)
 ], Medicine.prototype, "name", void 0);
 __decorate([

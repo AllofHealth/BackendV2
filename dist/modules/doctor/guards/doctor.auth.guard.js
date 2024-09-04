@@ -38,7 +38,7 @@ exports.DoctorAuthGuard = DoctorAuthGuard = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [doctor_dao_1.DoctorDao])
 ], DoctorAuthGuard);
-class DoctorVerificationGuard {
+let DoctorVerificationGuard = class DoctorVerificationGuard {
     constructor(doctorDao) {
         this.doctorDao = doctorDao;
     }
@@ -51,6 +51,10 @@ class DoctorVerificationGuard {
         }
         return true;
     }
-}
+};
 exports.DoctorVerificationGuard = DoctorVerificationGuard;
+exports.DoctorVerificationGuard = DoctorVerificationGuard = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [doctor_dao_1.DoctorDao])
+], DoctorVerificationGuard);
 //# sourceMappingURL=doctor.auth.guard.js.map

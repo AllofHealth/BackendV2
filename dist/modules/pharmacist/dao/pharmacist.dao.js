@@ -57,7 +57,12 @@ let PharmacistDao = class PharmacistDao {
         });
     }
     async createInventory() {
-        return await this.inventoryModel.create();
+        const inventory = await this.inventoryModel.create({
+            numberOfMedicines: 0,
+            numberOfCategories: 0,
+            products: [pharmacist_schema_1.Product],
+        });
+        return inventory;
     }
     async fetchProductById(productId, walletAddress) {
         const result = await this.pharmacistModel.findOne({

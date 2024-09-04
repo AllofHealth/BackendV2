@@ -35,7 +35,7 @@ exports.PharmacistAuthGuard = PharmacistAuthGuard = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [pharmacist_dao_1.PharmacistDao])
 ], PharmacistAuthGuard);
-class PharmacistVerificationGuard {
+let PharmacistVerificationGuard = class PharmacistVerificationGuard {
     constructor(pharmacistDao) {
         this.pharmacistDao = pharmacistDao;
     }
@@ -48,9 +48,13 @@ class PharmacistVerificationGuard {
         }
         return true;
     }
-}
+};
 exports.PharmacistVerificationGuard = PharmacistVerificationGuard;
-class PharmacistExist {
+exports.PharmacistVerificationGuard = PharmacistVerificationGuard = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [pharmacist_dao_1.PharmacistDao])
+], PharmacistVerificationGuard);
+let PharmacistExist = class PharmacistExist {
     constructor(pharmacistDao) {
         this.pharmacistDao = pharmacistDao;
     }
@@ -65,6 +69,10 @@ class PharmacistExist {
             throw new common_1.UnauthorizedException('no associated pharmacist');
         return true;
     }
-}
+};
 exports.PharmacistExist = PharmacistExist;
+exports.PharmacistExist = PharmacistExist = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [pharmacist_dao_1.PharmacistDao])
+], PharmacistExist);
 //# sourceMappingURL=pharmacist.auth.guard.js.map

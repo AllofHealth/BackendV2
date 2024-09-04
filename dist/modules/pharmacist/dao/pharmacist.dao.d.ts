@@ -40,9 +40,9 @@ export declare class PharmacistDao {
     createMedicine(args: MedicineType): Promise<import("mongoose").Document<unknown, {}, Medicine> & Medicine & {
         _id: Types.ObjectId;
     }>;
-    createInventory(): Promise<(import("mongoose").Document<unknown, {}, Inventory> & Inventory & {
+    createInventory(): Promise<import("mongoose").Document<unknown, {}, Inventory> & Inventory & {
         _id: Types.ObjectId;
-    })[]>;
+    }>;
     fetchProductById(productId: Types.ObjectId, walletAddress: string): Promise<Product>;
     fetchPharmacist(id: number): Promise<import("mongoose").Document<unknown, {}, Pharmacist> & Pharmacist & {
         _id: Types.ObjectId;
