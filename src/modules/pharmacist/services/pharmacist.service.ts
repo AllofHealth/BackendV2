@@ -246,7 +246,7 @@ export class PharmacistService {
       throw new HttpException(
         {
           message: 'an error occurred while deleting pharmacist',
-          error: error.message,
+          error: error,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -263,8 +263,10 @@ export class PharmacistService {
       await this.medicineService.addNewCategory(category);
       return 'none';
     }
+    const description = drugCategory.description;
+    console.log(description);
 
-    return drugCategory.description;
+    return description;
   }
 
   private capitalizeFirstLetter(word: string) {
@@ -304,7 +306,7 @@ export class PharmacistService {
           HttpStatus.BAD_REQUEST,
         );
 
-      return inventory[0];
+      return inventory;
     } catch (error) {
       console.error(error);
       throw new HttpException(
@@ -336,6 +338,8 @@ export class PharmacistService {
         description: await this.fetchClassDescription(category),
         medications: [medicine],
       });
+
+      console.log(product);
 
       if (!product) {
         throw new HttpException(
@@ -400,6 +404,7 @@ export class PharmacistService {
 
       if (!pharmacist.inventory) {
         await this.handleNoInventoryCreated(walletAddress, category, args);
+        await pharmacist.save();
       } else {
         const medicine = await this.initMedication(args);
         const productIndex = pharmacist.inventory.products.findIndex(
@@ -551,7 +556,10 @@ export class PharmacistService {
     } catch (error) {
       console.error(error);
       throw new HttpException(
-        { message: 'an error occurred while fetching product' },
+        {
+          message: 'an error occurred while fetching product',
+          error: error.message,
+        },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
