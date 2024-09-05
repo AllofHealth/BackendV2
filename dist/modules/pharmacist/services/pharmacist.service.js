@@ -426,7 +426,6 @@ let PharmacistService = class PharmacistService {
             return {
                 success: common_1.HttpStatus.OK,
                 message: 'successfully updated medication',
-                data,
             };
         }
         catch (error) {
@@ -439,7 +438,7 @@ let PharmacistService = class PharmacistService {
         try {
             const inventory = await this.fetchInventory(walletAddress);
             const product = inventory.inventory.products.find((prod) => prod.category === category);
-            const medicine = product.medications.find((med) => med.name === productPrescribed);
+            const medicine = product.medications.find((med) => med.name.toLowerCase() === productPrescribed.toLowerCase());
             let returnData;
             if (product && !medicine) {
                 returnData = {

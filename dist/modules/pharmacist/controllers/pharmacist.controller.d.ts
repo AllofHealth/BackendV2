@@ -56,7 +56,6 @@ export declare class PharmacistController {
     updateMedicine(walletAddress: string, medicineId: Types.ObjectId, productId: Types.ObjectId, data: UpdateMedicineDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
-        data: import("mongoose").UpdateWriteOpResult;
     }>;
     dispensePrescription(patientAddress: string, pharmacistAddress: string, dispenseDto: DispenseMedicationDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
@@ -133,5 +132,9 @@ export declare class PharmacistController {
     getSharedPrescription(walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
         success: import("@nestjs/common").HttpStatus;
         prescription: import("../../patient/schemas/patient.schema").Prescriptions;
+    }>;
+    checkProductExist(walletAddress: string, category: string, productPrescribed: string): Promise<{
+        success: import("@nestjs/common").HttpStatus;
+        data: import("../interface/pharmacist.interface").ReturnMedicationStatus;
     }>;
 }

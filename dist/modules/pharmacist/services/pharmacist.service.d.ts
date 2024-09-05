@@ -134,7 +134,6 @@ export declare class PharmacistService {
     updateMedicine(args: FetchMedicineInterface, update: UpdateMedicineType): Promise<{
         success: HttpStatus;
         message: string;
-        data: import("mongoose").UpdateWriteOpResult;
     }>;
     checkMedicineExist(args: DispenseHelper): Promise<{
         success: HttpStatus;

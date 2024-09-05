@@ -104,6 +104,13 @@ let PharmacistController = class PharmacistController {
             prescriptionId,
         });
     }
+    async checkProductExist(walletAddress, category, productPrescribed) {
+        return await this.pharmacistService.checkMedicineExist({
+            walletAddress,
+            category,
+            productPrescribed,
+        });
+    }
 };
 exports.PharmacistController = PharmacistController;
 __decorate([
@@ -256,6 +263,16 @@ __decorate([
     __metadata("design:paramtypes", [String, mongoose_1.Types.ObjectId]),
     __metadata("design:returntype", Promise)
 ], PharmacistController.prototype, "getSharedPrescription", null);
+__decorate([
+    (0, common_1.Get)('checkProductAvailability'),
+    (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
+    __param(0, (0, common_1.Query)('walletAddress')),
+    __param(1, (0, common_1.Query)('category')),
+    __param(2, (0, common_1.Query)('medication')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, String]),
+    __metadata("design:returntype", Promise)
+], PharmacistController.prototype, "checkProductExist", null);
 exports.PharmacistController = PharmacistController = __decorate([
     (0, common_1.Controller)('pharmacist'),
     __metadata("design:paramtypes", [pharmacist_service_1.PharmacistService])
