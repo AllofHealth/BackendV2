@@ -352,6 +352,15 @@ export class PharmacistService {
 
       pharmacist.inventory.products.push(product);
       await pharmacist.save();
+
+      pharmacist.inventory.numberOfCategories = 1;
+      pharmacist.inventory.numberOfMedicine = 1;
+      await pharmacist.save();
+
+      return {
+        success: HttpStatus.OK,
+        message: 'added medication to inventory successfully',
+      };
     } catch (error) {
       console.error(error);
     }
@@ -404,7 +413,6 @@ export class PharmacistService {
 
       if (!pharmacist.inventory) {
         await this.handleNoInventoryCreated(walletAddress, category, args);
-        await pharmacist.save();
       } else {
         const medicine = await this.initMedication(args);
         const productIndex = pharmacist.inventory.products.findIndex(
@@ -424,17 +432,16 @@ export class PharmacistService {
             medicine,
           );
         }
+        pharmacist.inventory.numberOfCategories =
+          pharmacist.inventory.products.length;
+        pharmacist.inventory.numberOfMedicine++;
+        await pharmacist.save();
+
+        return {
+          success: HttpStatus.OK,
+          message: 'added medication to inventory successfully',
+        };
       }
-
-      pharmacist.inventory.numberOfCategories =
-        pharmacist.inventory.products.length;
-      pharmacist.inventory.numberOfMedicine++;
-      await pharmacist.save();
-
-      return {
-        success: HttpStatus.OK,
-        message: 'added medication to inventory successfully',
-      };
     } catch (error) {
       console.error(error);
       throw new HttpException(
@@ -539,8 +546,9 @@ export class PharmacistService {
           HttpStatus.NOT_FOUND,
         );
       }
-      const product = inventory.products.find(
-        (prod: ProductType) => prod._id === productId,
+      const product = await this.pharmacistDao.fetchProductById(
+        productId,
+        walletAddress,
       );
       if (!product) {
         throw new HttpException(
@@ -596,8 +604,8 @@ export class PharmacistService {
     try {
       const data = await this.pharmacistDao.updateMedicine(
         walletAddress,
-        productId,
         medicineId,
+        productId,
         update,
       );
 
@@ -611,7 +619,6 @@ export class PharmacistService {
       return {
         success: HttpStatus.OK,
         message: 'successfully updated medication',
-        data,
       };
     } catch (error) {
       console.error(error);
@@ -631,7 +638,8 @@ export class PharmacistService {
       );
 
       const medicine = product.medications.find(
-        (med: MedicineType) => med.name === productPrescribed,
+        (med: MedicineType) =>
+          med.name.toLowerCase() === productPrescribed.toLowerCase(),
       );
 
       let returnData: ReturnMedicationStatus;
@@ -847,7 +855,7 @@ export class PharmacistService {
 
       return {
         success: HttpStatus.OK,
-        message: 'dispense successfull',
+        message: 'dispense successful',
         data: {
           productName: productToDispense,
           quantity,
