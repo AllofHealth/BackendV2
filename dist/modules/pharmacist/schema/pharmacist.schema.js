@@ -113,7 +113,7 @@ __decorate([
     __metadata("design:type", Number)
 ], Inventory.prototype, "numberOfMedicineSold", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: exports.ProductSchema }], unique: true }),
+    (0, mongoose_1.Prop)({ type: [{ type: exports.ProductSchema }], unique: true, default: [] }),
     __metadata("design:type", Array)
 ], Inventory.prototype, "products", void 0);
 exports.Inventory = Inventory = __decorate([

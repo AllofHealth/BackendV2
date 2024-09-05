@@ -56,7 +56,7 @@ export declare class PharmacistController {
     updateMedicine(walletAddress: string, medicineId: Types.ObjectId, productId: Types.ObjectId, data: UpdateMedicineDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
-        data: import("../schema/pharmacist.schema").Medicine;
+        data: import("mongoose").UpdateWriteOpResult;
     }>;
     dispensePrescription(patientAddress: string, pharmacistAddress: string, dispenseDto: DispenseMedicationDto): Promise<{
         success: import("@nestjs/common").HttpStatus;

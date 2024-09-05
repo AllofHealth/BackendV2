@@ -253,6 +253,13 @@ let PharmacistService = class PharmacistService {
             }
             pharmacist.inventory.products.push(product);
             await pharmacist.save();
+            pharmacist.inventory.numberOfCategories = 1;
+            pharmacist.inventory.numberOfMedicine = 1;
+            await pharmacist.save();
+            return {
+                success: common_1.HttpStatus.OK,
+                message: 'added medication to inventory successfully',
+            };
         }
         catch (error) {
             console.error(error);
@@ -283,7 +290,6 @@ let PharmacistService = class PharmacistService {
             const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
             if (!pharmacist.inventory) {
                 await this.handleNoInventoryCreated(walletAddress, category, args);
-                await pharmacist.save();
             }
             else {
                 const medicine = await this.initMedication(args);
@@ -299,15 +305,15 @@ let PharmacistService = class PharmacistService {
                 else {
                     pharmacist.inventory.products[productIndex].medications.push(medicine);
                 }
+                pharmacist.inventory.numberOfCategories =
+                    pharmacist.inventory.products.length;
+                pharmacist.inventory.numberOfMedicine++;
+                await pharmacist.save();
+                return {
+                    success: common_1.HttpStatus.OK,
+                    message: 'added medication to inventory successfully',
+                };
             }
-            pharmacist.inventory.numberOfCategories =
-                pharmacist.inventory.products.length;
-            pharmacist.inventory.numberOfMedicine++;
-            await pharmacist.save();
-            return {
-                success: common_1.HttpStatus.OK,
-                message: 'added medication to inventory successfully',
-            };
         }
         catch (error) {
             console.error(error);
@@ -375,7 +381,7 @@ let PharmacistService = class PharmacistService {
             if (!inventory) {
                 throw new common_1.HttpException({ message: 'no products added' }, common_1.HttpStatus.NOT_FOUND);
             }
-            const product = inventory.products.find((prod) => prod._id === productId);
+            const product = await this.pharmacistDao.fetchProductById(productId, walletAddress);
             if (!product) {
                 throw new common_1.HttpException({ message: 'product not found' }, common_1.HttpStatus.NOT_FOUND);
             }
@@ -413,7 +419,7 @@ let PharmacistService = class PharmacistService {
     async updateMedicine(args, update) {
         const { walletAddress, productId, medicineId } = args;
         try {
-            const data = await this.pharmacistDao.updateMedicine(walletAddress, productId, medicineId, update);
+            const data = await this.pharmacistDao.updateMedicine(walletAddress, medicineId, productId, update);
             if (!data) {
                 throw new common_1.HttpException({ message: 'an error occurred while updating medication' }, common_1.HttpStatus.BAD_REQUEST);
             }
@@ -560,7 +566,7 @@ let PharmacistService = class PharmacistService {
             });
             return {
                 success: common_1.HttpStatus.OK,
-                message: 'dispense successfull',
+                message: 'dispense successful',
                 data: {
                     productName: productToDispense,
                     quantity,

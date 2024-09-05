@@ -62,7 +62,7 @@ export declare class PharmacistDao {
     updatePharmacist(address: string, updateData: UpdatePharmacistType): Promise<import("mongoose").Document<unknown, {}, Pharmacist> & Pharmacist & {
         _id: Types.ObjectId;
     }>;
-    updateMedicine(walletAddress: string, medicineId: Types.ObjectId, productId: Types.ObjectId, updateData: UpdateMedicineType): Promise<Medicine>;
+    updateMedicine(walletAddress: string, medicineId: Types.ObjectId, productId: Types.ObjectId, updateData: UpdateMedicineType): Promise<import("mongoose").UpdateWriteOpResult>;
     updateInventory(args: {
         walletAddress: string;
         update: UpdateInventoryType;
