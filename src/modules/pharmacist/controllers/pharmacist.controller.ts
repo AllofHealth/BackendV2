@@ -229,4 +229,18 @@ export class PharmacistController {
       prescriptionId,
     });
   }
+
+  @Get('checkProductAvailability')
+  @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
+  async checkProductExist(
+    @Query('walletAddress') walletAddress: string,
+    @Query('category') category: string,
+    @Query('medication') productPrescribed: string,
+  ) {
+    return await this.pharmacistService.checkMedicineExist({
+      walletAddress,
+      category,
+      productPrescribed,
+    });
+  }
 }
