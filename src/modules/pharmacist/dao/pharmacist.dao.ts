@@ -66,7 +66,6 @@ export class PharmacistDao {
     const inventory = await this.inventoryModel.create({
       numberOfMedicines: 0,
       numberOfCategories: 0,
-      products: [Product],
     });
     return inventory;
   }
@@ -131,37 +130,29 @@ export class PharmacistDao {
     updateData: UpdateMedicineType,
   ) {
     const updates = Object.keys(updateData).reduce((acc, key) => {
-      acc[`inventory.products.$[product].medications.$[medication].${key}`] =
-        updateData[key];
+      acc[
+        `inventory.products.$[productElem].medications.$[medicineElem].${key}`
+      ] = updateData[key];
       return acc;
     }, {});
 
-    const result = await this.pharmacistModel.findOneAndUpdate(
-      { walletAddress },
+    const result = await this.pharmacistModel.updateOne(
+      {
+        walletAddress,
+        'inventory.products._id': productId,
+      },
       { $set: updates },
       {
         new: true,
         runValidators: true,
         arrayFilters: [
-          { 'product._id': productId },
-          { 'medication._id': medicineId },
+          { 'productElem._id': productId },
+          { 'medicineElem._id': medicineId },
         ],
-        projection: {
-          'inventory.products': {
-            $elemMatch: { _id: productId },
-          },
-        },
       },
     );
 
-    if (result && result.inventory.products[0]) {
-      const updatedMedication = result.inventory.products[0].medications.find(
-        (med: MedicineType) => med._id.toString() === medicineId.toString(),
-      );
-      return updatedMedication;
-    }
-
-    return null;
+    return result;
   }
 
   async updateInventory(args: {
@@ -185,19 +176,13 @@ export class PharmacistDao {
     medicineId: Types.ObjectId,
     productId: Types.ObjectId,
   ) {
-    const result = await this.pharmacistModel.findOne(
-      { walletAddress: walletAddress, 'inventory.products._id': productId },
-      { 'inventory.products.$': 1 },
+    const product = await this.fetchProductById(productId, walletAddress);
+
+    const medicine = product.medications.find(
+      (med: MedicineType) => med._id.toString() === medicineId.toString(),
     );
 
-    if (result && result.inventory.products[0]) {
-      const medicine = result.inventory.products[0].medications.find(
-        (med: MedicineType) => med._id === medicineId,
-      );
-      return medicine;
-    }
-
-    return null;
+    return medicine;
   }
 
   async pullMedicineById(
