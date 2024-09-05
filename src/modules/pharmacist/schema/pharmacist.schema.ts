@@ -79,7 +79,7 @@ export class Inventory {
   @Prop({ default: 0 })
   numberOfMedicineSold?: number;
 
-  @Prop({ type: [{ type: ProductSchema }], unique: true })
+  @Prop({ type: [{ type: ProductSchema }], unique: true, default: [] })
   products?: Product[];
 }
 
