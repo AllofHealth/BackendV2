@@ -237,6 +237,25 @@ export class AdminService {
     }
   }
 
+  async editAdmin(args: { walletAddress: string; replaceAddress: string }) {
+    try {
+      const admin = await this.adminDao.fetchAdminByAddress(args.walletAddress);
+      admin.walletAddress = args.replaceAddress;
+      admin.isVerified = true;
+      await admin.save();
+      return {
+        success: HttpStatus.OK,
+        message: 'modification completed',
+      };
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        'an error occurred while editing admin',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async fetchAllPractitioners() {
     try {
       const allDoctors = await this.doctorDao.fetchAllDoctors();

@@ -12,7 +12,6 @@ export class AdminAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-
     const adminAddress = request.query.adminAddress;
 
     if (!adminAddress) {

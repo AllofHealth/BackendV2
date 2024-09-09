@@ -78,6 +78,15 @@ export class AdminController {
     });
   }
 
+  @Post('modifyAdminAddress')
+  @UseGuards(AdminAuthGuard)
+  async modifyAddress(
+    @Query('adminAddress') walletAddress: string,
+    @Query('replaceAddress') replaceAddress: string,
+  ) {
+    return await this.adminService.editAdmin({ walletAddress, replaceAddress });
+  }
+
   @Delete('deleteAdmin')
   @UseGuards(AdminAuthGuard)
   async deleteAdmin(
