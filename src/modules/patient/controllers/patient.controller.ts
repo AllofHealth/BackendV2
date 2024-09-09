@@ -36,6 +36,7 @@ export class PatientController {
   }
 
   @Post('updatePatient')
+  @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async updatePatient(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,

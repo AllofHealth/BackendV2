@@ -328,14 +328,6 @@ export class PatientService {
 
   async updatePatient(walletAddress: string, args: UpdatePatientProfileType) {
     try {
-      const patientExist =
-        await this.patientGuard.validatePatient(walletAddress);
-      if (!patientExist) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'Patient not found',
-        };
-      }
       await this.patientDao.updatePatient(walletAddress, args);
       return {
         success: HttpStatus.OK,

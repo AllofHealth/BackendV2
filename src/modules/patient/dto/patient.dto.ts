@@ -73,11 +73,12 @@ export class UpdatePatientProfileDto {
   @IsOptional()
   @IsEmail()
   @IsString()
-  email: string;
+  email?: string;
 
+  @IsOptional()
   @IsString()
   @IsPhoneNumber()
-  phoneNo: string;
+  phoneNo?: string;
 
   @IsOptional()
   @IsString()
