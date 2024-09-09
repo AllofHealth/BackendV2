@@ -120,12 +120,7 @@ export declare class PatientController {
     }>;
     getAllMedicalRecords(walletAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
-        message: string;
-        medicalRecords?: undefined;
-    } | {
-        success: import("@nestjs/common").HttpStatus;
         medicalRecords: import("../schemas/patient.schema").MedicalRecordPreviewDocument[];
-        message?: undefined;
     }>;
     getFamilyMemberMedicalRecords(principalPatientAddress: string, familyMemberId: number): Promise<{
         success: import("@nestjs/common").HttpStatus;

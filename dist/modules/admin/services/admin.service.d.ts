@@ -91,6 +91,13 @@ export declare class AdminService {
         success: HttpStatus;
         message: string;
     }>;
+    editAdmin(args: {
+        walletAddress: string;
+        replaceAddress: string;
+    }): Promise<{
+        success: HttpStatus;
+        message: string;
+    }>;
     fetchAllPractitioners(): Promise<{
         success: HttpStatus;
         allPractitioners: any[];

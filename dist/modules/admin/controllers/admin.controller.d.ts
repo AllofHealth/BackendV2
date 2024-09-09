@@ -64,6 +64,10 @@ export declare class AdminController {
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
+    modifyAddress(walletAddress: string, replaceAddress: string): Promise<{
+        success: import("@nestjs/common").HttpStatus;
+        message: string;
+    }>;
     deleteAdmin(adminAddressToAuthorize: string, adminAddressToRemove: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;

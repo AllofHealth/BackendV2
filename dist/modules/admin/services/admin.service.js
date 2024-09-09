@@ -211,6 +211,22 @@ let AdminService = class AdminService {
             throw new shared_1.AdminError('Error updating admin');
         }
     }
+    async editAdmin(args) {
+        try {
+            const admin = await this.adminDao.fetchAdminByAddress(args.walletAddress);
+            admin.walletAddress = args.replaceAddress;
+            admin.isVerified = true;
+            await admin.save();
+            return {
+                success: common_1.HttpStatus.OK,
+                message: 'modification completed',
+            };
+        }
+        catch (error) {
+            console.error(error);
+            throw new common_1.HttpException('an error occurred while editing admin', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     async fetchAllPractitioners() {
         try {
             const allDoctors = await this.doctorDao.fetchAllDoctors();

@@ -49,6 +49,9 @@ let AdminController = class AdminController {
             blockchainId: id,
         });
     }
+    async modifyAddress(walletAddress, replaceAddress) {
+        return await this.adminService.editAdmin({ walletAddress, replaceAddress });
+    }
     async deleteAdmin(adminAddressToAuthorize, adminAddressToRemove) {
         return await this.adminService.removeAdmin({ adminAddressToRemove });
     }
@@ -107,6 +110,15 @@ __decorate([
     __metadata("design:paramtypes", [String, String, Number]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "authenticateAdmin", null);
+__decorate([
+    (0, common_1.Post)('modifyAdminAddress'),
+    (0, common_1.UseGuards)(admin_auth_guard_1.AdminAuthGuard),
+    __param(0, (0, common_1.Query)('adminAddress')),
+    __param(1, (0, common_1.Query)('replaceAddress')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "modifyAddress", null);
 __decorate([
     (0, common_1.Delete)('deleteAdmin'),
     (0, common_1.UseGuards)(admin_auth_guard_1.AdminAuthGuard),

@@ -525,14 +525,8 @@ let PatientService = class PatientService {
     }
     async fetchAllMedicalRecords(patientAddress) {
         try {
-            const patient = await this.patientDao.fetchPatientByAddress(patientAddress);
-            if (!patient) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'patient not found',
-                };
-            }
-            const medicalRecords = patient.medicalRecords;
+            const patient = await this.fetchPatientByWalletAddress(patientAddress);
+            const medicalRecords = patient.patient.medicalRecords;
             if (!medicalRecords) {
                 return {
                     success: common_1.HttpStatus.OK,

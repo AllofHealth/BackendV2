@@ -151,12 +151,7 @@ export declare class PatientService {
     }>;
     fetchAllMedicalRecords(patientAddress: string): Promise<{
         success: HttpStatus;
-        message: string;
-        medicalRecords?: undefined;
-    } | {
-        success: HttpStatus;
         medicalRecords: import("../schemas/patient.schema").MedicalRecordPreviewDocument[];
-        message?: undefined;
     }>;
     fetchAllMedicalRecordsForFamilyMember(args: {
         principalPatientAddress: string;
