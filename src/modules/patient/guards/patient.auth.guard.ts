@@ -20,6 +20,7 @@ export class PatientAuthGuard implements CanActivate {
   }
 }
 
+@Injectable()
 export class PatientVerificationGuard implements CanActivate {
   constructor(private readonly patientDao: PatientDao) {}
 
