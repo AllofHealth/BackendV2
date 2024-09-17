@@ -117,8 +117,7 @@ export class DoctorService {
         };
       }
 
-      let doctor = await this.doctorDao.createNewDoctor(args);
-      doctor = await this.doctorDao.fetchDoctorByAddress(args.walletAddress);
+      const doctor = await this.doctorDao.createNewDoctor(args);
 
       if (args.walletAddress === hospital.admin) {
         doctor.status = ApprovalStatus.Approved;
@@ -133,16 +132,17 @@ export class DoctorService {
       }
 
       const doctorPreview = {
+        id: doctor.id,
         walletAddress: doctor.walletAddress,
         hospitalIds: doctor.hospitalIds,
         profilePicture: doctor.profilePicture,
         name: doctor.name,
         status: doctor.status,
         category: Category.Doctor,
-      };
+      } as PreviewType;
 
       try {
-        hospital.doctors.push(doctorPreview as PreviewType);
+        hospital.doctors.push(doctorPreview);
         await this.otpService.deliverOtp(
           args.walletAddress,
           doctor.email,
