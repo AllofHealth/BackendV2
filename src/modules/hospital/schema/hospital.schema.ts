@@ -77,10 +77,10 @@ export class Hospital {
   @Prop({ required: true })
   description: string;
 
-  @Prop({ type: [{ type: DoctorSchema }] })
+  @Prop()
   doctors: PreviewType[];
 
-  @Prop({ type: [{ type: PharmacistSchema }] })
+  @Prop()
   pharmacists: PreviewType[];
 
   @Prop({ required: true, default: 'pending' })
