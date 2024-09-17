@@ -23,6 +23,7 @@ export interface CreateHospitalType {
 }
 
 export interface PreviewType {
+  id: number;
   walletAddress: string;
   profilePicture: string;
   name: string;
