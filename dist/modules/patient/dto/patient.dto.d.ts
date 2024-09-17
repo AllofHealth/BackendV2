@@ -41,8 +41,8 @@ export declare class UpdatePatientProfileDto {
     name?: string;
     lastName?: string;
     age?: string;
-    email: string;
-    phoneNo: string;
+    email?: string;
+    phoneNo?: string;
     profilePicture?: string;
     address?: string;
     city?: string;

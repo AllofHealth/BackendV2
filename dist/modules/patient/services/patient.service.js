@@ -260,13 +260,6 @@ let PatientService = class PatientService {
     }
     async updatePatient(walletAddress, args) {
         try {
-            const patientExist = await this.patientGuard.validatePatient(walletAddress);
-            if (!patientExist) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'Patient not found',
-                };
-            }
             await this.patientDao.updatePatient(walletAddress, args);
             return {
                 success: common_1.HttpStatus.OK,

@@ -120,6 +120,7 @@ __decorate([
 ], PatientController.prototype, "createNewPatient", null);
 __decorate([
     (0, common_1.Post)('updatePatient'),
+    (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
     __param(0, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(1, (0, common_1.Body)(new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
