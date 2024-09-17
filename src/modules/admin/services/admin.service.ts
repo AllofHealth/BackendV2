@@ -20,6 +20,7 @@ import { OtpService } from '@/modules/otp/services/otp.service';
 @Injectable()
 export class AdminService {
   private logger: MyLoggerService = new MyLoggerService('AdminService');
+
   constructor(
     @InjectModel(Admin.name) private adminModel: Model<Admin>,
     private readonly adminDao: AdminDao,
@@ -278,4 +279,5 @@ export class AdminService {
       throw new AdminError('Error fetching practitioners');
     }
   }
+
 }
