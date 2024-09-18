@@ -24,7 +24,9 @@ import {
   PharmacistVerificationGuard,
 } from '../guards/pharmacist.auth.guard';
 import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('pharmacist')
 @Controller('pharmacist')
 export class PharmacistController {
   private readonly logger = new MyLoggerService(PharmacistController.name);
