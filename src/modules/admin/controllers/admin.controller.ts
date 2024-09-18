@@ -12,7 +12,9 @@ import { AdminService } from '../services/admin.service';
 import { CreateAdminDto, UpdateAdminDto } from '../dto/admin.dto';
 import { Types } from 'mongoose';
 import { AdminAuthGuard } from '../guards/admin.auth.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('admin')
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
