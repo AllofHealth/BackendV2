@@ -25,7 +25,7 @@ import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
 
 @Controller('doctor')
 export class DoctorController {
-  private readonly logger = new MyLoggerService();
+  private readonly logger = new MyLoggerService(DoctorController.name);
 
   constructor(private readonly doctorService: DoctorService) {}
 
