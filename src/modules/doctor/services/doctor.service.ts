@@ -23,9 +23,12 @@ import { PatientGuard } from '@/modules/patient/guards/patient.guard';
 import { OtpService } from '@/modules/otp/services/otp.service';
 import { MedicineDao } from '@/modules/medicine/dao/medicine.dao';
 import { Medication } from '@/modules/medicine/schema/medicine.schema';
+import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
 
 @Injectable()
 export class DoctorService {
+  private readonly logger = new MyLoggerService('DoctorService');
+
   constructor(
     private readonly doctorDao: DoctorDao,
     private readonly doctorGuard: DoctorGuard,
@@ -636,6 +639,25 @@ export class DoctorService {
       console.error(error);
       throw new DoctorError(
         'An error occurred while deleting all approval requests',
+      );
+    }
+  }
+
+  async swapId(walletAddress: string, id: number) {
+    try {
+      const doctor = await this.doctorDao.fetchDoctorByAddress(walletAddress);
+      doctor.id = id;
+      await doctor.save();
+
+      return {
+        success: HttpStatus.OK,
+        message: 'swapped id successfully',
+      };
+    } catch (e) {
+      this.logger.error(e);
+      throw new HttpException(
+        'an error occurred while swapping id',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
