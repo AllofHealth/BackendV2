@@ -58,6 +58,9 @@ let DoctorController = class DoctorController {
             diagnosis: createMedicalRecordDto.diagnosis,
         });
     }
+    async swapId(walletAddress, id) {
+        return await this.doctorService.swapId(walletAddress, id);
+    }
     async deleteAllApprovalRequests(walletAddress) {
         return await this.doctorService.deleteAllApprovalRequests(walletAddress);
     }
@@ -137,6 +140,14 @@ __decorate([
     __metadata("design:paramtypes", [String, String, doctor_dto_1.CreateMedicalRecordDto]),
     __metadata("design:returntype", Promise)
 ], DoctorController.prototype, "createMedicalRecordPreview", null);
+__decorate([
+    (0, common_1.Post)('swapId'),
+    __param(0, (0, common_1.Query)('walletAddress')),
+    __param(1, (0, common_1.Query)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Number]),
+    __metadata("design:returntype", Promise)
+], DoctorController.prototype, "swapId", null);
 __decorate([
     (0, common_1.Post)('deleteAllApprovalRequests'),
     (0, common_1.UseGuards)(doctor_auth_guard_1.DoctorAuthGuard, doctor_auth_guard_1.DoctorVerificationGuard),

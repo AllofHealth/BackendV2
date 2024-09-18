@@ -37,6 +37,7 @@ export interface CreateHospitalType {
     regNo: string;
 }
 export interface PreviewType {
+    id: number;
     walletAddress: string;
     profilePicture: string;
     name: string;

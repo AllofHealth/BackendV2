@@ -25,7 +25,6 @@
 import { HttpStatus } from '@nestjs/common';
 import { Hospital } from '../schema/hospital.schema';
 import { Model, Types } from 'mongoose';
-import { HospitalGuard } from '../guard/hospital.guard';
 import { ApprovePractitionerType, CreateHospitalType, HospitalType, JoinHospitalType, PreviewType, RemovePractitionerType, UpdateHospitalProfileType } from '../interface/hospital.interface';
 import { ErrorCodes } from '@/shared';
 import { HospitalDao } from '../dao/hospital.dao';
@@ -38,7 +37,6 @@ import { EncryptionService } from '@/shared/utils/encryption/service/encryption.
 export declare class HospitalService {
     private hospitalModel;
     private readonly hospitalDao;
-    private readonly hospitalGuard;
     private readonly doctorDao;
     private readonly pharmacistDao;
     private readonly doctorGuard;
@@ -46,7 +44,7 @@ export declare class HospitalService {
     private readonly otpService;
     private readonly encryptionService;
     private logger;
-    constructor(hospitalModel: Model<Hospital>, hospitalDao: HospitalDao, hospitalGuard: HospitalGuard, doctorDao: DoctorDao, pharmacistDao: PharmacistDao, doctorGuard: DoctorGuard, pharmacistGuard: PharmacistGuard, otpService: OtpService, encryptionService: EncryptionService);
+    constructor(hospitalModel: Model<Hospital>, hospitalDao: HospitalDao, doctorDao: DoctorDao, pharmacistDao: PharmacistDao, doctorGuard: DoctorGuard, pharmacistGuard: PharmacistGuard, otpService: OtpService, encryptionService: EncryptionService);
     createNewHospital(args: CreateHospitalType): Promise<{
         success: HttpStatus;
         message: string;

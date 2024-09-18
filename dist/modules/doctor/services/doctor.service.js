@@ -20,6 +20,7 @@ const patient_dao_1 = require("../../patient/dao/patient.dao");
 const patient_guard_1 = require("../../patient/guards/patient.guard");
 const otp_service_1 = require("../../otp/services/otp.service");
 const medicine_dao_1 = require("../../medicine/dao/medicine.dao");
+const my_logger_service_1 = require("../../my-logger/my-logger.service");
 let DoctorService = class DoctorService {
     constructor(doctorDao, doctorGuard, hospitalDao, patientDao, patientGuard, otpService, medicineDao) {
         this.doctorDao = doctorDao;
@@ -29,6 +30,7 @@ let DoctorService = class DoctorService {
         this.patientGuard = patientGuard;
         this.otpService = otpService;
         this.medicineDao = medicineDao;
+        this.logger = new my_logger_service_1.MyLoggerService('DoctorService');
     }
     async getPendingDoctors() {
         try {
@@ -96,8 +98,7 @@ let DoctorService = class DoctorService {
                     message: 'Hospital not found',
                 };
             }
-            let doctor = await this.doctorDao.createNewDoctor(args);
-            doctor = await this.doctorDao.fetchDoctorByAddress(args.walletAddress);
+            const doctor = await this.doctorDao.createNewDoctor(args);
             if (args.walletAddress === hospital.admin) {
                 doctor.status = shared_1.ApprovalStatus.Approved;
                 await doctor.save();
@@ -110,6 +111,7 @@ let DoctorService = class DoctorService {
                 throw new Error('Error adding doctor');
             }
             const doctorPreview = {
+                id: doctor.id,
                 walletAddress: doctor.walletAddress,
                 hospitalIds: doctor.hospitalIds,
                 profilePicture: doctor.profilePicture,
@@ -516,6 +518,21 @@ let DoctorService = class DoctorService {
         catch (error) {
             console.error(error);
             throw new shared_1.DoctorError('An error occurred while deleting all approval requests');
+        }
+    }
+    async swapId(walletAddress, id) {
+        try {
+            const doctor = await this.doctorDao.fetchDoctorByAddress(walletAddress);
+            doctor.id = id;
+            await doctor.save();
+            return {
+                success: common_1.HttpStatus.OK,
+                message: 'swapped id successfully',
+            };
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new common_1.HttpException('an error occurred while swapping id', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };

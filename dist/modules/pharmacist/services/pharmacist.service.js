@@ -46,6 +46,7 @@ let PharmacistService = class PharmacistService {
             const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(args.walletAddress);
             pharmacist.hospitalIds.push(args.hospitalIds);
             const pharmacistPreview = {
+                id: pharmacist.id,
                 walletAddress: pharmacist.walletAddress,
                 hospitalIds: pharmacist.hospitalIds,
                 profilePicture: pharmacist.profilePicture,

@@ -66,6 +66,10 @@ export declare class DoctorController {
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
+    swapId(walletAddress: string, id: number): Promise<{
+        success: import("@nestjs/common").HttpStatus;
+        message: string;
+    }>;
     deleteAllApprovalRequests(walletAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;

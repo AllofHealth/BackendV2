@@ -40,6 +40,7 @@ export declare class DoctorService {
     private readonly patientGuard;
     private readonly otpService;
     private readonly medicineDao;
+    private readonly logger;
     constructor(doctorDao: DoctorDao, doctorGuard: DoctorGuard, hospitalDao: HospitalDao, patientDao: PatientDao, patientGuard: PatientGuard, otpService: OtpService, medicineDao: MedicineDao);
     getPendingDoctors(): Promise<{
         success: HttpStatus;
@@ -123,6 +124,10 @@ export declare class DoctorService {
         message: string;
     }>;
     deleteAllApprovalRequests(walletAddress: string): Promise<{
+        success: HttpStatus;
+        message: string;
+    }>;
+    swapId(walletAddress: string, id: number): Promise<{
         success: HttpStatus;
         message: string;
     }>;
