@@ -22,7 +22,9 @@ import {
   DoctorVerificationGuard,
 } from '../guards/doctor.auth.guard';
 import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('doctor')
 @Controller('doctor')
 export class DoctorController {
   private readonly logger = new MyLoggerService(DoctorController.name);
