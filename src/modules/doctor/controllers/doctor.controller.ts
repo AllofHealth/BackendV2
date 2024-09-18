@@ -113,6 +113,14 @@ export class DoctorController {
     });
   }
 
+  @Post('swapId')
+  async swapId(
+    @Query('walletAddress') walletAddress: string,
+    @Query('id') id: number,
+  ) {
+    return await this.doctorService.swapId(walletAddress, id);
+  }
+
   @Post('deleteAllApprovalRequests')
   @UseGuards(DoctorAuthGuard, DoctorVerificationGuard)
   async deleteAllApprovalRequests(
