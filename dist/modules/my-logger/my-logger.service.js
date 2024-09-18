@@ -8,14 +8,42 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MyLoggerService = void 0;
 const common_1 = require("@nestjs/common");
+const fs = require("fs");
+const fsPromises = require("fs/promises");
+const path = require("path");
 let MyLoggerService = class MyLoggerService extends common_1.ConsoleLogger {
+    async logToFile(entry) {
+        const formattedEntry = `${Intl.DateTimeFormat('en-US', {
+            timeZone: 'Africa/Lagos',
+            dateStyle: 'short',
+            timeStyle: 'short',
+        }).format(new Date())}\t${entry}\n`;
+        try {
+            const logsDir = path.resolve(__dirname, '..', '..', 'logs');
+            const pathExist = fs.existsSync(logsDir);
+            if (!pathExist) {
+                await fsPromises.mkdir(logsDir, { recursive: true });
+            }
+            const logFilePath = path.join(logsDir, 'myLogFile.log');
+            await fsPromises.appendFile(logFilePath, formattedEntry);
+        }
+        catch (e) {
+            console.error('Error writing to the log file:', e);
+        }
+    }
     log(message, context) {
+        const entry = `${context}\t${message}`;
+        this.logToFile(entry);
         super.log(message, context);
     }
     error(message, stackOrContext) {
+        const entry = `${stackOrContext}\t${message}`;
+        this.logToFile(entry);
         super.error(message, stackOrContext);
     }
     info(message, context) {
+        const entry = `${context}\t${message}`;
+        this.logToFile(entry);
         super.verbose(message, context);
     }
 };

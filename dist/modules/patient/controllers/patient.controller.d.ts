@@ -27,8 +27,9 @@ import { CreateApprovalDto, CreateFamilyMemberApprovalDto, CreateFamilyMemberDto
 import { Types } from 'mongoose';
 export declare class PatientController {
     private readonly patientService;
+    private readonly logger;
     constructor(patientService: PatientService);
-    createNewPatient(createPatientType: CreatePatientDto): Promise<{
+    createNewPatient(ip: string, createPatientType: CreatePatientDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
         patient?: undefined;
@@ -39,15 +40,15 @@ export declare class PatientController {
         };
         message: string;
     }>;
-    updatePatient(walletAddress: string, updatePatientDto: UpdatePatientProfileDto): Promise<{
+    updatePatient(ip: string, walletAddress: string, updatePatientDto: UpdatePatientProfileDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    createFamilyMember(walletAddress: string, createFamilyMemberDto: CreateFamilyMemberDto): Promise<{
+    createFamilyMember(ip: string, walletAddress: string, createFamilyMemberDto: CreateFamilyMemberDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    updateFamilyMember(walletAddress: string, familyMemberId: number, updateFamilyMemberDto: UpdateFamilyMemberDto): Promise<{
+    updateFamilyMember(ip: string, walletAddress: string, familyMemberId: number, updateFamilyMemberDto: UpdateFamilyMemberDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
         familyMember?: undefined;
@@ -56,31 +57,31 @@ export declare class PatientController {
         message: string;
         familyMember: import("mongoose").UpdateWriteOpResult;
     }>;
-    sharePrescription(walletAddress: string, pharmacistAddress: string, sharePrescriptionDto: SharePrescriptionDto): Promise<{
+    sharePrescription(ip: string, walletAddress: string, pharmacistAddress: string, sharePrescriptionDto: SharePrescriptionDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    removePrescription(walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
+    removePrescription(ip: string, walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    approveMedicalRecordAccess(walletAddress: string, createApprovalDto: CreateApprovalDto): Promise<{
+    approveMedicalRecordAccess(ip: string, walletAddress: string, createApprovalDto: CreateApprovalDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    approveFamilyMemberRecordAccess(walletAddress: string, createApprovalDto: CreateFamilyMemberApprovalDto): Promise<{
+    approveFamilyMemberRecordAccess(ip: string, walletAddress: string, createApprovalDto: CreateFamilyMemberApprovalDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    getAllPatients(): Promise<(import("mongoose").Document<unknown, {}, import("../schemas/patient.schema").Patient> & import("../schemas/patient.schema").Patient & {
+    getAllPatients(ip: string): Promise<(import("mongoose").Document<unknown, {}, import("../schemas/patient.schema").Patient> & import("../schemas/patient.schema").Patient & {
         _id: Types.ObjectId;
     })[]>;
-    getAllFamilyMembers(walletAddress: string): Promise<{
+    getAllFamilyMembers(ip: string, walletAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         members: import("../schemas/patient.schema").FamilyMember[];
         message: string;
     }>;
-    getFamilyMemberById(walletAddress: string, memberId: number): Promise<{
+    getFamilyMemberById(ip: string, walletAddress: string, memberId: number): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
         member?: undefined;
@@ -89,7 +90,7 @@ export declare class PatientController {
         member: import("../schemas/patient.schema").FamilyMember;
         message?: undefined;
     }>;
-    getPatientByAddress(walletAddress: string): Promise<{
+    getPatientByAddress(ip: string, walletAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
         patient?: undefined;
@@ -100,7 +101,7 @@ export declare class PatientController {
         };
         message?: undefined;
     }>;
-    getAllPrescriptions(walletAddress: string): Promise<{
+    getAllPrescriptions(ip: string, walletAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
         prescriptions?: undefined;
@@ -109,7 +110,7 @@ export declare class PatientController {
         prescriptions: import("../schemas/patient.schema").Prescriptions[];
         message?: undefined;
     }>;
-    getPrescription(walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
+    getPrescription(ip: string, walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
         prescription?: undefined;
@@ -118,11 +119,11 @@ export declare class PatientController {
         prescription: import("../schemas/patient.schema").Prescriptions;
         message?: undefined;
     }>;
-    getAllMedicalRecords(walletAddress: string): Promise<{
+    getAllMedicalRecords(ip: string, walletAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         medicalRecords: import("../schemas/patient.schema").MedicalRecordPreviewDocument[];
     }>;
-    getFamilyMemberMedicalRecords(principalPatientAddress: string, familyMemberId: number): Promise<{
+    getFamilyMemberMedicalRecords(ip: string, principalPatientAddress: string, familyMemberId: number): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
         records?: undefined;
@@ -131,7 +132,7 @@ export declare class PatientController {
         records: import("../schemas/patient.schema").MedicalRecordPreviewDocument[];
         message?: undefined;
     }>;
-    getMedicalRecord(walletAddress: string, recordId: number): Promise<{
+    getMedicalRecord(ip: string, walletAddress: string, recordId: number): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
         record?: undefined;
@@ -143,7 +144,7 @@ export declare class PatientController {
         };
         message?: undefined;
     }>;
-    deletePatient(walletAddress: string): Promise<{
+    deletePatient(ip: string, walletAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;

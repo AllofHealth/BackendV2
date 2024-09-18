@@ -27,8 +27,9 @@ import { CreateDoctorDto, CreateMedicalRecordDto, CreatePrescriptionDto, UpdateD
 import { Types } from 'mongoose';
 export declare class DoctorController {
     private readonly doctorService;
+    private readonly logger;
     constructor(doctorService: DoctorService);
-    createDoctor(createDoctorDto: CreateDoctorDto): Promise<{
+    createDoctor(ip: string, createDoctorDto: CreateDoctorDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
         doctor?: undefined;
@@ -39,7 +40,7 @@ export declare class DoctorController {
         };
         message: string;
     }>;
-    updateDoctor(walletAddress: string, updateDoctorDto: UpdateDoctorDto): Promise<{
+    updateDoctor(ip: string, walletAddress: string, updateDoctorDto: UpdateDoctorDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
         doctor?: undefined;
@@ -50,19 +51,19 @@ export declare class DoctorController {
             _id: Types.ObjectId;
         };
     }>;
-    addPatientPrescription(doctorAddress: string, patientAddress: string, prescriptionDto: CreatePrescriptionDto): Promise<{
+    addPatientPrescription(ip: string, doctorAddress: string, patientAddress: string, prescriptionDto: CreatePrescriptionDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    approveRecordAccessRequest(doctorAddress: string, patientAddress: string, recordId: Types.ObjectId): Promise<{
+    approveRecordAccessRequest(ip: string, doctorAddress: string, patientAddress: string, recordId: Types.ObjectId): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    rejectRecordAccessRequest(doctorAddress: string, patientAddress: string, recordId: Types.ObjectId): Promise<{
+    rejectRecordAccessRequest(ip: string, doctorAddress: string, patientAddress: string, recordId: Types.ObjectId): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    createMedicalRecordPreview(doctorAddress: string, patientAddress: string, createMedicalRecordDto: CreateMedicalRecordDto): Promise<{
+    createMedicalRecordPreview(ip: string, doctorAddress: string, patientAddress: string, createMedicalRecordDto: CreateMedicalRecordDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
@@ -70,11 +71,11 @@ export declare class DoctorController {
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    deleteAllApprovalRequests(walletAddress: string): Promise<{
+    deleteAllApprovalRequests(ip: string, walletAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    getDoctorByAddress(walletAddress: string): Promise<{
+    getDoctorByAddress(ip: string, walletAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
         doctor?: undefined;
@@ -85,25 +86,25 @@ export declare class DoctorController {
         };
         message?: undefined;
     }>;
-    getAllDoctors(): Promise<{
+    getAllDoctors(ip: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         allDoctors: (import("mongoose").Document<unknown, {}, import("../schema/doctor.schema").Doctor> & import("../schema/doctor.schema").Doctor & {
             _id: Types.ObjectId;
         })[];
     }>;
-    getApprovedDoctors(): Promise<{
+    getApprovedDoctors(ip: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         doctors: (import("mongoose").Document<unknown, {}, import("../schema/doctor.schema").Doctor> & import("../schema/doctor.schema").Doctor & {
             _id: Types.ObjectId;
         })[];
     }>;
-    getPendingDoctors(): Promise<{
+    getPendingDoctors(ip: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         doctors: (import("mongoose").Document<unknown, {}, import("../schema/doctor.schema").Doctor> & import("../schema/doctor.schema").Doctor & {
             _id: Types.ObjectId;
         })[];
     }>;
-    getActiveApprovals(doctorAddress: string): Promise<{
+    getActiveApprovals(ip: string, doctorAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
         approvals?: undefined;
@@ -112,7 +113,7 @@ export declare class DoctorController {
         approvals: import("../schema/doctor.schema").Approval[];
         message?: undefined;
     }>;
-    deleteDoctorByAddress(walletAddress: string): Promise<{
+    deleteDoctorByAddress(ip: string, walletAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
