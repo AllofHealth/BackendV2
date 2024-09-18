@@ -33,7 +33,10 @@ export declare class MedicineController {
             _id: import("mongoose").Types.ObjectId;
         };
     }>;
-    addCategory(category: string): any;
+    addCategory(category: string): Promise<{
+        success: import("@nestjs/common").HttpStatus;
+        categories: string[];
+    }>;
     fetchCategories(): Promise<string[] | {
         success: import("@nestjs/common").HttpStatus;
         categories: any[];

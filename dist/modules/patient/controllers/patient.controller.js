@@ -20,6 +20,7 @@ const patient_dto_1 = require("../dto/patient.dto");
 const mongoose_1 = require("mongoose");
 const patient_auth_guard_1 = require("../guards/patient.auth.guard");
 const my_logger_service_1 = require("../../my-logger/my-logger.service");
+const swagger_1 = require("@nestjs/swagger");
 let PatientController = PatientController_1 = class PatientController {
     constructor(patientService) {
         this.patientService = patientService;
@@ -302,6 +303,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PatientController.prototype, "deletePatient", null);
 exports.PatientController = PatientController = PatientController_1 = __decorate([
+    (0, swagger_1.ApiTags)('patient'),
     (0, common_1.Controller)('patient'),
     __metadata("design:paramtypes", [patient_service_1.PatientService])
 ], PatientController);

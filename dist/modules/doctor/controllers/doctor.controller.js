@@ -20,6 +20,7 @@ const doctor_dto_1 = require("../dto/doctor.dto");
 const mongoose_1 = require("mongoose");
 const doctor_auth_guard_1 = require("../guards/doctor.auth.guard");
 const my_logger_service_1 = require("../../my-logger/my-logger.service");
+const swagger_1 = require("@nestjs/swagger");
 let DoctorController = DoctorController_1 = class DoctorController {
     constructor(doctorService) {
         this.doctorService = doctorService;
@@ -226,6 +227,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DoctorController.prototype, "deleteDoctorByAddress", null);
 exports.DoctorController = DoctorController = DoctorController_1 = __decorate([
+    (0, swagger_1.ApiTags)('doctor'),
     (0, common_1.Controller)('doctor'),
     __metadata("design:paramtypes", [doctor_service_1.DoctorService])
 ], DoctorController);

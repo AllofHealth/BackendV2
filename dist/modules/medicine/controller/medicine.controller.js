@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MedicineController = void 0;
 const common_1 = require("@nestjs/common");
 const medicine_service_1 = require("../service/medicine.service");
+const swagger_1 = require("@nestjs/swagger");
 let MedicineController = class MedicineController {
     constructor(medicineService) {
         this.medicineService = medicineService;
@@ -23,7 +24,7 @@ let MedicineController = class MedicineController {
         return await this.medicineService.createCategories();
     }
     async addCategory(category) {
-        return await this.addCategory(category);
+        return await this.medicineService.addNewCategory(category);
     }
     async fetchCategories() {
         return await this.medicineService.getCategories();
@@ -50,6 +51,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], MedicineController.prototype, "fetchCategories", null);
 exports.MedicineController = MedicineController = __decorate([
+    (0, swagger_1.ApiTags)('medicine'),
     (0, common_1.Controller)('medicine'),
     __metadata("design:paramtypes", [medicine_service_1.MedicineService])
 ], MedicineController);

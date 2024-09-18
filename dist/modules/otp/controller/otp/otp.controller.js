@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OtpController = void 0;
 const common_1 = require("@nestjs/common");
 const otp_service_1 = require("../../services/otp.service");
+const swagger_1 = require("@nestjs/swagger");
 let OtpController = class OtpController {
     constructor(otpService) {
         this.otpService = otpService;
@@ -45,6 +46,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], OtpController.prototype, "verifyOTP", null);
 exports.OtpController = OtpController = __decorate([
+    (0, swagger_1.ApiTags)('otp'),
     (0, common_1.Controller)('otp'),
     __metadata("design:paramtypes", [otp_service_1.OtpService])
 ], OtpController);
