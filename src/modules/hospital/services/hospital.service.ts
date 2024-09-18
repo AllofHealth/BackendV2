@@ -1,4 +1,5 @@
 import {
+  HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
@@ -6,7 +7,6 @@ import {
 import { Hospital } from '../schema/hospital.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, MongooseError, Types } from 'mongoose';
-import { HospitalGuard } from '../guard/hospital.guard';
 import {
   ApprovePractitionerType,
   CreateHospitalType,
@@ -29,10 +29,10 @@ import { EncryptionService } from '@/shared/utils/encryption/service/encryption.
 @Injectable()
 export class HospitalService {
   private logger: MyLoggerService = new MyLoggerService('HospitalService');
+
   constructor(
     @InjectModel(Hospital.name) private hospitalModel: Model<Hospital>,
     private readonly hospitalDao: HospitalDao,
-    private readonly hospitalGuard: HospitalGuard,
     private readonly doctorDao: DoctorDao,
     private readonly pharmacistDao: PharmacistDao,
     private readonly doctorGuard: DoctorGuard,
@@ -73,7 +73,7 @@ export class HospitalService {
         await this.hospitalDao.removeHospitalById(hospital._id);
         return {
           success: HttpStatus.BAD_REQUEST,
-          message: 'An error occurred while creating instiution',
+          message: 'An error occurred while creating institution',
         };
       }
       return {
@@ -265,6 +265,7 @@ export class HospitalService {
       throw new Error('Error delegating admin position');
     }
   }
+
   async updateHospitalProfile(
     hospitalId: Types.ObjectId,
     updateData: UpdateHospitalProfileType,
@@ -340,6 +341,7 @@ export class HospitalService {
         }
         const doctor = await this.doctorDao.fetchDoctorByAddress(walletAddress);
         const doctorPreview: PreviewType = {
+          id: doctor.id,
           walletAddress,
           profilePicture: doctor.profilePicture,
           name: doctor.name,
@@ -378,6 +380,7 @@ export class HospitalService {
         const pharmacist =
           await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
         const pharmacistPreview: PreviewType = {
+          id: pharmacist.id,
           walletAddress,
           profilePicture: pharmacist.profilePicture,
           name: pharmacist.name,
@@ -475,13 +478,11 @@ export class HospitalService {
         hospital.id,
         walletAddress,
       );
-
       const isPharmacist =
         await this.pharmacistGuard.validatePharmacistExistsInHospital(
           hospital.id,
           walletAddress,
         );
-
       if (!isDoctor && !isPharmacist) {
         return {
           success: HttpStatus.NOT_FOUND,
@@ -498,22 +499,37 @@ export class HospitalService {
         await practitioner.save();
       }
 
-      const practitionerList = isDoctor
-        ? hospital.doctors
-        : hospital.pharmacists;
-      const practitionerPreview = practitionerList.find(
-        (p: PreviewType) => p.walletAddress === walletAddress,
-      );
+      if (isDoctor) {
+        const doctorStatus = hospital.doctors.find(
+          (p: PreviewType) => p.walletAddress === walletAddress,
+        ).status;
+        if (doctorStatus == ApprovalStatus.Approved) {
+          return {
+            success: HttpStatus.ACCEPTED,
+            message: 'practitioner already approved',
+          };
+        }
 
-      if (practitionerPreview.status === ApprovalStatus.Approved) {
-        return {
-          success: HttpStatus.ACCEPTED,
-          message: 'practitioner already approved',
-        };
+        await this.hospitalDao.updateDoctorStatus(
+          walletAddress,
+          ApprovalStatus.Approved,
+        );
+      } else if (isPharmacist) {
+        const pharmacistStatus = hospital.pharmacists.find(
+          (p: PreviewType) => p.walletAddress === walletAddress,
+        ).status;
+        if (pharmacistStatus == ApprovalStatus.Approved) {
+          return {
+            success: HttpStatus.ACCEPTED,
+            message: 'practitioner already approved',
+          };
+        }
+
+        await this.hospitalDao.updatePharmacistStatus(
+          walletAddress,
+          ApprovalStatus.Approved,
+        );
       }
-      practitionerPreview.status = ApprovalStatus.Approved;
-
-      await hospital.save();
 
       return {
         success: HttpStatus.OK,
@@ -521,6 +537,10 @@ export class HospitalService {
       };
     } catch (error) {
       console.error(error);
+      return {
+        success: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'internal server error',
+      };
     }
   }
 
@@ -773,9 +793,6 @@ export class HospitalService {
 
     try {
       const { hospital } = await this.fetchHospitalById(hospitalId);
-      if (!hospital) {
-        throw new HospitalError("hospital doesn't exist");
-      }
 
       const doctors = hospital.doctors;
 
@@ -797,15 +814,9 @@ export class HospitalService {
   }
 
   async fetchAllPharmacists(hospitalId: Types.ObjectId) {
-    if (!hospitalId) {
-      throw new HospitalError('Invalid or missing hospital id');
-    }
-
     try {
       const { hospital } = await this.fetchHospitalById(hospitalId);
-      if (!hospital) {
-        throw new HospitalError("hospital doesn't exist");
-      }
+
       const pharmacists = hospital.pharmacists;
       if (!pharmacists) {
         return {
@@ -826,6 +837,14 @@ export class HospitalService {
 
   async fetchHospitalPractitioners(hospitalId: Types.ObjectId) {
     try {
+      const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
+      if (!hospital) {
+        throw new HttpException(
+          { message: 'invalid hospital id' },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
       const { doctors } = await this.fetchAllDoctors(hospitalId);
       const { pharmacists } = await this.fetchAllPharmacists(hospitalId);
       const allPractitioners = doctors.concat(pharmacists);
