@@ -1,7 +1,9 @@
 import { Controller, Post, Query, ValidationPipe } from '@nestjs/common';
 import { OtpService } from '@/modules/otp/services/otp.service';
 import { RoleType } from '../../interface/otp.interface';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('otp')
 @Controller('otp')
 export class OtpController {
   constructor(private readonly otpService: OtpService) {}
