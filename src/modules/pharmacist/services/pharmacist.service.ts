@@ -26,7 +26,7 @@ import { MedicineService } from '@/modules/medicine/service/medicine.service';
 import { Prescriptions } from '@/modules/patient/schemas/patient.schema';
 import { Medication } from '@/modules/medicine/schema/medicine.schema';
 import { Product } from '../schema/pharmacist.schema';
-import { PreviewType } from "@/modules/hospital/interface/hospital.interface";
+import { PreviewType } from '@/modules/hospital/interface/hospital.interface';
 
 @Injectable()
 export class PharmacistService {
@@ -875,6 +875,7 @@ export class PharmacistService {
       );
     }
   }
+
   async removePrescription(args: {
     walletAddress: string;
     prescriptionId: Types.ObjectId;
