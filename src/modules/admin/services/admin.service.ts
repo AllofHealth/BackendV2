@@ -7,8 +7,8 @@ import {
   RemoveAdminType,
   UpdateAdminProfileType,
 } from '../interface/admin.interface';
-import { Model, MongooseError, Types } from 'mongoose';
-import { AdminError, ApprovalStatus, ErrorCodes } from '@/shared';
+import { Model, Types } from 'mongoose';
+import { ApprovalStatus, ErrorCodes } from '@/shared';
 import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
 import { AdminDao } from '../dao/admin.dao';
 import { AdminGuard } from '../guards/admin.guard';
@@ -16,10 +16,11 @@ import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
 import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
 import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
 import { OtpService } from '@/modules/otp/services/otp.service';
+import { AdminErrors, AdminMessages } from '@/modules/admin/data/admin.data';
 
 @Injectable()
 export class AdminService {
-  private logger: MyLoggerService = new MyLoggerService('AdminService');
+  private logger: MyLoggerService = new MyLoggerService(AdminService.name);
 
   constructor(
     @InjectModel(Admin.name) private adminModel: Model<Admin>,
@@ -37,16 +38,16 @@ export class AdminService {
       if (!admin) {
         return {
           success: ErrorCodes.NotFound,
-          message: 'Admin not found',
+          message: AdminErrors.NOT_FOUND,
         };
       }
       return admin;
-    } catch (error) {
-      console.error(error);
-      if (error instanceof MongooseError) {
-        throw new MongooseError(error.message);
-      }
-      throw new Error('An error occurred while fetching admin');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: AdminErrors.FETCHING_ADMIN },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -57,7 +58,7 @@ export class AdminService {
       if (!admin) {
         return {
           success: ErrorCodes.NotFound,
-          message: 'Admin not found',
+          message: AdminErrors.NOT_FOUND,
         };
       }
       if (admin.isAuthenticated) {
@@ -65,23 +66,37 @@ export class AdminService {
       }
 
       return isAuthenticated;
-    } catch (error) {
-      console.error(error);
-      if (error instanceof MongooseError) {
-        throw new HttpException(
-          { message: error.message },
-          HttpStatus.BAD_REQUEST,
-        );
-      }
+    } catch (e) {
+      this.logger.error(e.message);
       throw new HttpException(
-        { message: 'An error occurred while fetching admin' },
-        HttpStatus.BAD_REQUEST,
+        { message: AdminErrors.AUTH_CHECK_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
   async fetchAllAdmins() {
-    return await this.adminModel.find();
+    try {
+      const admins = await this.adminModel.find();
+      if (!admins) {
+        return {
+          success: HttpStatus.NOT_FOUND,
+          message: AdminErrors.NOT_FOUND,
+          data: [],
+        };
+      }
+
+      return {
+        success: HttpStatus.OK,
+        data: admins,
+      };
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: AdminErrors.FETCHING_ADMIN },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async authenticateAdmin(args: AuthenticateAdminInterface) {
@@ -93,7 +108,7 @@ export class AdminService {
       if (!admin) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'admin not found',
+          message: AdminErrors.NOT_FOUND,
         };
       }
 
@@ -103,12 +118,12 @@ export class AdminService {
 
       return {
         success: HttpStatus.OK,
-        message: 'admin successfully authenticated',
+        message: AdminMessages.AUTH_SUCCESSFUL,
       };
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      this.logger.error(e.message);
       throw new HttpException(
-        { message: error.message },
+        { message: AdminErrors.AUTH_ERROR },
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -117,8 +132,8 @@ export class AdminService {
   async createNewAdmin(args: CreateAdminType) {
     if (await this.adminDao.validateAdminExists(args.walletAddress)) {
       return {
-        success: HttpStatus.CREATED,
-        message: 'admin already exists',
+        success: HttpStatus.CONFLICT,
+        message: AdminErrors.ADMIN_EXIST,
       };
     }
 
@@ -130,21 +145,25 @@ export class AdminService {
           args.email,
           'admin',
         );
-      } catch (error) {
+      } catch (e) {
+        this.logger.error(e.message);
         await this.adminDao.removeAdminByAddress(args.walletAddress);
         return {
           success: HttpStatus.BAD_REQUEST,
-          message: 'An error occurred while creating an admin',
+          message: AdminErrors.CREATE_ADMIN,
         };
       }
       return {
-        success: ErrorCodes.Success,
+        success: HttpStatus.OK,
+        message: AdminMessages.CREATE_ADMIN,
         admin,
-        message: 'admin created successfully',
       };
-    } catch (error) {
-      this.logger.info('Error creating admin');
-      throw new AdminError('Error creating admin');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: AdminErrors.CREATE_ADMIN },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -154,7 +173,6 @@ export class AdminService {
     if (!(await this.adminGuard.validateAdmin(adminAddressToRemove))) {
       return {
         success: HttpStatus.UNAUTHORIZED,
-        message: 'Unauthorized',
       };
     }
 
@@ -162,11 +180,14 @@ export class AdminService {
       await this.adminDao.removeAdminByAddress(adminAddressToRemove);
       return {
         success: ErrorCodes.Success,
-        message: 'admin removed successfully',
+        message: AdminMessages.ADMIN_REMOVED,
       };
-    } catch (error) {
-      this.logger.info('Error removing admin');
-      throw new AdminError('Error removing admin');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: AdminErrors.ADMIN_REMOVED_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -179,15 +200,15 @@ export class AdminService {
       if (!hospital) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'Hospital not found',
+          message: AdminErrors.HOSPITAL_NOT_FOUND,
         };
       }
 
       switch (hospital.status) {
         case ApprovalStatus.Approved:
           return {
-            success: HttpStatus.CREATED,
-            message: 'hospital already approved',
+            success: HttpStatus.CONFLICT,
+            message: AdminErrors.HOSPITAL_APPROVED_ALREADY,
           };
 
         case ApprovalStatus.Pending:
@@ -199,17 +220,20 @@ export class AdminService {
         default:
           return {
             success: HttpStatus.BAD_REQUEST,
-            message: 'hospital status is invalid',
+            message: AdminErrors.INVALID_STATUS,
           };
       }
 
       return {
-        success: ErrorCodes.Success,
-        message: 'Hospital approved successfully',
+        success: HttpStatus.OK,
+        message: AdminMessages.HOSPITAL_APPROVED,
       };
-    } catch (error) {
-      console.error(error);
-      throw new AdminError('Error approving hospital');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: AdminErrors.HOSPITAL_APPROVE_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -219,43 +243,39 @@ export class AdminService {
   }) {
     const { walletAddress, data } = args;
     try {
-      const isAdmin = await this.adminGuard.validateAdmin(walletAddress);
-      if (!isAdmin) {
-        return {
-          success: HttpStatus.UNAUTHORIZED,
-          message: 'not authorized',
-        };
-      }
       await this.adminDao.updateAdmin(walletAddress, data);
 
       return {
         success: HttpStatus.OK,
-        message: 'Admin updated successfully',
+        message: AdminMessages.ADMIN_UPDATED,
       };
-    } catch (error) {
-      console.error(error);
-      throw new AdminError('Error updating admin');
-    }
-  }
-
-  async editAdmin(args: { walletAddress: string; replaceAddress: string }) {
-    try {
-      const admin = await this.adminDao.fetchAdminByAddress(args.walletAddress);
-      admin.walletAddress = args.replaceAddress;
-      admin.isVerified = true;
-      await admin.save();
-      return {
-        success: HttpStatus.OK,
-        message: 'modification completed',
-      };
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      this.logger.error(e.message);
       throw new HttpException(
-        'an error occurred while editing admin',
+        { message: AdminErrors.ADMIN_UPDATE_ERROR },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
+
+  // async editAdmin(args: { walletAddress: string; replaceAddress: string }) {
+  //   try {
+  //     const admin = await this.adminDao.fetchAdminByAddress(args.walletAddress);
+  //     admin.walletAddress = args.replaceAddress;
+  //     admin.isVerified = true;
+  //     await admin.save();
+  //     return {
+  //       success: HttpStatus.OK,
+  //       message: 'modification completed',
+  //     };
+  //   } catch (error) {
+  //     console.error(error);
+  //     throw new HttpException(
+  //       'an error occurred while editing admin',
+  //       HttpStatus.INTERNAL_SERVER_ERROR,
+  //     );
+  //   }
+  // }
 
   async fetchAllPractitioners() {
     try {
@@ -274,10 +294,12 @@ export class AdminService {
         success: HttpStatus.OK,
         allPractitioners: fullList,
       };
-    } catch (error) {
-      console.error(error);
-      throw new AdminError('Error fetching practitioners');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: AdminErrors.FETCHING_PRACTITIONERS },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
-
 }
