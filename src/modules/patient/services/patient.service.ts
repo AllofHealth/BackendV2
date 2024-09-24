@@ -199,8 +199,8 @@ export class PatientService {
         success: HttpStatus.OK,
         message: PatientSuccess.FAMILY_MEMBER_ADDED,
       };
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      this.logger.error(e.message);
       throw new HttpException(
         { message: PatientErrors.FAMILY_MEMBER_ERROR },
         HttpStatus.BAD_REQUEST,
@@ -216,20 +216,20 @@ export class PatientService {
       if (!familyMembers) {
         return {
           success: HttpStatus.FOUND,
+          message: PatientErrors.FAMILY_MEMBER_LIST_ERROR,
           members: [],
-          message: 'No family members added',
         };
       }
       return {
         success: HttpStatus.OK,
+        message: PatientSuccess.FAMILY_MEMBER_FOUND,
         members: familyMembers,
-        message: 'Family members found',
       };
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      this.logger.error(e.message);
       throw new HttpException(
-        { message: 'An error occurred while fetching family members' },
-        HttpStatus.BAD_REQUEST,
+        { message: PatientErrors.FAMILY_MEMBER_FETCH_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -242,7 +242,7 @@ export class PatientService {
       if (!patient) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'Patient not found',
+          message: PatientErrors.PATIENT_NOT_FOUND,
         };
       }
       const familyMember = patient.familyMembers;
@@ -250,7 +250,7 @@ export class PatientService {
       if (!member) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'Member not found',
+          message: PatientErrors.FAMILY_MEMBER_LIST_ERROR,
         };
       }
 
@@ -258,9 +258,12 @@ export class PatientService {
         success: HttpStatus.OK,
         member,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('an error occurred while fetching family member');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.FAMILY_MEMBER_FETCH_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
