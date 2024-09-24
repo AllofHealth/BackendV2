@@ -451,19 +451,10 @@ export class PatientService {
     try {
       const isPharmacist =
         await this.pharmacistGuard.validatePharmacistExists(pharmacistAddress);
-      const patient =
-        await this.patientDao.fetchPatientByAddress(walletAddress);
       if (!isPharmacist) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'Pharmacist not found',
-        };
-      }
-
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'Patient not found',
+          message: PatientErrors.PHARMACIST_NOT_FOUND,
         };
       }
 
@@ -475,7 +466,7 @@ export class PatientService {
       if (!prescription || !prescription.prescriptions.length) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'prescription not found, invalid id',
+          message: `${PatientErrors.PRESCRIPTION_NOT_FOUND} | ${PatientErrors.INVALID_PRESCRIPTION_ID}`,
         };
       }
 
@@ -487,17 +478,20 @@ export class PatientService {
       } catch (error) {
         return {
           success: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: 'an error occurred, please try again',
+          message: PatientErrors.SHARE_PRESCRIPTION_ERROR,
         };
       }
 
       return {
         success: HttpStatus.OK,
-        message: 'prescription shared successfully',
+        message: PatientSuccess.PRESCRIPTION_SHARED,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('An error occurred while sharing prescription');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.SHARE_PRESCRIPTION_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -508,12 +502,6 @@ export class PatientService {
     try {
       const patient =
         await this.patientDao.fetchPatientByAddress(walletAddress);
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'patient not found',
-        };
-      }
 
       const prescription = patient.prescriptions.find(
         (prescription) => prescription._id == prescriptionId,
@@ -521,7 +509,7 @@ export class PatientService {
       if (!prescription) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'prescription not found',
+          message: PatientErrors.PRESCRIPTION_NOT_FOUND,
         };
       }
 
@@ -530,11 +518,14 @@ export class PatientService {
 
       return {
         success: HttpStatus.OK,
-        message: 'successfully deleted prescription',
+        message: PatientSuccess.PRESCRIPTION_DELETED,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('an error occurred while removing prescription');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.DELETE_PRESCRIPTION_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
