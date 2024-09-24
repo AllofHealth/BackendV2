@@ -91,14 +91,6 @@ export class CreatePrescriptionDto {
   @IsNotEmpty()
   recordId: number;
 
-  @IsString()
-  @IsNotEmpty()
-  patientAddress: string;
-
-  @IsString()
-  @IsNotEmpty()
-  doctorAddress: string;
-
   @IsArray()
   @IsOptional()
   medicine: AddMedicineType[];
