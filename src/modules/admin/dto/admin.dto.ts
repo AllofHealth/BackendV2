@@ -9,6 +9,9 @@ import {
 } from 'class-validator';
 import { Types } from 'mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { PartialType } from '@nestjs/mapped-types';
+import { Prop } from '@nestjs/mongoose';
+import { Admin } from '@/modules/admin/schema/admin.schema';
 
 export class ApproveHospitalDto {
   @ApiProperty({
@@ -61,6 +64,43 @@ export class CreateAdminDto {
   @IsEthereumAddress()
   @IsNotEmpty()
   walletAddress: string;
+}
+
+export class AdminDto extends PartialType(Admin) {
+  @ApiProperty({ type: Number })
+  @Prop({ required: true })
+  id: number;
+
+  @ApiProperty({ type: String })
+  @Prop({ required: true })
+  name: string;
+
+  @ApiProperty({ type: String })
+  @Prop()
+  profilePicture: string;
+
+  @ApiProperty({ type: String })
+  @Prop({ required: true })
+  email: string;
+
+  @ApiProperty({ type: String })
+  @Prop({ required: true, unique: true })
+  walletAddress: string;
+
+  @ApiProperty({ type: String, default: 'admin' })
+  @Prop({ default: 'admin', required: true })
+  category: string;
+
+  @ApiProperty({ type: Boolean, default: false })
+  @Prop({ required: true, default: false })
+  isAuthenticated: boolean;
+
+  @ApiProperty({ type: Boolean, default: false })
+  @Prop({ required: true, default: false })
+  isVerified: boolean;
+
+  @ApiProperty({ type: Types.ObjectId })
+  _id: Types.ObjectId;
 }
 
 export class RemoveAdminDto {
