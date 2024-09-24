@@ -1,16 +1,16 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Patient } from '../schemas/patient.schema';
 import {
-  ApprovalInputType,
+  IApprovalInput,
   ApprovalType,
-  CreateApprovalInputType,
-  CreateApprovalType,
-  CreatePatientType,
-  FamilyMemberApprovalInputType,
-  FamilyMemberType,
-  SharePrescriptionInterface,
-  UpdateFamilyMemberType,
-  UpdatePatientProfileType,
+  ICreateApprovalInput,
+  ICreateApproval,
+  ICreatePatient,
+  IFamilyMemberApprovalInput,
+  IFamilyMember,
+  ISharePrescription,
+  IUpdateFamilyMember,
+  IUpdatePatientProfile,
 } from '../interface/patient.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, MongooseError, Types } from 'mongoose';
@@ -58,9 +58,7 @@ export class PatientService {
     throw new PatientError('Invalid approval type');
   }
 
-  private createApprovalInputs(
-    args: CreateApprovalInputType,
-  ): CreateApprovalType[] {
+  private createApprovalInputs(args: ICreateApprovalInput): ICreateApproval[] {
     const {
       id,
       name,
@@ -101,7 +99,7 @@ export class PatientService {
     }
   }
 
-  async createNewPatient(args: CreatePatientType) {
+  async createNewPatient(args: ICreatePatient) {
     const { walletAddress } = args;
 
     try {
@@ -149,7 +147,7 @@ export class PatientService {
 
   async addFamilyMember(args: {
     walletAddress: string;
-    familyMember: FamilyMemberType;
+    familyMember: IFamilyMember;
   }) {
     const { walletAddress, familyMember } = args;
     const {
@@ -270,19 +268,10 @@ export class PatientService {
   async editFamilyMember(args: {
     walletAddress: string;
     familyMemberId: number;
-    updateData: UpdateFamilyMemberType;
+    updateData: IUpdateFamilyMember;
   }) {
     const { walletAddress, familyMemberId, updateData } = args;
     try {
-      const patientExist =
-        await this.patientGuard.validatePatient(walletAddress);
-      if (!patientExist) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'Patient not found',
-        };
-      }
-
       const patient =
         await this.patientDao.fetchPatientByAddress(walletAddress);
 
@@ -293,7 +282,7 @@ export class PatientService {
       if (!familyMemberExists) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'Family member not found',
+          message: PatientErrors.FAMILY_MEMBER_NOT_FOUND,
         };
       }
 
@@ -305,17 +294,40 @@ export class PatientService {
 
       return {
         success: HttpStatus.OK,
-        message: 'Family member updated successfully',
+        message: PatientSuccess.FAMILY_MEMBER_UPDATED,
         familyMember,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('An error occurred while editing family member');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.FAMILY_MEMBER_UPDATE_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async findAllPatients() {
-    return await this.patientModel.find();
+    try {
+      const patients = await this.patientModel.find();
+      if (!patients) {
+        return {
+          status: HttpStatus.NOT_FOUND,
+          message: PatientErrors.PATIENT_NOT_FOUND,
+          data: [],
+        };
+      }
+
+      return {
+        status: HttpStatus.OK,
+        patients,
+      };
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.PATIENT_FETCH_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async fetchPatientByWalletAddress(walletAddress: string) {
@@ -343,7 +355,7 @@ export class PatientService {
     }
   }
 
-  async updatePatient(walletAddress: string, args: UpdatePatientProfileType) {
+  async updatePatient(walletAddress: string, args: IUpdatePatientProfile) {
     try {
       await this.patientDao.updatePatient(walletAddress, args);
       return {
@@ -430,7 +442,7 @@ export class PatientService {
     }
   }
 
-  async sharePrescription(args: SharePrescriptionInterface) {
+  async sharePrescription(args: ISharePrescription) {
     const { walletAddress, pharmacistAddress, prescriptionId } = args;
     try {
       const isPharmacist =
@@ -522,7 +534,7 @@ export class PatientService {
     }
   }
 
-  async approveMedicalRecordAccess(args: ApprovalInputType) {
+  async approveMedicalRecordAccess(args: IApprovalInput) {
     const {
       recordId,
       patientAddress,
@@ -591,7 +603,7 @@ export class PatientService {
   }
 
   async approveMedicalRecordAccessForFamilyMember(
-    args: FamilyMemberApprovalInputType,
+    args: IFamilyMemberApprovalInput,
   ) {
     const {
       recordId,
