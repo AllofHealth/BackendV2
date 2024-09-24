@@ -23,7 +23,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
-import { AdminErrors } from '@/modules/admin/data/admin.data';
+import { AdminErrors, AdminMessages } from '@/modules/admin/data/admin.data';
 
 @ApiTags('admin')
 @Controller('admin')
@@ -90,6 +90,16 @@ export class AdminController {
   }
 
   @Post('updateAdmin')
+  @ApiOperation({ summary: 'updates an admin document' })
+  @ApiQuery({ description: 'admin ethereum address', name: 'walletAddress' })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: AdminMessages.ADMIN_UPDATED,
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: AdminErrors.ADMIN_UPDATE_ERROR,
+  })
   @UseGuards(AdminAuthGuard)
   async updateAdmin(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
@@ -103,6 +113,25 @@ export class AdminController {
   }
 
   @Post('approveHospital')
+  @ApiOperation({ summary: 'approves an institution' })
+  @ApiQuery({
+    name: 'adminAddress',
+    description: 'authenticated admin address',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'hospitalId',
+    description: 'hospital mongo uuid',
+    type: Types.ObjectId.toString(),
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: AdminMessages.HOSPITAL_APPROVED,
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: AdminErrors.HOSPITAL_APPROVE_ERROR,
+  })
   @UseGuards(AdminAuthGuard)
   async approveHospital(
     @Query('adminAddress', new ValidationPipe({ transform: true }))
