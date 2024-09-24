@@ -16,7 +16,9 @@ import { Types } from 'mongoose';
 import { AdminAuthGuard } from '../guards/admin.auth.guard';
 import {
   ApiBadRequestResponse,
+  ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -47,6 +49,20 @@ export class AdminController {
   }
 
   @Get('getAdminByAddress')
+  @ApiOperation({ summary: 'returns admin associated with a wallet address' })
+  @ApiQuery({
+    name: 'walletAddress',
+    type: String,
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    type: AdminDto,
+    isArray: false,
+  })
+  @ApiBadRequestResponse({
+    description: AdminErrors.FETCHING_ADMIN,
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async getAdminByAddress(
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
