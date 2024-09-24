@@ -3,17 +3,25 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
+  Ip,
   Post,
   Query,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { AdminService } from '../services/admin.service';
-import { CreateAdminDto, UpdateAdminDto } from '../dto/admin.dto';
+import { AdminDto, CreateAdminDto, UpdateAdminDto } from '../dto/admin.dto';
 import { Types } from 'mongoose';
 import { AdminAuthGuard } from '../guards/admin.auth.guard';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
+import { AdminErrors } from '@/modules/admin/data/admin.data';
 
 @ApiTags('admin')
 @Controller('admin')
@@ -23,7 +31,18 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Get('allAdmins')
-  async getAllAdmins() {
+  @ApiOperation({ summary: 'returns all admins' })
+  @ApiResponse({
+    status: 200,
+    type: AdminDto,
+    isArray: true,
+  })
+  @ApiBadRequestResponse({
+    description: AdminErrors.NOT_FOUND,
+    status: HttpStatus.NOT_FOUND,
+  })
+  async getAllAdmins(@Ip() ip: string) {
+    this.logger.log(`Get all admin request ${ip}`);
     return await this.adminService.fetchAllAdmins();
   }
 
