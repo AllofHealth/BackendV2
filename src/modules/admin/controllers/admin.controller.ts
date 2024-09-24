@@ -71,6 +71,15 @@ export class AdminController {
   }
 
   @Get('getAllPractitioners')
+  @ApiOperation({ summary: 'fetch all practitioners (doctors & pharmacist)' })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: true,
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: AdminErrors.FETCHING_PRACTITIONERS,
+  })
   async getAllPractitioners() {
     return await this.adminService.fetchAllPractitioners();
   }
