@@ -270,11 +270,11 @@ let DoctorService = class DoctorService {
                     message: 'Hospital not found',
                 };
             }
-            const medication = [];
-            medicine.forEach(async (medicine) => {
-                const newMedicine = await this.addMedication(medicine);
-                medication.push(newMedicine);
+            const medicationPromises = medicine.map(async (med) => {
+                return await this.addMedication(med);
             });
+            const medication = await Promise.all(medicationPromises);
+            console.log(medication);
             const newPrescriptionArgs = {
                 recordId: recordId,
                 doctorName: doctor.name,
@@ -284,6 +284,7 @@ let DoctorService = class DoctorService {
                 patientAddress: patientAddress,
                 medicine: medication,
             };
+            this.logger.log(medication);
             const prescription = await this.patientDao.createPrescription(newPrescriptionArgs);
             patient.prescriptions.push(prescription);
             await patient.save();
