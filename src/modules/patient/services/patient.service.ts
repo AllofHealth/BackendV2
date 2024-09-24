@@ -1,19 +1,19 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Patient } from '../schemas/patient.schema';
 import {
-  IApprovalInput,
   ApprovalType,
-  ICreateApprovalInput,
+  IApprovalInput,
   ICreateApproval,
+  ICreateApprovalInput,
   ICreatePatient,
-  IFamilyMemberApprovalInput,
   IFamilyMember,
+  IFamilyMemberApprovalInput,
   ISharePrescription,
   IUpdateFamilyMember,
   IUpdatePatientProfile,
 } from '../interface/patient.interface';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, MongooseError, Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { PatientDao } from '../dao/patient.dao';
 import { PatientGuard } from '../guards/patient.guard';
 import { PharmacistGuard } from '@/modules/pharmacist/guards/pharmacist.guard';
@@ -22,7 +22,7 @@ import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
 import { PatientProvider } from '../provider/patient.provider';
 import { PROFILE_PLACEHOLDER } from '@/shared/constants';
 import { OtpService } from '@/modules/otp/services/otp.service';
-import { ApprovalStatus, ErrorCodes, PatientError } from '@/shared';
+import { ApprovalStatus, PatientError } from '@/shared';
 import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
 import {
   PatientErrors,
@@ -338,20 +338,21 @@ export class PatientService {
       if (!patientExist) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'Patient not found',
+          message: PatientErrors.PATIENT_NOT_FOUND,
         };
       }
       const patient =
         await this.patientDao.fetchPatientByAddress(walletAddress);
       return {
-        success: ErrorCodes.Success,
+        success: HttpStatus.OK,
         patient,
       };
-    } catch (error) {
-      console.error(error);
-      if (error instanceof MongooseError)
-        throw new MongooseError(error.message);
-      throw new PatientError('An error occurred while fetching patient');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.PATIENT_FETCH_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -360,13 +361,14 @@ export class PatientService {
       await this.patientDao.updatePatient(walletAddress, args);
       return {
         success: HttpStatus.OK,
-        message: 'Patient updated successfully',
+        message: PatientSuccess.PATIENT_UPDATED,
       };
-    } catch (error) {
-      console.error(error);
-      if (error instanceof MongooseError)
-        throw new MongooseError(error.message);
-      throw new PatientError('An error occurred while updating patient');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.PATIENT_UPDATE_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
