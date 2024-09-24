@@ -6,6 +6,18 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { Prop } from '@nestjs/mongoose';
+import {
+  Prescriptions,
+  PrescriptionsSchema,
+} from '@/modules/patient/schemas/patient.schema';
+import {
+  ApprovalList,
+  ApprovalListSchema,
+  Inventory,
+  InventorySchema,
+} from '@/modules/pharmacist/schema/pharmacist.schema';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreatePharmacistDto {
   @IsNumber()
@@ -39,6 +51,72 @@ export class CreatePharmacistDto {
   @IsNotEmpty()
   @IsEthereumAddress()
   walletAddress: string;
+}
+
+export class PharmacistDto {
+  @ApiProperty({ type: Number })
+  @Prop({ required: true, unique: true })
+  id: number;
+
+  @ApiProperty({ type: [Number] })
+  @Prop([Number])
+  hospitalIds: number[];
+
+  @ApiProperty({ type: Number })
+  @Prop({ required: true, default: 0 })
+  numberOfApprovals: number;
+
+  @ApiProperty({ type: String })
+  @Prop({ required: true })
+  name: string;
+
+  @ApiProperty({ type: String })
+  @Prop()
+  email?: string;
+
+  @ApiPropertyOptional({ type: String })
+  @Prop()
+  about?: string;
+
+  @ApiProperty({ type: String })
+  @Prop({ required: true })
+  profilePicture: string;
+
+  @ApiProperty({ type: String })
+  @Prop({ required: true })
+  location: string;
+
+  @ApiProperty({ type: String })
+  @Prop({ required: true })
+  phoneNumber: string;
+
+  @ApiProperty({ type: String })
+  @Prop({ required: true, unique: true })
+  walletAddress: string;
+
+  @ApiProperty({ type: String })
+  @Prop({ required: true })
+  status: string;
+
+  @ApiProperty({ type: InventorySchema })
+  @Prop({ type: InventorySchema })
+  inventory: Inventory;
+
+  @ApiProperty({ type: [ApprovalListSchema] })
+  @Prop({ type: [{ type: ApprovalListSchema }] })
+  approvalList: ApprovalList[];
+
+  @ApiProperty({ type: [PrescriptionsSchema] })
+  @Prop({ type: [{ type: PrescriptionsSchema }] })
+  sharedPrescriptions: Prescriptions[];
+
+  @ApiProperty({ type: String, default: 'pharmacist' })
+  @Prop({ default: 'pharmacist', required: true })
+  category: string;
+
+  @ApiProperty({ type: Boolean })
+  @Prop({ required: true })
+  isVerified: boolean;
 }
 
 export class UpdatePharmacistDto {
