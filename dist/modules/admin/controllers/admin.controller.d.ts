@@ -26,7 +26,7 @@ import { HttpStatus } from '@nestjs/common';
 import { AdminService } from '../services/admin.service';
 import { CreateAdminDto, UpdateAdminDto } from '../dto/admin.dto';
 import { Types } from 'mongoose';
-import { AdminErrors } from '@/modules/admin/data/admin.data';
+import { AdminErrors, AdminMessages } from '@/modules/admin/data/admin.data';
 export declare class AdminController {
     private readonly adminService;
     private readonly logger;
@@ -42,47 +42,47 @@ export declare class AdminController {
         })[];
         message?: undefined;
     }>;
-    getAdminByAddress(walletAddress: string): Promise<(import("mongoose").Document<unknown, {}, import("../schema/admin.schema").Admin> & import("../schema/admin.schema").Admin & {
+    getAdminByAddress(ip: string, walletAddress: string): Promise<(import("mongoose").Document<unknown, {}, import("../schema/admin.schema").Admin> & import("../schema/admin.schema").Admin & {
         _id: Types.ObjectId;
     }) | {
         success: import("../../../shared").ErrorCodes;
         message: AdminErrors;
     }>;
-    getAllPractitioners(): Promise<{
+    getAllPractitioners(ip: string): Promise<{
         success: HttpStatus;
         allPractitioners: any[];
     }>;
-    createAdmin(createAdminDto: CreateAdminDto): Promise<{
+    createAdmin(ip: string, createAdminDto: CreateAdminDto): Promise<{
         success: HttpStatus;
         message: AdminErrors;
         admin?: undefined;
     } | {
         success: HttpStatus;
-        message: import("@/modules/admin/data/admin.data").AdminMessages;
+        message: AdminMessages;
         admin: import("mongoose").Document<unknown, {}, import("../schema/admin.schema").Admin> & import("../schema/admin.schema").Admin & {
             _id: Types.ObjectId;
         };
     }>;
-    updateAdmin(walletAddress: string, updateAdminDto: UpdateAdminDto): Promise<{
+    updateAdmin(ip: string, walletAddress: string, updateAdminDto: UpdateAdminDto): Promise<{
         success: HttpStatus;
-        message: import("@/modules/admin/data/admin.data").AdminMessages;
+        message: AdminMessages;
     }>;
-    approveHospital(adminAddress: string, hospitalId: Types.ObjectId): Promise<{
+    approveHospital(ip: string, adminAddress: string, hospitalId: Types.ObjectId): Promise<{
         success: number;
         message: string;
     }>;
-    authenticateAdmin(adminAddress: string, walletAddress: string, id: number): Promise<{
+    authenticateAdmin(ip: string, adminAddress: string, walletAddress: string, id: number): Promise<{
         success: HttpStatus;
         message: AdminErrors;
     } | {
         success: HttpStatus;
-        message: import("@/modules/admin/data/admin.data").AdminMessages;
+        message: AdminMessages;
     }>;
-    deleteAdmin(adminAddressToAuthorize: string, adminAddressToRemove: string): Promise<{
+    deleteAdmin(ip: string, adminAddressToAuthorize: string, adminAddressToRemove: string): Promise<{
         success: HttpStatus;
         message?: undefined;
     } | {
         success: import("../../../shared").ErrorCodes;
-        message: import("@/modules/admin/data/admin.data").AdminMessages;
+        message: AdminMessages;
     }>;
 }
