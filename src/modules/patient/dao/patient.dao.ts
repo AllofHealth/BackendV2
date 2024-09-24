@@ -6,14 +6,14 @@ import {
 } from '../schemas/patient.schema';
 import { Category } from '@/shared';
 import {
-  CreateApprovalType,
-  CreateFamilyMemberType,
-  CreatePatientType,
-  CreatePrescriptionInterface,
-  MedicalRecordPreviewType,
-  UpdateFamilyMemberType,
-  UpdatePatientProfileType,
-  UpdatePrescriptionInterface,
+  ICreateApproval,
+  ICreateFamilyMember,
+  ICreatePatient,
+  ICreatePrescription,
+  IMedicalRecordPreview,
+  IUpdateFamilyMember,
+  IUpdatePatientProfile,
+  IUpdatePrescription,
 } from '../interface/patient.interface';
 import { PROFILE_PLACEHOLDER } from '@/shared/constants';
 import { HttpStatus, Injectable } from '@nestjs/common';
@@ -40,7 +40,7 @@ export class PatientDao {
     @InjectModel(MedicalRecordPreview.name)
     private readonly medicalRecordPreviewModel: Model<MedicalRecordPreview>,
   ) {}
-  async createNewPatient(patient: CreatePatientType) {
+  async createNewPatient(patient: ICreatePatient) {
     return await this.patientModel.create({
       id: patient.id,
       appointmentCount: 0,
@@ -61,7 +61,7 @@ export class PatientDao {
     });
   }
 
-  async createFamilyMembers(familyMember: CreateFamilyMemberType) {
+  async createFamilyMembers(familyMember: ICreateFamilyMember) {
     return await this.familyMemberModel.create({
       id: familyMember.id,
       principalPatient: familyMember.principalPatient,
@@ -79,7 +79,7 @@ export class PatientDao {
     });
   }
 
-  async createPrescription(prescription: CreatePrescriptionInterface) {
+  async createPrescription(prescription: ICreatePrescription) {
     return await this.prescriptionsModel.create({
       doctorName: prescription.doctorName,
       recordId: prescription.recordId,
@@ -91,7 +91,7 @@ export class PatientDao {
     });
   }
 
-  async createApproval(args: CreateApprovalType) {
+  async createApproval(args: ICreateApproval) {
     return await this.approvalModel.create({
       patientId: args.patientId,
       patientName: args.patientName,
@@ -105,7 +105,7 @@ export class PatientDao {
     });
   }
 
-  async createMedicalRecordPreview(args: MedicalRecordPreviewType) {
+  async createMedicalRecordPreview(args: IMedicalRecordPreview) {
     return await this.medicalRecordPreviewModel.create({
       id: args.recordId,
       principalPatient: args.principalPatientAddress,
@@ -178,7 +178,7 @@ export class PatientDao {
 
   async updatePatient(
     walletAddress: string,
-    updateData: UpdatePatientProfileType,
+    updateData: IUpdatePatientProfile,
   ) {
     const updates = Object.keys(updateData).reduce((acc, key) => {
       if (updateData[key] !== undefined) {
@@ -197,7 +197,7 @@ export class PatientDao {
   async updatePatientPrescription(
     walletAddress: string,
     recordId: number,
-    updateData: UpdatePrescriptionInterface,
+    updateData: IUpdatePrescription,
   ) {
     const updates = Object.keys(updateData).reduce((acc, key) => {
       acc[`prescriptions.$.${key}`] = updateData[key];
@@ -214,7 +214,7 @@ export class PatientDao {
   async updateFamilyMember(
     walletAddress: string,
     familyMemberId: number,
-    updateData: UpdateFamilyMemberType,
+    updateData: IUpdateFamilyMember,
   ) {
     const updates = Object.keys(updateData).reduce((acc, key) => {
       acc[`familyMembers.$.${key}`] = updateData[key];
