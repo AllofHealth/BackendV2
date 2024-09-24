@@ -22,7 +22,6 @@ import { PatientDao } from '@/modules/patient/dao/patient.dao';
 import { PatientGuard } from '@/modules/patient/guards/patient.guard';
 import { OtpService } from '@/modules/otp/services/otp.service';
 import { MedicineDao } from '@/modules/medicine/dao/medicine.dao';
-import { Medication } from '@/modules/medicine/schema/medicine.schema';
 import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
 
 @Injectable()
@@ -320,12 +319,12 @@ export class DoctorService {
         };
       }
 
-      const medication: Medication[] = [];
-
-      medicine.forEach(async (medicine) => {
-        const newMedicine = await this.addMedication(medicine);
-        medication.push(newMedicine);
+      const medicationPromises = medicine.map(async (med) => {
+        return await this.addMedication(med);
       });
+
+      const medication = await Promise.all(medicationPromises);
+      console.log(medication);
 
       const newPrescriptionArgs = {
         recordId: recordId,
@@ -336,7 +335,7 @@ export class DoctorService {
         patientAddress: patientAddress,
         medicine: medication,
       };
-
+      this.logger.log(medication);
       const prescription =
         await this.patientDao.createPrescription(newPrescriptionArgs);
       patient.prescriptions.push(prescription);
