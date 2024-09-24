@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Patient } from '../schemas/patient.schema';
 import {
   ApprovalInputType,
@@ -22,7 +22,12 @@ import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
 import { PatientProvider } from '../provider/patient.provider';
 import { PROFILE_PLACEHOLDER } from '@/shared/constants';
 import { OtpService } from '@/modules/otp/services/otp.service';
-import { PatientError, ErrorCodes, ApprovalStatus } from '@/shared';
+import { ApprovalStatus, ErrorCodes, PatientError } from '@/shared';
+import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
+import {
+  PatientErrors,
+  PatientSuccess,
+} from '@/modules/patient/data/patient.data';
 
 /**
  * @file: Patient Service
@@ -30,6 +35,9 @@ import { PatientError, ErrorCodes, ApprovalStatus } from '@/shared';
  */
 @Injectable()
 export class PatientService {
+  private readonly logger = new MyLoggerService(PatientService.name);
+  private provider = PatientProvider.useFactory();
+
   constructor(
     @InjectModel(Patient.name) private patientModel: Model<Patient>,
     private readonly patientDao: PatientDao,
@@ -39,8 +47,6 @@ export class PatientService {
     private readonly doctorDao: DoctorDao,
     private readonly otpService: OtpService,
   ) {}
-
-  private provider = PatientProvider.useFactory();
 
   private getApprovalType(approvalType: string): string {
     const upperCaseType = approvalType.toUpperCase();
@@ -104,32 +110,40 @@ export class PatientService {
       if (patientExist) {
         return {
           success: HttpStatus.CREATED,
-          message: 'patient already exist',
+          message: PatientErrors.PATIENT_EXISTS,
         };
       }
       const patient = await this.patientDao.createNewPatient(args);
       if (!patient) {
         return {
           success: HttpStatus.BAD_REQUEST,
-          message: 'An error occurred while creating patient',
+          message: PatientErrors.PATIENT_CREATED_ERROR,
         };
       }
 
       try {
         await this.otpService.deliverOtp(walletAddress, args.email, 'patient');
-        console.log('Email sent');
-      } catch (error) {
-        console.error(error);
-        throw new Error('An error occurred while creating patient');
+        this.logger.info(
+          `email successfully sent on patient creation to ${args.email}`,
+        );
+      } catch (e) {
+        this.logger.log(e.message);
+        throw new HttpException(
+          { message: PatientErrors.PATIENT_CREATED_ERROR },
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
       return {
         success: HttpStatus.OK,
+        message: PatientSuccess.PATIENT_CREATED,
         patient,
-        message: 'Patient created successfully',
       };
-    } catch (error) {
-      Logger.error(error);
-      throw new PatientError('An error occurred while creating patient');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.PATIENT_CREATED_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -173,7 +187,7 @@ export class PatientService {
       if (familyMemberExist) {
         return {
           success: HttpStatus.CONFLICT,
-          message: 'family member already exist',
+          message: PatientErrors.FAMILY_MEMBER_EXIST,
         };
       }
 
@@ -183,12 +197,12 @@ export class PatientService {
       await patient.save();
       return {
         success: HttpStatus.OK,
-        message: 'Family member added successfully',
+        message: PatientSuccess.FAMILY_MEMBER_ADDED,
       };
     } catch (error) {
       console.error(error);
       throw new HttpException(
-        { message: 'An error occurred while adding family member' },
+        { message: PatientErrors.FAMILY_MEMBER_ERROR },
         HttpStatus.BAD_REQUEST,
       );
     }
