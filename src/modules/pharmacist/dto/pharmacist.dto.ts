@@ -18,6 +18,7 @@ import {
   InventorySchema,
 } from '@/modules/pharmacist/schema/pharmacist.schema';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 
 export class CreatePharmacistDto {
   @IsNumber()
@@ -117,6 +118,9 @@ export class PharmacistDto {
   @ApiProperty({ type: Boolean })
   @Prop({ required: true })
   isVerified: boolean;
+
+  @ApiProperty({ type: Types.ObjectId })
+  _id: Types.ObjectId;
 }
 
 export class UpdatePharmacistDto {
