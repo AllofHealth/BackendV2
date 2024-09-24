@@ -13,10 +13,13 @@ import { CreateAdminDto, UpdateAdminDto } from '../dto/admin.dto';
 import { Types } from 'mongoose';
 import { AdminAuthGuard } from '../guards/admin.auth.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
 
 @ApiTags('admin')
 @Controller('admin')
 export class AdminController {
+  private readonly logger = new MyLoggerService(AdminController.name);
+
   constructor(private readonly adminService: AdminService) {}
 
   @Get('allAdmins')
