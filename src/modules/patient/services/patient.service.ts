@@ -379,17 +379,20 @@ export class PatientService {
       if (!patientExists) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'Patient not found',
+          message: PatientErrors.PATIENT_NOT_FOUND,
         };
       }
-      await this.patientModel.deleteOne({ walletAddress });
+      await this.patientDao.DeletePatient(walletAddress);
       return {
         success: HttpStatus.OK,
-        message: 'Patient deleted successfully',
+        message: PatientSuccess.PATIENT_DELETED,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('An error occurred while deleting patient');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.PATIENT_DELETE_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -398,22 +401,18 @@ export class PatientService {
       const patient =
         await this.patientDao.fetchPatientByAddress(walletAddress);
 
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'Patient not found',
-        };
-      }
-
       const prescriptions = patient.prescriptions;
 
       return {
         success: HttpStatus.OK,
         prescriptions,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('An error occurred while fetching prescriptions');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.FETCH_PRESCRIPTION_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -430,7 +429,7 @@ export class PatientService {
       if (!prescription || !prescription.prescriptions.length) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'prescription not found, invalid id',
+          message: `${PatientErrors.PRESCRIPTION_NOT_FOUND} | ${PatientErrors.INVALID_PRESCRIPTION_ID}`,
         };
       }
 
@@ -438,9 +437,12 @@ export class PatientService {
         success: HttpStatus.OK,
         prescription: prescription.prescriptions[0],
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('An error occurred while fetching prescription');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.FETCH_PRESCRIPTION_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
