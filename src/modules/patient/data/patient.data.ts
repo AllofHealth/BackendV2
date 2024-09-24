@@ -14,6 +14,9 @@ export enum PatientErrors {
   FETCH_PRESCRIPTION_ERROR = 'an error occurred while fetching prescriptions',
   PRESCRIPTION_NOT_FOUND = 'prescription not found',
   INVALID_PRESCRIPTION_ID = 'invalid prescription id',
+  PHARMACIST_NOT_FOUND = 'pharmacist not found',
+  SHARE_PRESCRIPTION_ERROR = 'an error occurred while sharing prescription',
+  DELETE_PRESCRIPTION_ERROR = 'an error occurred while deleting prescription',
 }
 
 export enum PatientSuccess {
@@ -23,4 +26,6 @@ export enum PatientSuccess {
   FAMILY_MEMBER_ADDED = 'family member added successfully',
   FAMILY_MEMBER_FOUND = 'family member found',
   FAMILY_MEMBER_UPDATED = 'family member updated successfully',
+  PRESCRIPTION_SHARED = 'prescription shared successfully',
+  PRESCRIPTION_DELETED = 'prescription deleted successfully',
 }
