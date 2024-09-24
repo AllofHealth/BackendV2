@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var PatientService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PatientService = void 0;
 const common_1 = require("@nestjs/common");
@@ -27,7 +28,9 @@ const patient_provider_1 = require("../provider/patient.provider");
 const constants_1 = require("../../../shared/constants");
 const otp_service_1 = require("../../otp/services/otp.service");
 const shared_1 = require("../../../shared");
-let PatientService = class PatientService {
+const my_logger_service_1 = require("../../my-logger/my-logger.service");
+const patient_data_1 = require("../data/patient.data");
+let PatientService = PatientService_1 = class PatientService {
     constructor(patientModel, patientDao, patientGuard, pharmacistGuard, pharmacistDao, doctorDao, otpService) {
         this.patientModel = patientModel;
         this.patientDao = patientDao;
@@ -36,6 +39,7 @@ let PatientService = class PatientService {
         this.pharmacistDao = pharmacistDao;
         this.doctorDao = doctorDao;
         this.otpService = otpService;
+        this.logger = new my_logger_service_1.MyLoggerService(PatientService_1.name);
         this.provider = patient_provider_1.PatientProvider.useFactory();
     }
     getApprovalType(approvalType) {
@@ -86,33 +90,33 @@ let PatientService = class PatientService {
             if (patientExist) {
                 return {
                     success: common_1.HttpStatus.CREATED,
-                    message: 'patient already exist',
+                    message: patient_data_1.PatientErrors.PATIENT_EXISTS,
                 };
             }
             const patient = await this.patientDao.createNewPatient(args);
             if (!patient) {
                 return {
                     success: common_1.HttpStatus.BAD_REQUEST,
-                    message: 'An error occurred while creating patient',
+                    message: patient_data_1.PatientErrors.PATIENT_CREATED_ERROR,
                 };
             }
             try {
                 await this.otpService.deliverOtp(walletAddress, args.email, 'patient');
-                console.log('Email sent');
+                this.logger.info(`email successfully sent on patient creation to ${args.email}`);
             }
-            catch (error) {
-                console.error(error);
-                throw new Error('An error occurred while creating patient');
+            catch (e) {
+                this.logger.log(e.message);
+                throw new common_1.HttpException({ message: patient_data_1.PatientErrors.PATIENT_CREATED_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
             }
             return {
                 success: common_1.HttpStatus.OK,
+                message: patient_data_1.PatientSuccess.PATIENT_CREATED,
                 patient,
-                message: 'Patient created successfully',
             };
         }
-        catch (error) {
-            common_1.Logger.error(error);
-            throw new shared_1.PatientError('An error occurred while creating patient');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.PATIENT_CREATED_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async addFamilyMember(args) {
@@ -137,7 +141,7 @@ let PatientService = class PatientService {
             if (familyMemberExist) {
                 return {
                     success: common_1.HttpStatus.CONFLICT,
-                    message: 'family member already exist',
+                    message: patient_data_1.PatientErrors.FAMILY_MEMBER_EXIST,
                 };
             }
             const newFamilyMember = await this.patientDao.createFamilyMembers(sanitizedArgs);
@@ -145,12 +149,12 @@ let PatientService = class PatientService {
             await patient.save();
             return {
                 success: common_1.HttpStatus.OK,
-                message: 'Family member added successfully',
+                message: patient_data_1.PatientSuccess.FAMILY_MEMBER_ADDED,
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new common_1.HttpException({ message: 'An error occurred while adding family member' }, common_1.HttpStatus.BAD_REQUEST);
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.FAMILY_MEMBER_ERROR }, common_1.HttpStatus.BAD_REQUEST);
         }
     }
     async listFamilyMember(walletAddress) {
@@ -160,19 +164,19 @@ let PatientService = class PatientService {
             if (!familyMembers) {
                 return {
                     success: common_1.HttpStatus.FOUND,
+                    message: patient_data_1.PatientErrors.FAMILY_MEMBER_LIST_ERROR,
                     members: [],
-                    message: 'No family members added',
                 };
             }
             return {
                 success: common_1.HttpStatus.OK,
+                message: patient_data_1.PatientSuccess.FAMILY_MEMBER_FOUND,
                 members: familyMembers,
-                message: 'Family members found',
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new common_1.HttpException({ message: 'An error occurred while fetching family members' }, common_1.HttpStatus.BAD_REQUEST);
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.FAMILY_MEMBER_FETCH_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async getFamilyMemberById(args) {
@@ -182,7 +186,7 @@ let PatientService = class PatientService {
             if (!patient) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'Patient not found',
+                    message: patient_data_1.PatientErrors.PATIENT_NOT_FOUND,
                 };
             }
             const familyMember = patient.familyMembers;
@@ -190,7 +194,7 @@ let PatientService = class PatientService {
             if (!member) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'Member not found',
+                    message: patient_data_1.PatientErrors.FAMILY_MEMBER_LIST_ERROR,
                 };
             }
             return {
@@ -198,43 +202,53 @@ let PatientService = class PatientService {
                 member,
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.PatientError('an error occurred while fetching family member');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.FAMILY_MEMBER_FETCH_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async editFamilyMember(args) {
         const { walletAddress, familyMemberId, updateData } = args;
         try {
-            const patientExist = await this.patientGuard.validatePatient(walletAddress);
-            if (!patientExist) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'Patient not found',
-                };
-            }
             const patient = await this.patientDao.fetchPatientByAddress(walletAddress);
             const familyMemberExists = patient.familyMembers.find((member) => member.id === familyMemberId);
             if (!familyMemberExists) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'Family member not found',
+                    message: patient_data_1.PatientErrors.FAMILY_MEMBER_NOT_FOUND,
                 };
             }
             const familyMember = await this.patientDao.updateFamilyMember(walletAddress, familyMemberId, updateData);
             return {
                 success: common_1.HttpStatus.OK,
-                message: 'Family member updated successfully',
+                message: patient_data_1.PatientSuccess.FAMILY_MEMBER_UPDATED,
                 familyMember,
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.PatientError('An error occurred while editing family member');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.FAMILY_MEMBER_UPDATE_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async findAllPatients() {
-        return await this.patientModel.find();
+        try {
+            const patients = await this.patientModel.find();
+            if (!patients) {
+                return {
+                    status: common_1.HttpStatus.NOT_FOUND,
+                    message: patient_data_1.PatientErrors.PATIENT_NOT_FOUND,
+                    data: [],
+                };
+            }
+            return {
+                status: common_1.HttpStatus.OK,
+                patients,
+            };
+        }
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.PATIENT_FETCH_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     async fetchPatientByWalletAddress(walletAddress) {
         try {
@@ -242,20 +256,18 @@ let PatientService = class PatientService {
             if (!patientExist) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'Patient not found',
+                    message: patient_data_1.PatientErrors.PATIENT_NOT_FOUND,
                 };
             }
             const patient = await this.patientDao.fetchPatientByAddress(walletAddress);
             return {
-                success: shared_1.ErrorCodes.Success,
+                success: common_1.HttpStatus.OK,
                 patient,
             };
         }
-        catch (error) {
-            console.error(error);
-            if (error instanceof mongoose_2.MongooseError)
-                throw new mongoose_2.MongooseError(error.message);
-            throw new shared_1.PatientError('An error occurred while fetching patient');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.PATIENT_FETCH_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async updatePatient(walletAddress, args) {
@@ -263,14 +275,12 @@ let PatientService = class PatientService {
             await this.patientDao.updatePatient(walletAddress, args);
             return {
                 success: common_1.HttpStatus.OK,
-                message: 'Patient updated successfully',
+                message: patient_data_1.PatientSuccess.PATIENT_UPDATED,
             };
         }
-        catch (error) {
-            console.error(error);
-            if (error instanceof mongoose_2.MongooseError)
-                throw new mongoose_2.MongooseError(error.message);
-            throw new shared_1.PatientError('An error occurred while updating patient');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.PATIENT_UPDATE_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async deletePatientByAddress(walletAddress) {
@@ -279,38 +289,32 @@ let PatientService = class PatientService {
             if (!patientExists) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'Patient not found',
+                    message: patient_data_1.PatientErrors.PATIENT_NOT_FOUND,
                 };
             }
-            await this.patientModel.deleteOne({ walletAddress });
+            await this.patientDao.DeletePatient(walletAddress);
             return {
                 success: common_1.HttpStatus.OK,
-                message: 'Patient deleted successfully',
+                message: patient_data_1.PatientSuccess.PATIENT_DELETED,
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.PatientError('An error occurred while deleting patient');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.PATIENT_DELETE_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async fetchAllPrescriptions(walletAddress) {
         try {
             const patient = await this.patientDao.fetchPatientByAddress(walletAddress);
-            if (!patient) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'Patient not found',
-                };
-            }
             const prescriptions = patient.prescriptions;
             return {
                 success: common_1.HttpStatus.OK,
                 prescriptions,
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.PatientError('An error occurred while fetching prescriptions');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.FETCH_PRESCRIPTION_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async fetchPrescription(walletAddress, prescriptionId) {
@@ -319,7 +323,7 @@ let PatientService = class PatientService {
             if (!prescription || !prescription.prescriptions.length) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'prescription not found, invalid id',
+                    message: `${patient_data_1.PatientErrors.PRESCRIPTION_NOT_FOUND} | ${patient_data_1.PatientErrors.INVALID_PRESCRIPTION_ID}`,
                 };
             }
             return {
@@ -327,33 +331,26 @@ let PatientService = class PatientService {
                 prescription: prescription.prescriptions[0],
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.PatientError('An error occurred while fetching prescription');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.FETCH_PRESCRIPTION_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async sharePrescription(args) {
         const { walletAddress, pharmacistAddress, prescriptionId } = args;
         try {
             const isPharmacist = await this.pharmacistGuard.validatePharmacistExists(pharmacistAddress);
-            const patient = await this.patientDao.fetchPatientByAddress(walletAddress);
             if (!isPharmacist) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'Pharmacist not found',
-                };
-            }
-            if (!patient) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'Patient not found',
+                    message: patient_data_1.PatientErrors.PHARMACIST_NOT_FOUND,
                 };
             }
             const prescription = await this.patientModel.findOne({ walletAddress, 'prescriptions._id': prescriptionId }, { 'prescriptions.$': 1 });
             if (!prescription || !prescription.prescriptions.length) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'prescription not found, invalid id',
+                    message: `${patient_data_1.PatientErrors.PRESCRIPTION_NOT_FOUND} | ${patient_data_1.PatientErrors.INVALID_PRESCRIPTION_ID}`,
                 };
             }
             const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(pharmacistAddress);
@@ -364,45 +361,39 @@ let PatientService = class PatientService {
             catch (error) {
                 return {
                     success: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
-                    message: 'an error occurred, please try again',
+                    message: patient_data_1.PatientErrors.SHARE_PRESCRIPTION_ERROR,
                 };
             }
             return {
                 success: common_1.HttpStatus.OK,
-                message: 'prescription shared successfully',
+                message: patient_data_1.PatientSuccess.PRESCRIPTION_SHARED,
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.PatientError('An error occurred while sharing prescription');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.SHARE_PRESCRIPTION_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async removePrescriptions(walletAddress, prescriptionId) {
         try {
             const patient = await this.patientDao.fetchPatientByAddress(walletAddress);
-            if (!patient) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'patient not found',
-                };
-            }
             const prescription = patient.prescriptions.find((prescription) => prescription._id == prescriptionId);
             if (!prescription) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'prescription not found',
+                    message: patient_data_1.PatientErrors.PRESCRIPTION_NOT_FOUND,
                 };
             }
             await this.patientDao.pullOnePrescription(prescriptionId, walletAddress);
             await patient.save();
             return {
                 success: common_1.HttpStatus.OK,
-                message: 'successfully deleted prescription',
+                message: patient_data_1.PatientSuccess.PRESCRIPTION_DELETED,
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.PatientError('an error occurred while removing prescription');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.DELETE_PRESCRIPTION_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async approveMedicalRecordAccess(args) {
@@ -593,7 +584,7 @@ let PatientService = class PatientService {
     }
 };
 exports.PatientService = PatientService;
-exports.PatientService = PatientService = __decorate([
+exports.PatientService = PatientService = PatientService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(patient_schema_1.Patient.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,

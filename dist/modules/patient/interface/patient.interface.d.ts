@@ -29,7 +29,7 @@ export declare enum ApprovalType {
     FULL = "FULL"
 }
 export type RelationShipType = 'father' | 'mother' | 'brother' | 'sister' | 'aunt' | 'uncle' | 'cousin' | 'nephew' | 'niece' | 'grandfather' | 'grandmother' | 'grandson' | 'granddaughter' | 'son' | 'daughter' | 'wife' | 'husband' | 'friend' | 'other';
-export interface MedicalRecordPreviewType {
+export interface IMedicalRecordPreview {
     recordId: number;
     principalPatientAddress: string;
     doctorAddress: string;
@@ -37,7 +37,7 @@ export interface MedicalRecordPreviewType {
     doctorsName: string;
     hospitalName: string;
 }
-export interface FamilyMemberType {
+export interface IFamilyMember {
     id: number;
     principalPatient?: string;
     name: string;
@@ -49,9 +49,9 @@ export interface FamilyMemberType {
     dob: string;
     bloodGroup: string;
     genotype: string;
-    medicalRecord?: MedicalRecordPreviewType[];
+    medicalRecord?: IMedicalRecordPreview[];
 }
-export interface CreateFamilyMemberType {
+export interface ICreateFamilyMember {
     id: number;
     principalPatient?: string;
     name: string;
@@ -63,9 +63,9 @@ export interface CreateFamilyMemberType {
     dob: Date;
     bloodGroup: string;
     genotype: string;
-    medicalRecord?: MedicalRecordPreviewType[];
+    medicalRecord?: IMedicalRecordPreview[];
 }
-export interface CreatePatientType {
+export interface ICreatePatient {
     id: number;
     name: string;
     lastName?: string;
@@ -80,7 +80,7 @@ export interface CreatePatientType {
     walletAddress: string;
     category?: string;
 }
-export interface CreateApprovalType {
+export interface ICreateApproval {
     patientId: number;
     patientName: string;
     recordId?: number;
@@ -91,7 +91,7 @@ export interface CreateApprovalType {
     recordOwner?: string;
     recordTag?: RecordTag;
 }
-export interface CreateApprovalInputType {
+export interface ICreateApprovalInput {
     id: number;
     name: string;
     recordIds?: number[];
@@ -101,7 +101,7 @@ export interface CreateApprovalInputType {
     recordOwner?: string;
     recordTag?: RecordTag;
 }
-export interface UpdateFamilyMemberType {
+export interface IUpdateFamilyMember {
     name?: string;
     relationship?: string;
     email?: string;
@@ -111,13 +111,13 @@ export interface UpdateFamilyMemberType {
     bloodGroup?: string;
     genotype?: string;
 }
-export interface PatientType extends CreatePatientType {
+export interface IPatient extends ICreatePatient {
     appointmentCount: number;
-    medicalRecords: MedicalRecordPreviewType[];
-    familyMembers: FamilyMemberType[];
+    medicalRecords: IMedicalRecordPreview[];
+    familyMembers: IFamilyMember[];
     category: string;
 }
-export interface ApprovalInputType {
+export interface IApprovalInput {
     recordId?: number[];
     patientAddress: string;
     doctorAddress: string;
@@ -125,13 +125,10 @@ export interface ApprovalInputType {
     approvalDurationInSecs: number;
     recordTag?: string;
 }
-export interface FamilyMemberApprovalInputType extends ApprovalInputType {
+export interface IFamilyMemberApprovalInput extends IApprovalInput {
     familyMemberId: number;
 }
-export interface FamilyMemberApprovalInputType extends ApprovalInputType {
-    familyMemberId: number;
-}
-export interface UpdatePatientProfileType {
+export interface IUpdatePatientProfile {
     name?: string;
     lastName?: string;
     age?: string;
@@ -143,26 +140,26 @@ export interface UpdatePatientProfileType {
     bloodGroup?: string;
     genotype?: string;
 }
-export interface CreatePrescriptionInterface {
+export interface ICreatePrescription {
     recordId: number;
     doctorName: string;
     doctorAddress: string;
     institutionName: string;
     patientName: string;
     patientAddress: string;
-    medicine: AddMedicineType[];
+    medicine: IAddMedicine[];
 }
-export interface AddMedicineType {
+export interface IAddMedicine {
     productPrescribed: string;
     productCategory: string;
     practitionerNote: string;
 }
-export interface SharePrescriptionInterface {
+export interface ISharePrescription {
     walletAddress: string;
     pharmacistAddress: string;
     prescriptionId: Types.ObjectId;
 }
-export interface UpdatePrescriptionInterface {
+export interface IUpdatePrescription {
     medicineName?: string;
     medicineId?: string;
     medicineGroup?: string;
