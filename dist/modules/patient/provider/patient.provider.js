@@ -6,8 +6,7 @@ exports.PatientProvider = {
         return {
             returnDuration: (durationInSecs) => {
                 const currentTime = new Date();
-                const newTime = new Date(currentTime.getTime() + durationInSecs * 1000);
-                return newTime;
+                return new Date(currentTime.getTime() + durationInSecs * 1000);
             },
         };
     },
