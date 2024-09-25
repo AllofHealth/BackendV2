@@ -1,5 +1,5 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Patient } from '../schemas/patient.schema';
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { Patient } from "../schemas/patient.schema";
 import {
   ApprovalType,
   IApprovalInput,
@@ -10,24 +10,21 @@ import {
   IFamilyMemberApprovalInput,
   ISharePrescription,
   IUpdateFamilyMember,
-  IUpdatePatientProfile,
-} from '../interface/patient.interface';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { PatientDao } from '../dao/patient.dao';
-import { PatientGuard } from '../guards/patient.guard';
-import { PharmacistGuard } from '@/modules/pharmacist/guards/pharmacist.guard';
-import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
-import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
-import { PatientProvider } from '../provider/patient.provider';
-import { PROFILE_PLACEHOLDER } from '@/shared/constants';
-import { OtpService } from '@/modules/otp/services/otp.service';
-import { ApprovalStatus, PatientError } from '@/shared';
-import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
-import {
-  PatientErrors,
-  PatientSuccess,
-} from '@/modules/patient/data/patient.data';
+  IUpdatePatientProfile
+} from "../interface/patient.interface";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model, Types } from "mongoose";
+import { PatientDao } from "../dao/patient.dao";
+import { PatientGuard } from "../guards/patient.guard";
+import { PharmacistGuard } from "@/modules/pharmacist/guards/pharmacist.guard";
+import { PharmacistDao } from "@/modules/pharmacist/dao/pharmacist.dao";
+import { DoctorDao } from "@/modules/doctor/dao/doctor.dao";
+import { PatientProvider } from "../provider/patient.provider";
+import { PROFILE_PLACEHOLDER } from "@/shared/constants";
+import { OtpService } from "@/modules/otp/services/otp.service";
+import { ApprovalStatus, PatientError } from "@/shared";
+import { MyLoggerService } from "@/modules/my-logger/my-logger.service";
+import { PatientErrors, PatientSuccess } from "@/modules/patient/data/patient.data";
 
 /**
  * @file: Patient Service
@@ -541,25 +538,19 @@ export class PatientService {
     try {
       const patient =
         await this.patientDao.fetchPatientByAddress(patientAddress);
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'patient not found',
-        };
-      }
 
       const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
       if (!doctor) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'doctor not found',
+          message: PatientErrors.DOCTOR_NOT_FOUND,
         };
       }
 
       if (doctor.status !== ApprovalStatus.Approved) {
         return {
           success: HttpStatus.UNAUTHORIZED,
-          message: 'doctor is not approved',
+          message: PatientErrors.DOCTOR_NOT_APPROVED,
         };
       }
 
@@ -587,12 +578,13 @@ export class PatientService {
 
       return {
         success: HttpStatus.OK,
-        message: 'approval request sent',
+        message: PatientSuccess.MEDICAL_RECORD_ACCESS_APPROVED,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError(
-        'an error occurred while approving medical record access',
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.APPROVE_MEDICAL_RECORD_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -609,27 +601,18 @@ export class PatientService {
       approvalDurationInSecs,
     } = args;
     try {
-      const patient =
-        await this.patientDao.fetchPatientByAddress(patientAddress);
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'patient not found',
-        };
-      }
-
       const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
       if (!doctor) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'doctor not found',
+          message: PatientErrors.DOCTOR_NOT_FOUND,
         };
       }
 
       if (doctor.status !== ApprovalStatus.Approved) {
         return {
           success: HttpStatus.UNAUTHORIZED,
-          message: 'doctor is not approved',
+          message: PatientErrors.DOCTOR_NOT_APPROVED,
         };
       }
 
@@ -641,14 +624,14 @@ export class PatientService {
       if (!familyMember) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'family member not found',
+          message: PatientErrors.FAMILY_MEMBER_NOT_FOUND,
         };
       }
 
       if (familyMember.principalPatient != patientAddress) {
         return {
           success: HttpStatus.UNAUTHORIZED,
-          message: 'invalid principal patient address',
+          message: PatientErrors.INVALID_PRINCIPAL_PATIENT,
         };
       }
 
@@ -676,12 +659,13 @@ export class PatientService {
 
       return {
         success: HttpStatus.OK,
-        message: 'family member approval request sent',
+        message: PatientSuccess.FAMILY_MEDICAL_RECORD_ACCESS_APPROVED,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError(
-        'an error occurred while approving family member medical record access',
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.APPROVE_MEDICAL_RECORD_FAMILY },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -702,10 +686,11 @@ export class PatientService {
         success: HttpStatus.OK,
         medicalRecords,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError(
-        'an error occurred while fetching medical records',
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.FETCH_MEDICAL_RECORD_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -719,12 +704,6 @@ export class PatientService {
       const patient = await this.patientDao.fetchPatientByAddress(
         principalPatientAddress,
       );
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'patient not found',
-        };
-      }
 
       const familyMember = patient.familyMembers.find(
         (member) => member.id === familyMemberId,
@@ -733,7 +712,7 @@ export class PatientService {
       if (!familyMember) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'family member not found',
+          message: PatientErrors.FAMILY_MEMBER_NOT_FOUND,
         };
       }
 
@@ -743,10 +722,11 @@ export class PatientService {
         success: HttpStatus.OK,
         records,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError(
-        'An error occurred while fetch family member records',
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.FETCH_FAMILY_MEDICAL_RECORD },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -757,14 +737,6 @@ export class PatientService {
   }) {
     const { walletAddress, recordId } = args;
     try {
-      const isPatient = await this.patientGuard.validatePatient(walletAddress);
-      if (!isPatient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'patient not found',
-        };
-      }
-
       const record = await this.patientDao.findOneRecord(
         walletAddress,
         recordId,
@@ -772,7 +744,7 @@ export class PatientService {
       if (!record) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'record not found',
+          message: PatientErrors.RECORD_NOT_FOUND,
         };
       }
 
@@ -780,9 +752,12 @@ export class PatientService {
         success: HttpStatus.OK,
         record,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('an error occurred while fetching medical record');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.RECORD_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
