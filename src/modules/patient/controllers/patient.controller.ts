@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Ip,
   Post,
   Query,
@@ -15,6 +16,7 @@ import {
   CreateFamilyMemberApprovalDto,
   CreateFamilyMemberDto,
   CreatePatientDto,
+  PatientDto,
   SharePrescriptionDto,
   UpdateFamilyMemberDto,
   UpdatePatientProfileDto,
@@ -25,16 +27,34 @@ import {
   PatientVerificationGuard,
 } from '../guards/patient.auth.guard';
 import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import {
+  PatientErrors,
+  PatientSuccess,
+} from '@/modules/patient/data/patient.data';
 
 @ApiTags('patient')
 @Controller('patient')
 export class PatientController {
   private readonly logger = new MyLoggerService(PatientController.name);
-
   constructor(private readonly patientService: PatientService) {}
 
   @Post('createNewPatient')
+  @ApiOperation({ summary: 'creates a new patient document' })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: PatientSuccess.PATIENT_CREATED,
+    type: PatientDto,
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: PatientErrors.PATIENT_CREATED_ERROR,
+  })
   async createNewPatient(
     @Ip() ip: string,
     @Body(ValidationPipe) createPatientType: CreatePatientDto,
