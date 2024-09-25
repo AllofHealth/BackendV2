@@ -31,6 +31,7 @@ import {
   ApiBadRequestResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import {
@@ -64,6 +65,20 @@ export class PatientController {
   }
 
   @Post('updatePatient')
+  @ApiOperation({ summary: 'update a patient document' })
+  @ApiQuery({
+    name: 'walletAddress',
+    description: 'patient ethereum address',
+    type: String,
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: PatientSuccess.PATIENT_UPDATED,
+  })
+  @ApiOkResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: PatientErrors.PATIENT_UPDATE_ERROR,
+  })
   @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async updatePatient(
     @Ip() ip: string,
