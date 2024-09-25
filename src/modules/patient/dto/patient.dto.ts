@@ -120,6 +120,7 @@ export class PatientDto {
   @Prop({ required: true })
   city: string;
 
+  @ApiProperty({ name: 'walletAddress', type: String })
   @Prop({ required: true, unique: true })
   walletAddress: string;
 
@@ -154,6 +155,52 @@ export class PatientDto {
   @ApiProperty({ name: '_id', type: Types.ObjectId })
   @Prop()
   _id: Types.ObjectId;
+}
+
+export class FamilyMemberDto {
+  @ApiProperty({ name: 'id', description: 'blockchain id', type: Number })
+  @Prop({ required: true })
+  id: number;
+
+  @ApiProperty({ name: 'principalPatient', type: String })
+  @Prop({ required: true })
+  principalPatient: string;
+
+  @ApiProperty({ name: 'name', type: String })
+  @Prop({ required: true })
+  name: string;
+
+  @ApiPropertyOptional({ name: 'relationship', type: String })
+  @Prop({ required: true })
+  relationship: string;
+
+  @ApiProperty({ name: 'email', type: String })
+  @Prop({ required: true })
+  email: string;
+
+  @ApiProperty({ name: 'address', type: String })
+  @Prop({ required: true })
+  address: string;
+
+  @ApiProperty({ name: 'age', type: Number })
+  @Prop({ required: true })
+  age: number;
+
+  @ApiProperty({ name: 'dob', type: Date })
+  @Prop({ sparse: true })
+  dob: Date;
+
+  @ApiProperty({ name: 'bloodGroup', type: String })
+  @Prop({ required: true })
+  bloodGroup: string;
+
+  @ApiProperty({ name: 'genotype', type: String })
+  @Prop({ required: true })
+  genotype: string;
+
+  @ApiProperty({ name: 'medicalRecords', type: [MedicalRecordPreviewSchema] })
+  @Prop({ type: [{ type: MedicalRecordPreviewSchema, unique: true }] })
+  medicalRecord: MedicalRecordPreviewDocument[];
 }
 
 export class UpdatePatientProfileDto {
