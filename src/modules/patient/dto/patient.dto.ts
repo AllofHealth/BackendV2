@@ -201,6 +201,10 @@ export class FamilyMemberDto {
   @ApiProperty({ name: 'medicalRecords', type: [MedicalRecordPreviewSchema] })
   @Prop({ type: [{ type: MedicalRecordPreviewSchema, unique: true }] })
   medicalRecord: MedicalRecordPreviewDocument[];
+
+  @ApiProperty({ name: '_id', type: Types.ObjectId })
+  @Prop()
+  _id: Types.ObjectId;
 }
 
 export class UpdatePatientProfileDto {
