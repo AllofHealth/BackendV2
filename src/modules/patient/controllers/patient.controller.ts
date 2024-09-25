@@ -95,6 +95,20 @@ export class PatientController {
   }
 
   @Post('createFamilyMember')
+  @ApiOperation({ summary: 'creates a family member document' })
+  @ApiQuery({
+    name: 'walletAddress',
+    description: 'patient ethereum address',
+    type: String,
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: PatientSuccess.FAMILY_MEMBER_ADDED,
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: PatientErrors.FAMILY_MEMBER_ERROR,
+  })
   @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async createFamilyMember(
     @Ip() ip: string,
@@ -111,6 +125,20 @@ export class PatientController {
   }
 
   @Post('updateFamilyMember')
+  @ApiOperation({ summary: 'updates a family member document' })
+  @ApiQuery({
+    name: 'walletAddress',
+    description: 'patient ethereum address',
+    type: String,
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: PatientSuccess.FAMILY_MEMBER_UPDATED,
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: PatientErrors.FAMILY_MEMBER_UPDATE_ERROR,
+  })
   @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async updateFamilyMember(
     @Ip() ip: string,
