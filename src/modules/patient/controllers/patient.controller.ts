@@ -158,6 +158,25 @@ export class PatientController {
   }
 
   @Post('sharePrescription')
+  @ApiOperation({ summary: 'share prescription to a pharmacist' })
+  @ApiQuery({
+    name: 'walletAddress',
+    description: 'patient ethereum address',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'pharmacistAddress',
+    description: 'an approved pharmacist ethereum address',
+    type: String,
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: PatientSuccess.PRESCRIPTION_SHARED,
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: PatientErrors.SHARE_PRESCRIPTION_ERROR,
+  })
   @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async sharePrescription(
     @Ip() ip: string,
@@ -177,6 +196,27 @@ export class PatientController {
   }
 
   @Post('removePrescription')
+  @ApiOperation({ summary: 'removes a patient prescription' })
+  @ApiQuery({
+    name: 'walletAddress',
+    description: 'patient ethereum address',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'prescriptionId',
+    description: 'prescription mongo id',
+    type: Types.ObjectId,
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: PatientSuccess.PRESCRIPTION_DELETED,
+    isArray: false,
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: PatientErrors.PATIENT_DELETE_ERROR,
+    isArray: false,
+  })
   @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async removePrescription(
     @Ip() ip: string,
