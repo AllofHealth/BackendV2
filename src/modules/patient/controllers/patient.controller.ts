@@ -16,6 +16,7 @@ import {
   CreateFamilyMemberApprovalDto,
   CreateFamilyMemberDto,
   CreatePatientDto,
+  FamilyMemberDto,
   PatientDto,
   SharePrescriptionDto,
   UpdateFamilyMemberDto,
@@ -298,12 +299,40 @@ export class PatientController {
   }
 
   @Get('allPatients')
+  @ApiOperation({ summary: 'returns all patients documents' })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: true,
+    type: [PatientDto],
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: PatientErrors.PATIENT_FETCH_ERROR,
+  })
   async getAllPatients(@Ip() ip: string) {
     this.logger.log(`Get All Patient Request\t${ip}`);
     return await this.patientService.findAllPatients();
   }
 
   @Get('allFamilyMembers')
+  @ApiOperation({
+    summary: 'returns all family members associated with an ethereum address',
+  })
+  @ApiQuery({
+    name: 'walletAddress',
+    description: 'patient ethereum address',
+    type: String,
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: PatientSuccess.FAMILY_MEMBER_FOUND,
+    isArray: true,
+    type: [FamilyMemberDto],
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: PatientErrors.FAMILY_MEMBER_FETCH_ERROR,
+  })
   @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async getAllFamilyMembers(
     @Ip() ip: string,
@@ -315,6 +344,29 @@ export class PatientController {
   }
 
   @Get('getFamilyMemberById')
+  @ApiOperation({
+    summary:
+      'returns a family members associated with an blockchain identifier',
+  })
+  @ApiQuery({
+    name: 'walletAddress',
+    description: 'patient ethereum address',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'memberId',
+    description: 'family member blockchain id',
+    type: Number,
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: PatientSuccess.FAMILY_MEMBER_FOUND,
+    type: FamilyMemberDto,
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: PatientErrors.FAMILY_MEMBER_FETCH_ERROR,
+  })
   async getFamilyMemberById(
     @Ip() ip: string,
     @Query('walletAddress', new ValidationPipe({ transform: true }))
@@ -322,7 +374,9 @@ export class PatientController {
     @Query('memberId', new ValidationPipe({ transform: true }))
     memberId: number,
   ) {
-    this.logger.log(`Get Family Member By Id Request\t${ip}`);
+    this.logger.log(
+      `Get Family Member By Id Request\t${ip} \t wallet address ${walletAddress}`,
+    );
     return await this.patientService.getFamilyMemberById({
       walletAddress,
       memberId,
