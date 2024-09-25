@@ -1,5 +1,5 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { Patient } from "../schemas/patient.schema";
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Patient } from '../schemas/patient.schema';
 import {
   ApprovalType,
   IApprovalInput,
@@ -10,21 +10,24 @@ import {
   IFamilyMemberApprovalInput,
   ISharePrescription,
   IUpdateFamilyMember,
-  IUpdatePatientProfile
-} from "../interface/patient.interface";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model, Types } from "mongoose";
-import { PatientDao } from "../dao/patient.dao";
-import { PatientGuard } from "../guards/patient.guard";
-import { PharmacistGuard } from "@/modules/pharmacist/guards/pharmacist.guard";
-import { PharmacistDao } from "@/modules/pharmacist/dao/pharmacist.dao";
-import { DoctorDao } from "@/modules/doctor/dao/doctor.dao";
-import { PatientProvider } from "../provider/patient.provider";
-import { PROFILE_PLACEHOLDER } from "@/shared/constants";
-import { OtpService } from "@/modules/otp/services/otp.service";
-import { ApprovalStatus, PatientError } from "@/shared";
-import { MyLoggerService } from "@/modules/my-logger/my-logger.service";
-import { PatientErrors, PatientSuccess } from "@/modules/patient/data/patient.data";
+  IUpdatePatientProfile,
+} from '../interface/patient.interface';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import { PatientDao } from '../dao/patient.dao';
+import { PatientGuard } from '../guards/patient.guard';
+import { PharmacistGuard } from '@/modules/pharmacist/guards/pharmacist.guard';
+import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
+import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
+import { PatientProvider } from '../provider/patient.provider';
+import { PROFILE_PLACEHOLDER } from '@/shared/constants';
+import { OtpService } from '@/modules/otp/services/otp.service';
+import { ApprovalStatus, PatientError } from '@/shared';
+import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
+import {
+  PatientErrors,
+  PatientSuccess,
+} from '@/modules/patient/data/patient.data';
 
 /**
  * @file: Patient Service
