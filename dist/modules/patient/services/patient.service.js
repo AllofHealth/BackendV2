@@ -385,6 +385,7 @@ let PatientService = PatientService_1 = class PatientService {
                 };
             }
             await this.patientDao.pullOnePrescription(prescriptionId, walletAddress);
+            await this.patientDao.deletePrescription(prescriptionId);
             await patient.save();
             return {
                 success: common_1.HttpStatus.OK,

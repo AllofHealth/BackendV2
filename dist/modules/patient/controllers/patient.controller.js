@@ -21,6 +21,7 @@ const mongoose_1 = require("mongoose");
 const patient_auth_guard_1 = require("../guards/patient.auth.guard");
 const my_logger_service_1 = require("../../my-logger/my-logger.service");
 const swagger_1 = require("@nestjs/swagger");
+const patient_data_1 = require("../data/patient.data");
 let PatientController = PatientController_1 = class PatientController {
     constructor(patientService) {
         this.patientService = patientService;
@@ -135,6 +136,16 @@ let PatientController = PatientController_1 = class PatientController {
 exports.PatientController = PatientController;
 __decorate([
     (0, common_1.Post)('createNewPatient'),
+    (0, swagger_1.ApiOperation)({ summary: 'creates a new patient document' }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        description: patient_data_1.PatientSuccess.PATIENT_CREATED,
+        type: patient_dto_1.PatientDto,
+    }),
+    (0, swagger_1.ApiBadRequestResponse)({
+        status: common_1.HttpStatus.BAD_REQUEST,
+        description: patient_data_1.PatientErrors.PATIENT_CREATED_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Body)(common_1.ValidationPipe)),
     __metadata("design:type", Function),
@@ -143,6 +154,20 @@ __decorate([
 ], PatientController.prototype, "createNewPatient", null);
 __decorate([
     (0, common_1.Post)('updatePatient'),
+    (0, swagger_1.ApiOperation)({ summary: 'update a patient document' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        description: 'patient ethereum address',
+        type: String,
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        description: patient_data_1.PatientSuccess.PATIENT_UPDATED,
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+        description: patient_data_1.PatientErrors.PATIENT_UPDATE_ERROR,
+    }),
     (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
@@ -153,6 +178,20 @@ __decorate([
 ], PatientController.prototype, "updatePatient", null);
 __decorate([
     (0, common_1.Post)('createFamilyMember'),
+    (0, swagger_1.ApiOperation)({ summary: 'creates a family member document' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        description: 'patient ethereum address',
+        type: String,
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        description: patient_data_1.PatientSuccess.FAMILY_MEMBER_ADDED,
+    }),
+    (0, swagger_1.ApiBadRequestResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+        description: patient_data_1.PatientErrors.FAMILY_MEMBER_ERROR,
+    }),
     (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
@@ -163,6 +202,20 @@ __decorate([
 ], PatientController.prototype, "createFamilyMember", null);
 __decorate([
     (0, common_1.Post)('updateFamilyMember'),
+    (0, swagger_1.ApiOperation)({ summary: 'updates a family member document' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        description: 'patient ethereum address',
+        type: String,
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        description: patient_data_1.PatientSuccess.FAMILY_MEMBER_UPDATED,
+    }),
+    (0, swagger_1.ApiBadRequestResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+        description: patient_data_1.PatientErrors.FAMILY_MEMBER_UPDATE_ERROR,
+    }),
     (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
@@ -174,6 +227,25 @@ __decorate([
 ], PatientController.prototype, "updateFamilyMember", null);
 __decorate([
     (0, common_1.Post)('sharePrescription'),
+    (0, swagger_1.ApiOperation)({ summary: 'share prescription to a pharmacist' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        description: 'patient ethereum address',
+        type: String,
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'pharmacistAddress',
+        description: 'an approved pharmacist ethereum address',
+        type: String,
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        description: patient_data_1.PatientSuccess.PRESCRIPTION_SHARED,
+    }),
+    (0, swagger_1.ApiBadRequestResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+        description: patient_data_1.PatientErrors.SHARE_PRESCRIPTION_ERROR,
+    }),
     (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
@@ -185,6 +257,27 @@ __decorate([
 ], PatientController.prototype, "sharePrescription", null);
 __decorate([
     (0, common_1.Post)('removePrescription'),
+    (0, swagger_1.ApiOperation)({ summary: 'removes a patient prescription' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        description: 'patient ethereum address',
+        type: String,
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'prescriptionId',
+        description: 'prescription mongo id',
+        type: mongoose_1.Types.ObjectId,
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        description: patient_data_1.PatientSuccess.PRESCRIPTION_DELETED,
+        isArray: false,
+    }),
+    (0, swagger_1.ApiBadRequestResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+        description: patient_data_1.PatientErrors.PATIENT_DELETE_ERROR,
+        isArray: false,
+    }),
     (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),

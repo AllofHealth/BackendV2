@@ -117,6 +117,9 @@ let PatientDao = class PatientDao {
     async pullOnePrescription(prescriptionId, walletAddress) {
         return await this.patientModel.updateOne({ walletAddress: walletAddress }, { $pull: { prescriptions: { _id: prescriptionId } } });
     }
+    async deletePrescription(prescriptionId) {
+        return await this.prescriptionsModel.deleteOne({ _id: prescriptionId });
+    }
     async pullOneApproval(doctorAddress, patientAddress, recordId) {
         return await this.doctorModel.updateOne({ walletAddress: doctorAddress }, {
             $pull: {

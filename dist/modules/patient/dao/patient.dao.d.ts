@@ -62,6 +62,7 @@ export declare class PatientDao {
         _id: Types.ObjectId;
     })[]>;
     pullOnePrescription(prescriptionId: Types.ObjectId, walletAddress: string): Promise<import("mongoose").UpdateWriteOpResult>;
+    deletePrescription(prescriptionId: Types.ObjectId): Promise<import("mongodb").DeleteResult>;
     pullOneApproval(doctorAddress: string, patientAddress: string, recordId: Types.ObjectId): Promise<import("mongoose").UpdateWriteOpResult>;
     pullPatientApprovals(doctorAddress: string, patientAddress: string): Promise<import("mongoose").UpdateWriteOpResult>;
     updatePatient(walletAddress: string, updateData: IUpdatePatientProfile): Promise<import("mongoose").UpdateWriteOpResult>;

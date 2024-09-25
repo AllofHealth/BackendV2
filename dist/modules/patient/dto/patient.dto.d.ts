@@ -23,6 +23,7 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import { Types } from 'mongoose';
+import { FamilyMember, MedicalRecordPreviewDocument, Prescriptions } from '@/modules/patient/schemas/patient.schema';
 export declare class CreatePatientDto {
     id: number;
     name: string;
@@ -36,6 +37,27 @@ export declare class CreatePatientDto {
     genotype: string;
     walletAddress: string;
     category?: string;
+}
+export declare class PatientDto {
+    id: number;
+    appointmentCount: number;
+    name: string;
+    lastName: string;
+    age: number;
+    email: string;
+    phoneNo: string;
+    profilePicture: string;
+    address: string;
+    city: string;
+    walletAddress: string;
+    bloodGroup: string;
+    genotype: string;
+    medicalRecords: MedicalRecordPreviewDocument[];
+    prescriptions: Prescriptions[];
+    familyMembers: FamilyMember[];
+    category: string;
+    isVerified: boolean;
+    _id: Types.ObjectId;
 }
 export declare class UpdatePatientProfileDto {
     name?: string;
@@ -51,7 +73,6 @@ export declare class UpdatePatientProfileDto {
 }
 export declare class CreateFamilyMemberDto {
     id: number;
-    principalPatient?: string;
     name: string;
     profilePicture?: string;
     relationship: string;
@@ -64,6 +85,7 @@ export declare class CreateFamilyMemberDto {
 }
 export declare class UpdateFamilyMemberDto {
     name?: string;
+    profilePicture?: string;
     relationship?: string;
     email?: string;
     address?: string;
