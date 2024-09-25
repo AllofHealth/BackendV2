@@ -73,11 +73,17 @@ export declare class PatientController {
     }>;
     approveMedicalRecordAccess(ip: string, walletAddress: string, createApprovalDto: CreateApprovalDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
-        message: string;
+        message: import("../data/patient.data").PatientErrors;
+    } | {
+        success: import("@nestjs/common").HttpStatus;
+        message: import("../data/patient.data").PatientSuccess;
     }>;
     approveFamilyMemberRecordAccess(ip: string, walletAddress: string, createApprovalDto: CreateFamilyMemberApprovalDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
-        message: string;
+        message: import("../data/patient.data").PatientErrors;
+    } | {
+        success: import("@nestjs/common").HttpStatus;
+        message: import("../data/patient.data").PatientSuccess;
     }>;
     getAllPatients(ip: string): Promise<{
         status: import("@nestjs/common").HttpStatus;
@@ -140,7 +146,7 @@ export declare class PatientController {
     }>;
     getFamilyMemberMedicalRecords(ip: string, principalPatientAddress: string, familyMemberId: number): Promise<{
         success: import("@nestjs/common").HttpStatus;
-        message: string;
+        message: import("../data/patient.data").PatientErrors;
         records?: undefined;
     } | {
         success: import("@nestjs/common").HttpStatus;
@@ -149,7 +155,7 @@ export declare class PatientController {
     }>;
     getMedicalRecord(ip: string, walletAddress: string, recordId: number): Promise<{
         success: import("@nestjs/common").HttpStatus;
-        message: string;
+        message: import("../data/patient.data").PatientErrors;
         record?: undefined;
     } | {
         success: import("@nestjs/common").HttpStatus;

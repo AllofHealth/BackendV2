@@ -21,6 +21,15 @@ var PatientErrors;
     PatientErrors["PHARMACIST_NOT_FOUND"] = "pharmacist not found";
     PatientErrors["SHARE_PRESCRIPTION_ERROR"] = "an error occurred while sharing prescription";
     PatientErrors["DELETE_PRESCRIPTION_ERROR"] = "an error occurred while deleting prescription";
+    PatientErrors["DOCTOR_NOT_FOUND"] = "doctor not found";
+    PatientErrors["DOCTOR_NOT_APPROVED"] = "doctor not approved";
+    PatientErrors["APPROVE_MEDICAL_RECORD_ERROR"] = "an error occurred while approving medical record access";
+    PatientErrors["INVALID_PRINCIPAL_PATIENT"] = "invalid principal patient address";
+    PatientErrors["APPROVE_MEDICAL_RECORD_FAMILY"] = "an error occurred while approving medical record access for family member";
+    PatientErrors["FETCH_MEDICAL_RECORD_ERROR"] = "an error occurred while fetching all medical records";
+    PatientErrors["FETCH_FAMILY_MEDICAL_RECORD"] = "an error occurred while fetching all medical records for family member";
+    PatientErrors["RECORD_NOT_FOUND"] = "record not found";
+    PatientErrors["RECORD_ERROR"] = "an error occurred while fetching medical record";
 })(PatientErrors || (exports.PatientErrors = PatientErrors = {}));
 var PatientSuccess;
 (function (PatientSuccess) {
@@ -30,7 +39,9 @@ var PatientSuccess;
     PatientSuccess["FAMILY_MEMBER_ADDED"] = "family member added successfully";
     PatientSuccess["FAMILY_MEMBER_FOUND"] = "family member found";
     PatientSuccess["FAMILY_MEMBER_UPDATED"] = "family member updated successfully";
+    PatientSuccess["FAMILY_MEDICAL_RECORD_ACCESS_APPROVED"] = "family member medical record access approved successfully";
     PatientSuccess["PRESCRIPTION_SHARED"] = "prescription shared successfully";
     PatientSuccess["PRESCRIPTION_DELETED"] = "prescription deleted successfully";
+    PatientSuccess["MEDICAL_RECORD_ACCESS_APPROVED"] = "medical record access approved successfully";
 })(PatientSuccess || (exports.PatientSuccess = PatientSuccess = {}));
 //# sourceMappingURL=patient.data.js.map

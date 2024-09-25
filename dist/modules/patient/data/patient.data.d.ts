@@ -16,7 +16,16 @@ export declare enum PatientErrors {
     INVALID_PRESCRIPTION_ID = "invalid prescription id",
     PHARMACIST_NOT_FOUND = "pharmacist not found",
     SHARE_PRESCRIPTION_ERROR = "an error occurred while sharing prescription",
-    DELETE_PRESCRIPTION_ERROR = "an error occurred while deleting prescription"
+    DELETE_PRESCRIPTION_ERROR = "an error occurred while deleting prescription",
+    DOCTOR_NOT_FOUND = "doctor not found",
+    DOCTOR_NOT_APPROVED = "doctor not approved",
+    APPROVE_MEDICAL_RECORD_ERROR = "an error occurred while approving medical record access",
+    INVALID_PRINCIPAL_PATIENT = "invalid principal patient address",
+    APPROVE_MEDICAL_RECORD_FAMILY = "an error occurred while approving medical record access for family member",
+    FETCH_MEDICAL_RECORD_ERROR = "an error occurred while fetching all medical records",
+    FETCH_FAMILY_MEDICAL_RECORD = "an error occurred while fetching all medical records for family member",
+    RECORD_NOT_FOUND = "record not found",
+    RECORD_ERROR = "an error occurred while fetching medical record"
 }
 export declare enum PatientSuccess {
     PATIENT_CREATED = "patient created successfully",
@@ -25,6 +34,8 @@ export declare enum PatientSuccess {
     FAMILY_MEMBER_ADDED = "family member added successfully",
     FAMILY_MEMBER_FOUND = "family member found",
     FAMILY_MEMBER_UPDATED = "family member updated successfully",
+    FAMILY_MEDICAL_RECORD_ACCESS_APPROVED = "family member medical record access approved successfully",
     PRESCRIPTION_SHARED = "prescription shared successfully",
-    PRESCRIPTION_DELETED = "prescription deleted successfully"
+    PRESCRIPTION_DELETED = "prescription deleted successfully",
+    MEDICAL_RECORD_ACCESS_APPROVED = "medical record access approved successfully"
 }

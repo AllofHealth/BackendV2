@@ -400,23 +400,17 @@ let PatientService = PatientService_1 = class PatientService {
         const { recordId, patientAddress, doctorAddress, approvalType, approvalDurationInSecs, } = args;
         try {
             const patient = await this.patientDao.fetchPatientByAddress(patientAddress);
-            if (!patient) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'patient not found',
-                };
-            }
             const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
             if (!doctor) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'doctor not found',
+                    message: patient_data_1.PatientErrors.DOCTOR_NOT_FOUND,
                 };
             }
             if (doctor.status !== shared_1.ApprovalStatus.Approved) {
                 return {
                     success: common_1.HttpStatus.UNAUTHORIZED,
-                    message: 'doctor is not approved',
+                    message: patient_data_1.PatientErrors.DOCTOR_NOT_APPROVED,
                 };
             }
             const sanitizedApprovalType = this.getApprovalType(approvalType);
@@ -437,48 +431,41 @@ let PatientService = PatientService_1 = class PatientService {
             await doctor.save();
             return {
                 success: common_1.HttpStatus.OK,
-                message: 'approval request sent',
+                message: patient_data_1.PatientSuccess.MEDICAL_RECORD_ACCESS_APPROVED,
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.PatientError('an error occurred while approving medical record access');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.APPROVE_MEDICAL_RECORD_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async approveMedicalRecordAccessForFamilyMember(args) {
         const { recordId, familyMemberId, patientAddress, doctorAddress, approvalType, approvalDurationInSecs, } = args;
         try {
-            const patient = await this.patientDao.fetchPatientByAddress(patientAddress);
-            if (!patient) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'patient not found',
-                };
-            }
             const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
             if (!doctor) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'doctor not found',
+                    message: patient_data_1.PatientErrors.DOCTOR_NOT_FOUND,
                 };
             }
             if (doctor.status !== shared_1.ApprovalStatus.Approved) {
                 return {
                     success: common_1.HttpStatus.UNAUTHORIZED,
-                    message: 'doctor is not approved',
+                    message: patient_data_1.PatientErrors.DOCTOR_NOT_APPROVED,
                 };
             }
             const familyMember = await this.patientDao.fetchPatientFamilyMember(patientAddress, familyMemberId);
             if (!familyMember) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'family member not found',
+                    message: patient_data_1.PatientErrors.FAMILY_MEMBER_NOT_FOUND,
                 };
             }
             if (familyMember.principalPatient != patientAddress) {
                 return {
                     success: common_1.HttpStatus.UNAUTHORIZED,
-                    message: 'invalid principal patient address',
+                    message: patient_data_1.PatientErrors.INVALID_PRINCIPAL_PATIENT,
                 };
             }
             const sanitizedApprovalType = this.getApprovalType(approvalType);
@@ -499,12 +486,12 @@ let PatientService = PatientService_1 = class PatientService {
             await doctor.save();
             return {
                 success: common_1.HttpStatus.OK,
-                message: 'family member approval request sent',
+                message: patient_data_1.PatientSuccess.FAMILY_MEDICAL_RECORD_ACCESS_APPROVED,
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.PatientError('an error occurred while approving family member medical record access');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.APPROVE_MEDICAL_RECORD_FAMILY }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async fetchAllMedicalRecords(patientAddress) {
@@ -522,26 +509,20 @@ let PatientService = PatientService_1 = class PatientService {
                 medicalRecords,
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.PatientError('an error occurred while fetching medical records');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.FETCH_MEDICAL_RECORD_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async fetchAllMedicalRecordsForFamilyMember(args) {
         const { principalPatientAddress, familyMemberId } = args;
         try {
             const patient = await this.patientDao.fetchPatientByAddress(principalPatientAddress);
-            if (!patient) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'patient not found',
-                };
-            }
             const familyMember = patient.familyMembers.find((member) => member.id === familyMemberId);
             if (!familyMember) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'family member not found',
+                    message: patient_data_1.PatientErrors.FAMILY_MEMBER_NOT_FOUND,
                 };
             }
             const records = familyMember.medicalRecord;
@@ -550,26 +531,19 @@ let PatientService = PatientService_1 = class PatientService {
                 records,
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.PatientError('An error occurred while fetch family member records');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.FETCH_FAMILY_MEDICAL_RECORD }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async fetchMedicalRecordById(args) {
         const { walletAddress, recordId } = args;
         try {
-            const isPatient = await this.patientGuard.validatePatient(walletAddress);
-            if (!isPatient) {
-                return {
-                    success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'patient not found',
-                };
-            }
             const record = await this.patientDao.findOneRecord(walletAddress, recordId);
             if (!record) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'record not found',
+                    message: patient_data_1.PatientErrors.RECORD_NOT_FOUND,
                 };
             }
             return {
@@ -577,9 +551,9 @@ let PatientService = PatientService_1 = class PatientService {
                 record,
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.PatientError('an error occurred while fetching medical record');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.RECORD_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };

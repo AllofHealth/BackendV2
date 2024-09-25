@@ -22,17 +22,17 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import { HttpStatus } from '@nestjs/common';
-import { Patient } from '../schemas/patient.schema';
-import { IApprovalInput, ICreatePatient, IFamilyMember, IFamilyMemberApprovalInput, ISharePrescription, IUpdateFamilyMember, IUpdatePatientProfile } from '../interface/patient.interface';
-import { Model, Types } from 'mongoose';
-import { PatientDao } from '../dao/patient.dao';
-import { PatientGuard } from '../guards/patient.guard';
-import { PharmacistGuard } from '@/modules/pharmacist/guards/pharmacist.guard';
-import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
-import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
-import { OtpService } from '@/modules/otp/services/otp.service';
-import { PatientErrors, PatientSuccess } from '@/modules/patient/data/patient.data';
+import { HttpStatus } from "@nestjs/common";
+import { Patient } from "../schemas/patient.schema";
+import { IApprovalInput, ICreatePatient, IFamilyMember, IFamilyMemberApprovalInput, ISharePrescription, IUpdateFamilyMember, IUpdatePatientProfile } from "../interface/patient.interface";
+import { Model, Types } from "mongoose";
+import { PatientDao } from "../dao/patient.dao";
+import { PatientGuard } from "../guards/patient.guard";
+import { PharmacistGuard } from "@/modules/pharmacist/guards/pharmacist.guard";
+import { PharmacistDao } from "@/modules/pharmacist/dao/pharmacist.dao";
+import { DoctorDao } from "@/modules/doctor/dao/doctor.dao";
+import { OtpService } from "@/modules/otp/services/otp.service";
+import { PatientErrors, PatientSuccess } from "@/modules/patient/data/patient.data";
 export declare class PatientService {
     private patientModel;
     private readonly patientDao;
@@ -162,11 +162,17 @@ export declare class PatientService {
     }>;
     approveMedicalRecordAccess(args: IApprovalInput): Promise<{
         success: HttpStatus;
-        message: string;
+        message: PatientErrors;
+    } | {
+        success: HttpStatus;
+        message: PatientSuccess;
     }>;
     approveMedicalRecordAccessForFamilyMember(args: IFamilyMemberApprovalInput): Promise<{
         success: HttpStatus;
-        message: string;
+        message: PatientErrors;
+    } | {
+        success: HttpStatus;
+        message: PatientSuccess;
     }>;
     fetchAllMedicalRecords(patientAddress: string): Promise<{
         success: HttpStatus;
@@ -177,7 +183,7 @@ export declare class PatientService {
         familyMemberId: number;
     }): Promise<{
         success: HttpStatus;
-        message: string;
+        message: PatientErrors;
         records?: undefined;
     } | {
         success: HttpStatus;
@@ -189,7 +195,7 @@ export declare class PatientService {
         recordId: number;
     }): Promise<{
         success: HttpStatus;
-        message: string;
+        message: PatientErrors;
         record?: undefined;
     } | {
         success: HttpStatus;
