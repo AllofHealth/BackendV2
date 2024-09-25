@@ -12,6 +12,15 @@ import {
 } from 'class-validator';
 import { Types } from 'mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Prop } from '@nestjs/mongoose';
+import {
+  FamilyMember,
+  FamilyMemberSchema,
+  MedicalRecordPreviewDocument,
+  MedicalRecordPreviewSchema,
+  Prescriptions,
+  PrescriptionsSchema,
+} from '@/modules/patient/schemas/patient.schema';
 
 export class CreatePatientDto {
   @ApiProperty({ name: 'id', description: 'blockchain id', type: Number })
@@ -68,6 +77,83 @@ export class CreatePatientDto {
   @IsOptional()
   @IsString()
   category?: string;
+}
+
+export class PatientDto {
+  @ApiProperty({ name: 'id', description: 'blockchain id', type: Number })
+  @Prop({ required: true, unique: true })
+  id: number;
+
+  @ApiProperty({ name: 'appointmentCount', type: Number, default: 0 })
+  @Prop()
+  appointmentCount: number;
+
+  @ApiProperty({ name: 'name', type: String })
+  @Prop({ required: true })
+  name: string;
+
+  @ApiProperty({ name: 'lastName', type: String })
+  @Prop()
+  lastName: string;
+
+  @ApiProperty({ name: 'age', type: Number })
+  @Prop({ required: true })
+  age: number;
+
+  @ApiProperty({ name: 'email', type: String })
+  @Prop({ required: true })
+  email: string;
+
+  @ApiProperty({ name: 'phoneNo', type: String })
+  @Prop({ required: true })
+  phoneNo: string;
+
+  @ApiPropertyOptional({ name: 'profilePicture', type: String })
+  @Prop()
+  profilePicture: string;
+
+  @ApiProperty({ name: 'address', type: String })
+  @Prop({ required: true })
+  address: string;
+
+  @ApiProperty({ name: 'city', type: String })
+  @Prop({ required: true })
+  city: string;
+
+  @Prop({ required: true, unique: true })
+  walletAddress: string;
+
+  @ApiProperty({ name: 'bloodGroup', type: String })
+  @Prop()
+  bloodGroup: string;
+
+  @ApiProperty({ name: 'genotype', type: String })
+  @Prop()
+  genotype: string;
+
+  @ApiProperty({ name: 'medicalRecords', type: [MedicalRecordPreviewSchema] })
+  @Prop({ type: [{ type: MedicalRecordPreviewSchema, unique: true }] })
+  medicalRecords: MedicalRecordPreviewDocument[];
+
+  @ApiProperty({ name: 'prescriptions', type: [PrescriptionsSchema] })
+  @Prop({ type: [{ type: PrescriptionsSchema, unique: true }] })
+  prescriptions: Prescriptions[];
+
+  @ApiProperty({ name: 'familyMembers', type: [FamilyMemberSchema] })
+  @Prop({ type: [{ type: FamilyMemberSchema, unique: true }] })
+  familyMembers: FamilyMember[];
+
+  @ApiProperty({ name: 'patient', type: String, default: 'patient' })
+  @Prop({ default: 'patient', required: true })
+  category: string;
+
+  @ApiProperty({ name: 'isVerified', type: Boolean })
+  @Prop({ required: true })
+  isVerified: boolean;
+
+  @ApiProperty({ name: '_id', type: Types.ObjectId })
+  @Prop()
+  _id: Types.ObjectId;
 }
 
 export class UpdatePatientProfileDto {
