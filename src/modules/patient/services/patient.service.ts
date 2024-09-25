@@ -514,6 +514,7 @@ export class PatientService {
       }
 
       await this.patientDao.pullOnePrescription(prescriptionId, walletAddress);
+      await this.patientDao.deletePrescription(prescriptionId);
       await patient.save();
 
       return {
