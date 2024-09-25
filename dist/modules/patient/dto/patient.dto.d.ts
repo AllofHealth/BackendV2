@@ -59,6 +59,20 @@ export declare class PatientDto {
     isVerified: boolean;
     _id: Types.ObjectId;
 }
+export declare class FamilyMemberDto {
+    id: number;
+    principalPatient: string;
+    name: string;
+    relationship: string;
+    email: string;
+    address: string;
+    age: number;
+    dob: Date;
+    bloodGroup: string;
+    genotype: string;
+    medicalRecord: MedicalRecordPreviewDocument[];
+    _id: Types.ObjectId;
+}
 export declare class UpdatePatientProfileDto {
     name?: string;
     lastName?: string;
