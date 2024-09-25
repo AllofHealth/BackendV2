@@ -233,6 +233,19 @@ export class PatientController {
   }
 
   @Post('approveMedicalRecordAccess')
+  @ApiOperation({ summary: 'approve access to medical record' })
+  @ApiQuery({
+    name: 'walletAddress',
+    description: 'patient ethereum address',
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: PatientSuccess.MEDICAL_RECORD_ACCESS_APPROVED,
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: PatientErrors.APPROVE_MEDICAL_RECORD_ERROR,
+  })
   @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async approveMedicalRecordAccess(
     @Ip() ip: string,
@@ -252,6 +265,19 @@ export class PatientController {
   }
 
   @Post('approveFamilyMemberRecordAccess')
+  @ApiOperation({ summary: 'approve access to family member medical record' })
+  @ApiQuery({
+    name: 'walletAddress',
+    description: 'patient ethereum address',
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: PatientSuccess.FAMILY_MEDICAL_RECORD_ACCESS_APPROVED,
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: PatientErrors.APPROVE_MEDICAL_RECORD_FAMILY,
+  })
   @UseGuards(PatientAuthGuard, PatientVerificationGuard)
   async approveFamilyMemberRecordAccess(
     @Ip() ip: string,
