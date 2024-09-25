@@ -88,7 +88,9 @@ export class PatientController {
     @Body(new ValidationPipe({ transform: true }))
     updatePatientDto: UpdatePatientProfileDto,
   ) {
-    this.logger.log(`Update Patient Request\t${ip}`);
+    this.logger.log(
+      `Update Patient Request\t${ip} \t wallet address ${walletAddress}`,
+    );
     return await this.patientService.updatePatient(
       walletAddress,
       updatePatientDto,
@@ -118,7 +120,9 @@ export class PatientController {
     @Body(new ValidationPipe({ transform: true }))
     createFamilyMemberDto: CreateFamilyMemberDto,
   ) {
-    this.logger.log(`Create Family Member Request\t${ip}`);
+    this.logger.log(
+      `Create Family Member Request\t${ip}\t wallet address ${walletAddress}`,
+    );
     return await this.patientService.addFamilyMember({
       walletAddress,
       familyMember: createFamilyMemberDto,
@@ -150,7 +154,9 @@ export class PatientController {
     @Body(new ValidationPipe({ transform: true }))
     updateFamilyMemberDto: UpdateFamilyMemberDto,
   ) {
-    this.logger.log(`Update Family Member Request\t${ip}`);
+    this.logger.log(
+      `Update Family Member Request\t${ip} \t wallet address ${walletAddress}`,
+    );
     return await this.patientService.editFamilyMember({
       walletAddress,
       familyMemberId,
@@ -188,7 +194,9 @@ export class PatientController {
     @Body(new ValidationPipe({ transform: true }))
     sharePrescriptionDto: SharePrescriptionDto,
   ) {
-    this.logger.log(`Share Prescription Request\t${ip}`);
+    this.logger.log(
+      `Share Prescription Request\t${ip} \t wallet address ${walletAddress}`,
+    );
     return await this.patientService.sharePrescription({
       walletAddress,
       pharmacistAddress,
@@ -226,7 +234,9 @@ export class PatientController {
     @Query('prescriptionId', new ValidationPipe({ transform: true }))
     prescriptionId: Types.ObjectId,
   ) {
-    this.logger.log(`Remove Prescription Request\t${ip}`);
+    this.logger.log(
+      `Remove Prescription Request\t${ip} \t wallet address ${walletAddress}`,
+    );
     return await this.patientService.removePrescriptions(
       walletAddress,
       prescriptionId,
@@ -255,7 +265,9 @@ export class PatientController {
     @Body(new ValidationPipe({ transform: true }))
     createApprovalDto: CreateApprovalDto,
   ) {
-    this.logger.log(`Approve Medical Record Access Request\t${ip}`);
+    this.logger.log(
+      `Approve Medical Record Access Request\t${ip} \t wallet address ${walletAddress}`,
+    );
     return await this.patientService.approveMedicalRecordAccess({
       recordId: createApprovalDto.recordId,
       patientAddress: walletAddress,
@@ -287,7 +299,9 @@ export class PatientController {
     @Body(new ValidationPipe({ transform: true }))
     createApprovalDto: CreateFamilyMemberApprovalDto,
   ) {
-    this.logger.log(`Approve Family Member Record Access Request\t${ip}`);
+    this.logger.log(
+      `Approve Family Member Record Access Request\t${ip}\t wallet address ${walletAddress}`,
+    );
     return await this.patientService.approveMedicalRecordAccessForFamilyMember({
       recordId: createApprovalDto.recordId,
       familyMemberId: createApprovalDto.familyMemberId,
@@ -339,7 +353,9 @@ export class PatientController {
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
   ) {
-    this.logger.log(`Get All Family Member Request\t${ip}`);
+    this.logger.log(
+      `Get All Family Member Request\t${ip} \t wallet address ${walletAddress}`,
+    );
     return await this.patientService.listFamilyMember(walletAddress);
   }
 
@@ -384,12 +400,29 @@ export class PatientController {
   }
 
   @Get('getPatientByAddress')
+  @ApiOperation({ summary: 'returns a patient document' })
+  @ApiQuery({
+    name: 'walletAddress',
+    description: 'patient ethereum address',
+    type: String,
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: false,
+    type: PatientDto,
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: PatientErrors.PATIENT_FETCH_ERROR,
+  })
   async getPatientByAddress(
     @Ip() ip: string,
     @Query('walletAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
   ) {
-    this.logger.log(`Get Patient By Id Request\t${ip}`);
+    this.logger.log(
+      `Get Patient By Id Request\t${ip} \t wallet address ${walletAddress}`,
+    );
     return await this.patientService.fetchPatientByWalletAddress(walletAddress);
   }
 
