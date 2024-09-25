@@ -145,6 +145,10 @@ export class PatientDao {
     );
   }
 
+  async deletePrescription(prescriptionId: Types.ObjectId) {
+    return await this.prescriptionsModel.deleteOne({ _id: prescriptionId });
+  }
+
   async pullOneApproval(
     doctorAddress: string,
     patientAddress: string,
