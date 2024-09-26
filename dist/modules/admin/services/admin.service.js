@@ -25,17 +25,19 @@ const admin_guard_1 = require("../guards/admin.guard");
 const hospital_dao_1 = require("../../hospital/dao/hospital.dao");
 const doctor_dao_1 = require("../../doctor/dao/doctor.dao");
 const pharmacist_dao_1 = require("../../pharmacist/dao/pharmacist.dao");
-const otp_service_1 = require("../../otp/services/otp.service");
 const admin_data_1 = require("../data/admin.data");
+const event_emitter_1 = require("@nestjs/event-emitter");
+const shared_events_1 = require("../../../shared/events/shared.events");
+const shared_dto_1 = require("../../../shared/dto/shared.dto");
 let AdminService = AdminService_1 = class AdminService {
-    constructor(adminModel, adminDao, adminGuard, hospitalDao, doctorDao, pharmacistDao, otpService) {
+    constructor(adminModel, adminDao, adminGuard, hospitalDao, doctorDao, pharmacistDao, eventEmitter) {
         this.adminModel = adminModel;
         this.adminDao = adminDao;
         this.adminGuard = adminGuard;
         this.hospitalDao = hospitalDao;
         this.doctorDao = doctorDao;
         this.pharmacistDao = pharmacistDao;
-        this.otpService = otpService;
+        this.eventEmitter = eventEmitter;
         this.logger = new my_logger_service_1.MyLoggerService(AdminService_1.name);
     }
     async fetchAdminByAddress(walletAddress) {
@@ -127,7 +129,7 @@ let AdminService = AdminService_1 = class AdminService {
         try {
             const admin = await this.adminDao.createAdmin(args);
             try {
-                await this.otpService.deliverOtp(args.walletAddress, args.email, 'admin');
+                this.eventEmitter.emit(shared_events_1.SharedEvents.ENTITY_CREATED, new shared_dto_1.EntityCreatedDto(args.walletAddress, admin.email, 'admin'));
             }
             catch (e) {
                 this.logger.error(e.message);
@@ -249,6 +251,6 @@ exports.AdminService = AdminService = AdminService_1 = __decorate([
         hospital_dao_1.HospitalDao,
         doctor_dao_1.DoctorDao,
         pharmacist_dao_1.PharmacistDao,
-        otp_service_1.OtpService])
+        event_emitter_1.EventEmitter2])
 ], AdminService);
 //# sourceMappingURL=admin.service.js.map

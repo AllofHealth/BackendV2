@@ -32,8 +32,8 @@ import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
 import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
 import { DoctorGuard } from '@/modules/doctor/guards/doctor.guard';
 import { PharmacistGuard } from '@/modules/pharmacist/guards/pharmacist.guard';
-import { OtpService } from '@/modules/otp/services/otp.service';
 import { EncryptionService } from '@/shared/utils/encryption/service/encryption.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 export declare class HospitalService {
     private hospitalModel;
     private readonly hospitalDao;
@@ -41,10 +41,10 @@ export declare class HospitalService {
     private readonly pharmacistDao;
     private readonly doctorGuard;
     private readonly pharmacistGuard;
-    private readonly otpService;
+    private readonly eventEmitter;
     private readonly encryptionService;
     private logger;
-    constructor(hospitalModel: Model<Hospital>, hospitalDao: HospitalDao, doctorDao: DoctorDao, pharmacistDao: PharmacistDao, doctorGuard: DoctorGuard, pharmacistGuard: PharmacistGuard, otpService: OtpService, encryptionService: EncryptionService);
+    constructor(hospitalModel: Model<Hospital>, hospitalDao: HospitalDao, doctorDao: DoctorDao, pharmacistDao: PharmacistDao, doctorGuard: DoctorGuard, pharmacistGuard: PharmacistGuard, eventEmitter: EventEmitter2, encryptionService: EncryptionService);
     createNewHospital(args: CreateHospitalType): Promise<{
         success: HttpStatus;
         message: string;

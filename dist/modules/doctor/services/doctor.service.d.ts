@@ -30,18 +30,18 @@ import { DoctorGuard } from '../guards/doctor.guard';
 import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
 import { PatientDao } from '@/modules/patient/dao/patient.dao';
 import { PatientGuard } from '@/modules/patient/guards/patient.guard';
-import { OtpService } from '@/modules/otp/services/otp.service';
 import { MedicineDao } from '@/modules/medicine/dao/medicine.dao';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 export declare class DoctorService {
     private readonly doctorDao;
     private readonly doctorGuard;
     private readonly hospitalDao;
     private readonly patientDao;
     private readonly patientGuard;
-    private readonly otpService;
     private readonly medicineDao;
+    private readonly eventEmitter;
     private readonly logger;
-    constructor(doctorDao: DoctorDao, doctorGuard: DoctorGuard, hospitalDao: HospitalDao, patientDao: PatientDao, patientGuard: PatientGuard, otpService: OtpService, medicineDao: MedicineDao);
+    constructor(doctorDao: DoctorDao, doctorGuard: DoctorGuard, hospitalDao: HospitalDao, patientDao: PatientDao, patientGuard: PatientGuard, medicineDao: MedicineDao, eventEmitter: EventEmitter2);
     getPendingDoctors(): Promise<{
         success: HttpStatus;
         doctors: (import("mongoose").Document<unknown, {}, import("../schema/doctor.schema").Doctor> & import("../schema/doctor.schema").Doctor & {

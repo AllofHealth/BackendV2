@@ -32,8 +32,8 @@ import { AdminGuard } from '../guards/admin.guard';
 import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
 import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
 import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
-import { OtpService } from '@/modules/otp/services/otp.service';
 import { AdminErrors, AdminMessages } from '@/modules/admin/data/admin.data';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 export declare class AdminService {
     private adminModel;
     private readonly adminDao;
@@ -41,9 +41,9 @@ export declare class AdminService {
     private readonly hospitalDao;
     private readonly doctorDao;
     private readonly pharmacistDao;
-    private readonly otpService;
+    private readonly eventEmitter;
     private logger;
-    constructor(adminModel: Model<Admin>, adminDao: AdminDao, adminGuard: AdminGuard, hospitalDao: HospitalDao, doctorDao: DoctorDao, pharmacistDao: PharmacistDao, otpService: OtpService);
+    constructor(adminModel: Model<Admin>, adminDao: AdminDao, adminGuard: AdminGuard, hospitalDao: HospitalDao, doctorDao: DoctorDao, pharmacistDao: PharmacistDao, eventEmitter: EventEmitter2);
     fetchAdminByAddress(walletAddress: string): Promise<(import("mongoose").Document<unknown, {}, Admin> & Admin & {
         _id: Types.ObjectId;
     }) | {

@@ -8,16 +8,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var OtpService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OtpService = void 0;
 const common_1 = require("@nestjs/common");
 const otplib_1 = require("otplib");
 const otp_dao_1 = require("../dao/otp.dao");
 const postmark_service_1 = require("../../postmark/service/postmark.service");
-let OtpService = class OtpService {
+const shared_dto_1 = require("../../../shared/dto/shared.dto");
+const event_emitter_1 = require("@nestjs/event-emitter");
+const shared_events_1 = require("../../../shared/events/shared.events");
+const my_logger_service_1 = require("../../my-logger/my-logger.service");
+let OtpService = OtpService_1 = class OtpService {
     constructor(otpDao, postmarkService) {
         this.otpDao = otpDao;
         this.postmarkService = postmarkService;
+        this.logger = new my_logger_service_1.MyLoggerService(OtpService_1.name);
         this.expirationTime = 1000 * 60 * 5;
     }
     async cleanUp(secret) {
@@ -139,19 +145,21 @@ let OtpService = class OtpService {
             throw new Error('error while verifying otp');
         }
     }
-    async deliverOtp(walletAddress, emailAddress, role) {
+    async deliverOtp(args) {
+        const { walletAddress, email, role } = args;
         try {
+            this.logger.log(`generating otp`);
             const { otp } = await this.generateOtp(walletAddress, role);
-            console.log(otp);
+            this.logger.log(`delivering email to ${email}`);
             await this.postmarkService.sendEmail({
-                to: emailAddress,
+                to: email,
                 otp,
             });
-            console.log('otp sent successfully');
+            this.logger.log(`otp delivered successfully`);
         }
-        catch (error) {
-            console.error(error);
-            throw new Error('an error occurred while delivering otp');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException('an error occurred while delivering otp', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async resendOtp(walletAddress, role) {
@@ -160,19 +168,35 @@ let OtpService = class OtpService {
             switch (role) {
                 case 'patient':
                     const patient = await this.otpDao.fetchPatient(walletAddress);
-                    await this.deliverOtp(walletAddress, patient.email, 'patient');
+                    await this.deliverOtp({
+                        walletAddress,
+                        email: patient.email,
+                        role: 'patient',
+                    });
                     break;
                 case 'doctor':
                     const doctor = await this.otpDao.fetchDoctor(walletAddress);
-                    await this.deliverOtp(walletAddress, doctor.email, 'doctor');
+                    await this.deliverOtp({
+                        walletAddress,
+                        email: doctor.email,
+                        role: 'doctor',
+                    });
                     break;
                 case 'pharmacist':
                     const pharmacist = await this.otpDao.fetchPharmacist(walletAddress);
-                    await this.deliverOtp(walletAddress, pharmacist.email, 'pharmacist');
+                    await this.deliverOtp({
+                        walletAddress,
+                        email: pharmacist.email,
+                        role: 'pharmacist',
+                    });
                     break;
                 case 'institution':
                     const institution = await this.otpDao.fetchInstitution(walletAddress);
-                    await this.deliverOtp(walletAddress, institution.admin, 'institution');
+                    await this.deliverOtp({
+                        walletAddress,
+                        email: institution.admin,
+                        role: 'institution',
+                    });
                     break;
             }
             return {
@@ -187,7 +211,13 @@ let OtpService = class OtpService {
     }
 };
 exports.OtpService = OtpService;
-exports.OtpService = OtpService = __decorate([
+__decorate([
+    (0, event_emitter_1.OnEvent)(shared_events_1.SharedEvents.ENTITY_CREATED, { async: true }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [shared_dto_1.EntityCreatedDto]),
+    __metadata("design:returntype", Promise)
+], OtpService.prototype, "deliverOtp", null);
+exports.OtpService = OtpService = OtpService_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [otp_dao_1.OtpDao,
         postmark_service_1.PostmarkService])

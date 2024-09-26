@@ -33,6 +33,7 @@ import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
 import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
 import { OtpService } from '@/modules/otp/services/otp.service';
 import { PatientErrors, PatientSuccess } from '@/modules/patient/data/patient.data';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 export declare class PatientService {
     private patientModel;
     private readonly patientDao;
@@ -41,9 +42,10 @@ export declare class PatientService {
     private readonly pharmacistDao;
     private readonly doctorDao;
     private readonly otpService;
+    private readonly eventEmitter;
     private readonly logger;
     private provider;
-    constructor(patientModel: Model<Patient>, patientDao: PatientDao, patientGuard: PatientGuard, pharmacistGuard: PharmacistGuard, pharmacistDao: PharmacistDao, doctorDao: DoctorDao, otpService: OtpService);
+    constructor(patientModel: Model<Patient>, patientDao: PatientDao, patientGuard: PatientGuard, pharmacistGuard: PharmacistGuard, pharmacistDao: PharmacistDao, doctorDao: DoctorDao, otpService: OtpService, eventEmitter: EventEmitter2);
     private getApprovalType;
     private createApprovalInputs;
     createNewPatient(args: ICreatePatient): Promise<{

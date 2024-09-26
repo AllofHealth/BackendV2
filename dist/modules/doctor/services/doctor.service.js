@@ -18,18 +18,20 @@ const doctor_guard_1 = require("../guards/doctor.guard");
 const hospital_dao_1 = require("../../hospital/dao/hospital.dao");
 const patient_dao_1 = require("../../patient/dao/patient.dao");
 const patient_guard_1 = require("../../patient/guards/patient.guard");
-const otp_service_1 = require("../../otp/services/otp.service");
 const medicine_dao_1 = require("../../medicine/dao/medicine.dao");
 const my_logger_service_1 = require("../../my-logger/my-logger.service");
+const event_emitter_1 = require("@nestjs/event-emitter");
+const shared_events_1 = require("../../../shared/events/shared.events");
+const shared_dto_1 = require("../../../shared/dto/shared.dto");
 let DoctorService = class DoctorService {
-    constructor(doctorDao, doctorGuard, hospitalDao, patientDao, patientGuard, otpService, medicineDao) {
+    constructor(doctorDao, doctorGuard, hospitalDao, patientDao, patientGuard, medicineDao, eventEmitter) {
         this.doctorDao = doctorDao;
         this.doctorGuard = doctorGuard;
         this.hospitalDao = hospitalDao;
         this.patientDao = patientDao;
         this.patientGuard = patientGuard;
-        this.otpService = otpService;
         this.medicineDao = medicineDao;
+        this.eventEmitter = eventEmitter;
         this.logger = new my_logger_service_1.MyLoggerService('DoctorService');
     }
     async getPendingDoctors() {
@@ -121,7 +123,7 @@ let DoctorService = class DoctorService {
             };
             try {
                 hospital.doctors.push(doctorPreview);
-                await this.otpService.deliverOtp(args.walletAddress, doctor.email, 'doctor');
+                this.eventEmitter.emit(shared_events_1.SharedEvents.ENTITY_CREATED, new shared_dto_1.EntityCreatedDto(args.walletAddress, doctor.email, 'doctor'));
             }
             catch (error) {
                 await this.doctorDao.deleteDoctor(args.walletAddress);
@@ -545,7 +547,7 @@ exports.DoctorService = DoctorService = __decorate([
         hospital_dao_1.HospitalDao,
         patient_dao_1.PatientDao,
         patient_guard_1.PatientGuard,
-        otp_service_1.OtpService,
-        medicine_dao_1.MedicineDao])
+        medicine_dao_1.MedicineDao,
+        event_emitter_1.EventEmitter2])
 ], DoctorService);
 //# sourceMappingURL=doctor.service.js.map

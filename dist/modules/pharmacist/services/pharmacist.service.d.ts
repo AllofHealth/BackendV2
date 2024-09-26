@@ -30,18 +30,18 @@ import { ErrorCodes } from '@/shared';
 import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
 import { Types } from 'mongoose';
 import { PatientDao } from '@/modules/patient/dao/patient.dao';
-import { OtpService } from '@/modules/otp/services/otp.service';
 import { MedicineService } from '@/modules/medicine/service/medicine.service';
 import { Prescriptions } from '@/modules/patient/schemas/patient.schema';
 import { Product } from '../schema/pharmacist.schema';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 export declare class PharmacistService {
     private readonly pharmacistDao;
     private readonly pharmacistGuard;
     private readonly hospitalDao;
     private readonly patientDao;
-    private readonly otpService;
     private readonly medicineService;
-    constructor(pharmacistDao: PharmacistDao, pharmacistGuard: PharmacistGuard, hospitalDao: HospitalDao, patientDao: PatientDao, otpService: OtpService, medicineService: MedicineService);
+    private readonly eventEmitter;
+    constructor(pharmacistDao: PharmacistDao, pharmacistGuard: PharmacistGuard, hospitalDao: HospitalDao, patientDao: PatientDao, medicineService: MedicineService, eventEmitter: EventEmitter2);
     createPharmacist(args: CreatePharmacistType): Promise<{
         success: HttpStatus;
         pharmacist: import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {

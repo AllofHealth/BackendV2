@@ -26,12 +26,14 @@ const configify_1 = require("@itgorillaz/configify");
 const encryption_module_1 = require("./shared/utils/encryption/encryption.module");
 const config_1 = require("@nestjs/config");
 const config_2 = require("./shared/config/config");
+const event_emitter_1 = require("@nestjs/event-emitter");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            event_emitter_1.EventEmitterModule.forRoot(),
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
                 cache: true,

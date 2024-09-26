@@ -17,17 +17,19 @@ const shared_1 = require("../../../shared");
 const hospital_dao_1 = require("../../hospital/dao/hospital.dao");
 const mongoose_1 = require("mongoose");
 const patient_dao_1 = require("../../patient/dao/patient.dao");
-const otp_service_1 = require("../../otp/services/otp.service");
 const medicine_interface_1 = require("../../medicine/interface/medicine.interface");
 const medicine_service_1 = require("../../medicine/service/medicine.service");
+const event_emitter_1 = require("@nestjs/event-emitter");
+const shared_events_1 = require("../../../shared/events/shared.events");
+const shared_dto_1 = require("../../../shared/dto/shared.dto");
 let PharmacistService = class PharmacistService {
-    constructor(pharmacistDao, pharmacistGuard, hospitalDao, patientDao, otpService, medicineService) {
+    constructor(pharmacistDao, pharmacistGuard, hospitalDao, patientDao, medicineService, eventEmitter) {
         this.pharmacistDao = pharmacistDao;
         this.pharmacistGuard = pharmacistGuard;
         this.hospitalDao = hospitalDao;
         this.patientDao = patientDao;
-        this.otpService = otpService;
         this.medicineService = medicineService;
+        this.eventEmitter = eventEmitter;
     }
     async createPharmacist(args) {
         const pharmacistExists = await this.pharmacistGuard.validatePharmacistExists(args.walletAddress);
@@ -56,7 +58,7 @@ let PharmacistService = class PharmacistService {
             };
             try {
                 hospital.pharmacists.push(pharmacistPreview);
-                await this.otpService.deliverOtp(args.walletAddress, pharmacist.email, 'pharmacist');
+                this.eventEmitter.emit(shared_events_1.SharedEvents.ENTITY_CREATED, new shared_dto_1.EntityCreatedDto(args.walletAddress, pharmacist.email, 'pharmacist'));
             }
             catch (error) {
                 await this.pharmacistDao.deletePharmacist(pharmacist.walletAddress);
@@ -610,7 +612,7 @@ exports.PharmacistService = PharmacistService = __decorate([
         pharmacist_guard_1.PharmacistGuard,
         hospital_dao_1.HospitalDao,
         patient_dao_1.PatientDao,
-        otp_service_1.OtpService,
-        medicine_service_1.MedicineService])
+        medicine_service_1.MedicineService,
+        event_emitter_1.EventEmitter2])
 ], PharmacistService);
 //# sourceMappingURL=pharmacist.service.js.map

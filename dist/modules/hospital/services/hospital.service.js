@@ -24,17 +24,19 @@ const doctor_dao_1 = require("../../doctor/dao/doctor.dao");
 const pharmacist_dao_1 = require("../../pharmacist/dao/pharmacist.dao");
 const doctor_guard_1 = require("../../doctor/guards/doctor.guard");
 const pharmacist_guard_1 = require("../../pharmacist/guards/pharmacist.guard");
-const otp_service_1 = require("../../otp/services/otp.service");
 const encryption_service_1 = require("../../../shared/utils/encryption/service/encryption.service");
+const event_emitter_1 = require("@nestjs/event-emitter");
+const shared_events_1 = require("../../../shared/events/shared.events");
+const shared_dto_1 = require("../../../shared/dto/shared.dto");
 let HospitalService = class HospitalService {
-    constructor(hospitalModel, hospitalDao, doctorDao, pharmacistDao, doctorGuard, pharmacistGuard, otpService, encryptionService) {
+    constructor(hospitalModel, hospitalDao, doctorDao, pharmacistDao, doctorGuard, pharmacistGuard, eventEmitter, encryptionService) {
         this.hospitalModel = hospitalModel;
         this.hospitalDao = hospitalDao;
         this.doctorDao = doctorDao;
         this.pharmacistDao = pharmacistDao;
         this.doctorGuard = doctorGuard;
         this.pharmacistGuard = pharmacistGuard;
-        this.otpService = otpService;
+        this.eventEmitter = eventEmitter;
         this.encryptionService = encryptionService;
         this.logger = new my_logger_service_1.MyLoggerService('HospitalService');
     }
@@ -60,7 +62,7 @@ let HospitalService = class HospitalService {
                 };
             }
             try {
-                await this.otpService.deliverOtp(args.admin, args.email, 'institution');
+                this.eventEmitter.emit(shared_events_1.SharedEvents.ENTITY_CREATED, new shared_dto_1.EntityCreatedDto(args.admin, hospital.email, 'institution'));
             }
             catch (error) {
                 await this.hospitalDao.removeHospitalById(hospital._id);
@@ -786,7 +788,7 @@ exports.HospitalService = HospitalService = __decorate([
         pharmacist_dao_1.PharmacistDao,
         doctor_guard_1.DoctorGuard,
         pharmacist_guard_1.PharmacistGuard,
-        otp_service_1.OtpService,
+        event_emitter_1.EventEmitter2,
         encryption_service_1.EncryptionService])
 ], HospitalService);
 //# sourceMappingURL=hospital.service.js.map

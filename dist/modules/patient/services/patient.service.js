@@ -30,8 +30,11 @@ const otp_service_1 = require("../../otp/services/otp.service");
 const shared_1 = require("../../../shared");
 const my_logger_service_1 = require("../../my-logger/my-logger.service");
 const patient_data_1 = require("../data/patient.data");
+const event_emitter_1 = require("@nestjs/event-emitter");
+const shared_events_1 = require("../../../shared/events/shared.events");
+const shared_dto_1 = require("../../../shared/dto/shared.dto");
 let PatientService = PatientService_1 = class PatientService {
-    constructor(patientModel, patientDao, patientGuard, pharmacistGuard, pharmacistDao, doctorDao, otpService) {
+    constructor(patientModel, patientDao, patientGuard, pharmacistGuard, pharmacistDao, doctorDao, otpService, eventEmitter) {
         this.patientModel = patientModel;
         this.patientDao = patientDao;
         this.patientGuard = patientGuard;
@@ -39,6 +42,7 @@ let PatientService = PatientService_1 = class PatientService {
         this.pharmacistDao = pharmacistDao;
         this.doctorDao = doctorDao;
         this.otpService = otpService;
+        this.eventEmitter = eventEmitter;
         this.logger = new my_logger_service_1.MyLoggerService(PatientService_1.name);
         this.provider = patient_provider_1.PatientProvider.useFactory();
     }
@@ -100,14 +104,7 @@ let PatientService = PatientService_1 = class PatientService {
                     message: patient_data_1.PatientErrors.PATIENT_CREATED_ERROR,
                 };
             }
-            try {
-                await this.otpService.deliverOtp(walletAddress, args.email, 'patient');
-                this.logger.info(`email successfully sent on patient creation to ${args.email}`);
-            }
-            catch (e) {
-                this.logger.log(e.message);
-                throw new common_1.HttpException({ message: patient_data_1.PatientErrors.PATIENT_CREATED_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+            this.eventEmitter.emit(shared_events_1.SharedEvents.ENTITY_CREATED, new shared_dto_1.EntityCreatedDto(walletAddress, args.email, 'patient'));
             return {
                 success: common_1.HttpStatus.OK,
                 message: patient_data_1.PatientSuccess.PATIENT_CREATED,
@@ -568,6 +565,7 @@ exports.PatientService = PatientService = PatientService_1 = __decorate([
         pharmacist_guard_1.PharmacistGuard,
         pharmacist_dao_1.PharmacistDao,
         doctor_dao_1.DoctorDao,
-        otp_service_1.OtpService])
+        otp_service_1.OtpService,
+        event_emitter_1.EventEmitter2])
 ], PatientService);
 //# sourceMappingURL=patient.service.js.map

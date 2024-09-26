@@ -2,9 +2,11 @@ import { HttpStatus } from '@nestjs/common';
 import { OtpDao } from '../dao/otp.dao';
 import { PostmarkService } from '@/modules/postmark/service/postmark.service';
 import { RoleType } from '../interface/otp.interface';
+import { EntityCreatedDto } from '@/shared/dto/shared.dto';
 export declare class OtpService {
     private readonly otpDao;
     private readonly postmarkService;
+    private readonly logger;
     private readonly expirationTime;
     constructor(otpDao: OtpDao, postmarkService: PostmarkService);
     private cleanUp;
@@ -29,7 +31,7 @@ export declare class OtpService {
         message: string;
         isValid: boolean;
     }>;
-    deliverOtp(walletAddress: string, emailAddress: string, role: RoleType): Promise<void>;
+    deliverOtp(args: EntityCreatedDto): Promise<void>;
     resendOtp(walletAddress: string, role: RoleType): Promise<{
         success: HttpStatus;
         message: string;
