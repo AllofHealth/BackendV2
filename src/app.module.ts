@@ -17,9 +17,11 @@ import { ConfigifyModule } from '@itgorillaz/configify';
 import { EncryptionModule } from './shared/utils/encryption/encryption.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import config from '@/shared/config/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
