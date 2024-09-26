@@ -15,8 +15,10 @@ import { AdminGuard } from '../guards/admin.guard';
 import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
 import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
 import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
-import { OtpService } from '@/modules/otp/services/otp.service';
 import { AdminErrors, AdminMessages } from '@/modules/admin/data/admin.data';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SharedEvents } from '@/shared/events/shared.events';
+import { EntityCreatedDto } from '@/shared/dto/shared.dto';
 
 @Injectable()
 export class AdminService {
@@ -29,7 +31,7 @@ export class AdminService {
     private readonly hospitalDao: HospitalDao,
     private readonly doctorDao: DoctorDao,
     private readonly pharmacistDao: PharmacistDao,
-    private readonly otpService: OtpService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async fetchAdminByAddress(walletAddress: string) {
@@ -140,10 +142,9 @@ export class AdminService {
     try {
       const admin = await this.adminDao.createAdmin(args);
       try {
-        await this.otpService.deliverOtp(
-          args.walletAddress,
-          args.email,
-          'admin',
+        this.eventEmitter.emit(
+          SharedEvents.ENTITY_CREATED,
+          new EntityCreatedDto(args.walletAddress, admin.email, 'admin'),
         );
       } catch (e) {
         this.logger.error(e.message);
