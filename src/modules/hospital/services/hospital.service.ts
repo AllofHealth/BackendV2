@@ -23,8 +23,10 @@ import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
 import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
 import { DoctorGuard } from '@/modules/doctor/guards/doctor.guard';
 import { PharmacistGuard } from '@/modules/pharmacist/guards/pharmacist.guard';
-import { OtpService } from '@/modules/otp/services/otp.service';
 import { EncryptionService } from '@/shared/utils/encryption/service/encryption.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SharedEvents } from '@/shared/events/shared.events';
+import { EntityCreatedDto } from '@/shared/dto/shared.dto';
 
 @Injectable()
 export class HospitalService {
@@ -37,7 +39,7 @@ export class HospitalService {
     private readonly pharmacistDao: PharmacistDao,
     private readonly doctorGuard: DoctorGuard,
     private readonly pharmacistGuard: PharmacistGuard,
-    private readonly otpService: OtpService,
+    private readonly eventEmitter: EventEmitter2,
     private readonly encryptionService: EncryptionService,
   ) {}
 
@@ -68,7 +70,10 @@ export class HospitalService {
       }
 
       try {
-        await this.otpService.deliverOtp(args.admin, args.email, 'institution');
+        this.eventEmitter.emit(
+          SharedEvents.ENTITY_CREATED,
+          new EntityCreatedDto(args.admin, hospital.email, 'institution'),
+        );
       } catch (error) {
         await this.hospitalDao.removeHospitalById(hospital._id);
         return {
