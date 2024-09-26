@@ -21,7 +21,6 @@ import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
 import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
 import { PatientProvider } from '../provider/patient.provider';
 import { PROFILE_PLACEHOLDER } from '@/shared/constants';
-import { OtpService } from '@/modules/otp/services/otp.service';
 import { ApprovalStatus, PatientError } from '@/shared';
 import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
 import {
@@ -48,7 +47,6 @@ export class PatientService {
     private readonly pharmacistGuard: PharmacistGuard,
     private readonly pharmacistDao: PharmacistDao,
     private readonly doctorDao: DoctorDao,
-    private readonly otpService: OtpService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
