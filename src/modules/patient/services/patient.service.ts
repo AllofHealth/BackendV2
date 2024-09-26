@@ -28,6 +28,9 @@ import {
   PatientErrors,
   PatientSuccess,
 } from '@/modules/patient/data/patient.data';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SharedEvents } from '@/shared/events/shared.events';
+import { EntityCreatedDto } from '@/shared/dto/shared.dto';
 
 /**
  * @file: Patient Service
@@ -46,6 +49,7 @@ export class PatientService {
     private readonly pharmacistDao: PharmacistDao,
     private readonly doctorDao: DoctorDao,
     private readonly otpService: OtpService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   private getApprovalType(approvalType: string): string {
@@ -119,18 +123,11 @@ export class PatientService {
         };
       }
 
-      try {
-        await this.otpService.deliverOtp(walletAddress, args.email, 'patient');
-        this.logger.info(
-          `email successfully sent on patient creation to ${args.email}`,
-        );
-      } catch (e) {
-        this.logger.log(e.message);
-        throw new HttpException(
-          { message: PatientErrors.PATIENT_CREATED_ERROR },
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
+      this.eventEmitter.emit(
+        SharedEvents.ENTITY_CREATED,
+        new EntityCreatedDto(walletAddress, args.email, 'patient'),
+      );
+
       return {
         success: HttpStatus.OK,
         message: PatientSuccess.PATIENT_CREATED,
