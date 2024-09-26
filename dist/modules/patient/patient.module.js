@@ -16,7 +16,6 @@ const patient_guard_1 = require("./guards/patient.guard");
 const mongoose_1 = require("@nestjs/mongoose");
 const pharmacist_module_1 = require("../pharmacist/pharmacist.module");
 const doctor_module_1 = require("../doctor/doctor.module");
-const otp_module_1 = require("../otp/otp.module");
 const doctor_schema_1 = require("../doctor/schema/doctor.schema");
 let PatientModule = class PatientModule {
 };
@@ -43,7 +42,6 @@ exports.PatientModule = PatientModule = __decorate([
             ]),
             (0, common_1.forwardRef)(() => pharmacist_module_1.PharmacistModule),
             (0, common_1.forwardRef)(() => doctor_module_1.DoctorModule),
-            otp_module_1.OtpModule,
         ],
         providers: [patient_service_1.PatientService, patient_dao_1.PatientDao, patient_guard_1.PatientGuard],
         controllers: [patient_controller_1.PatientController],

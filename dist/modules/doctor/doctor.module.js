@@ -16,7 +16,6 @@ const doctor_schema_1 = require("./schema/doctor.schema");
 const doctor_guard_1 = require("./guards/doctor.guard");
 const hospital_module_1 = require("../hospital/hospital.module");
 const patient_module_1 = require("../patient/patient.module");
-const otp_module_1 = require("../otp/otp.module");
 const medicine_module_1 = require("../medicine/medicine.module");
 let DoctorModule = class DoctorModule {
 };
@@ -27,7 +26,6 @@ exports.DoctorModule = DoctorModule = __decorate([
             mongoose_1.MongooseModule.forFeature([{ name: doctor_schema_1.Doctor.name, schema: doctor_schema_1.DoctorSchema }]),
             (0, common_1.forwardRef)(() => hospital_module_1.HospitalModule),
             (0, common_1.forwardRef)(() => patient_module_1.PatientModule),
-            (0, common_1.forwardRef)(() => otp_module_1.OtpModule),
             medicine_module_1.MedicineModule,
         ],
         providers: [doctor_service_1.DoctorService, doctor_dao_1.DoctorDao, doctor_guard_1.DoctorGuard],

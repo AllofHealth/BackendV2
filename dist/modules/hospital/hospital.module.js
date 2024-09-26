@@ -16,7 +16,6 @@ const mongoose_1 = require("@nestjs/mongoose");
 const hospital_guard_1 = require("./guard/hospital.guard");
 const doctor_module_1 = require("../doctor/doctor.module");
 const pharmacist_module_1 = require("../pharmacist/pharmacist.module");
-const otp_module_1 = require("../otp/otp.module");
 const encryption_module_1 = require("../../shared/utils/encryption/encryption.module");
 const hospital_approved_guard_1 = require("./guard/hospital.approved.guard");
 const hospital_auth_guard_1 = require("./guard/hospital.auth.guard");
@@ -31,7 +30,6 @@ exports.HospitalModule = HospitalModule = __decorate([
             ]),
             doctor_module_1.DoctorModule,
             (0, common_1.forwardRef)(() => pharmacist_module_1.PharmacistModule),
-            (0, common_1.forwardRef)(() => otp_module_1.OtpModule),
             encryption_module_1.EncryptionModule,
         ],
         providers: [

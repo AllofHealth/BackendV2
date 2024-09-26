@@ -26,7 +26,6 @@ const pharmacist_dao_1 = require("../../pharmacist/dao/pharmacist.dao");
 const doctor_dao_1 = require("../../doctor/dao/doctor.dao");
 const patient_provider_1 = require("../provider/patient.provider");
 const constants_1 = require("../../../shared/constants");
-const otp_service_1 = require("../../otp/services/otp.service");
 const shared_1 = require("../../../shared");
 const my_logger_service_1 = require("../../my-logger/my-logger.service");
 const patient_data_1 = require("../data/patient.data");
@@ -34,14 +33,13 @@ const event_emitter_1 = require("@nestjs/event-emitter");
 const shared_events_1 = require("../../../shared/events/shared.events");
 const shared_dto_1 = require("../../../shared/dto/shared.dto");
 let PatientService = PatientService_1 = class PatientService {
-    constructor(patientModel, patientDao, patientGuard, pharmacistGuard, pharmacistDao, doctorDao, otpService, eventEmitter) {
+    constructor(patientModel, patientDao, patientGuard, pharmacistGuard, pharmacistDao, doctorDao, eventEmitter) {
         this.patientModel = patientModel;
         this.patientDao = patientDao;
         this.patientGuard = patientGuard;
         this.pharmacistGuard = pharmacistGuard;
         this.pharmacistDao = pharmacistDao;
         this.doctorDao = doctorDao;
-        this.otpService = otpService;
         this.eventEmitter = eventEmitter;
         this.logger = new my_logger_service_1.MyLoggerService(PatientService_1.name);
         this.provider = patient_provider_1.PatientProvider.useFactory();
@@ -565,7 +563,6 @@ exports.PatientService = PatientService = PatientService_1 = __decorate([
         pharmacist_guard_1.PharmacistGuard,
         pharmacist_dao_1.PharmacistDao,
         doctor_dao_1.DoctorDao,
-        otp_service_1.OtpService,
         event_emitter_1.EventEmitter2])
 ], PatientService);
 //# sourceMappingURL=patient.service.js.map
