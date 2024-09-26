@@ -27,6 +27,9 @@ import { Prescriptions } from '@/modules/patient/schemas/patient.schema';
 import { Medication } from '@/modules/medicine/schema/medicine.schema';
 import { Product } from '../schema/pharmacist.schema';
 import { PreviewType } from '@/modules/hospital/interface/hospital.interface';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SharedEvents } from '@/shared/events/shared.events';
+import { EntityCreatedDto } from '@/shared/dto/shared.dto';
 
 @Injectable()
 export class PharmacistService {
@@ -35,8 +38,8 @@ export class PharmacistService {
     private readonly pharmacistGuard: PharmacistGuard,
     private readonly hospitalDao: HospitalDao,
     private readonly patientDao: PatientDao,
-    private readonly otpService: OtpService,
     private readonly medicineService: MedicineService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async createPharmacist(args: CreatePharmacistType) {
@@ -91,10 +94,13 @@ export class PharmacistService {
 
       try {
         hospital.pharmacists.push(pharmacistPreview);
-        await this.otpService.deliverOtp(
-          args.walletAddress,
-          pharmacist.email,
-          'pharmacist',
+        this.eventEmitter.emit(
+          SharedEvents.ENTITY_CREATED,
+          new EntityCreatedDto(
+            args.walletAddress,
+            pharmacist.email,
+            'pharmacist',
+          ),
         );
       } catch (error) {
         await this.pharmacistDao.deletePharmacist(pharmacist.walletAddress);
