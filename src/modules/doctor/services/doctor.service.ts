@@ -20,9 +20,11 @@ import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
 import { PreviewType } from '@/modules/hospital/interface/hospital.interface';
 import { PatientDao } from '@/modules/patient/dao/patient.dao';
 import { PatientGuard } from '@/modules/patient/guards/patient.guard';
-import { OtpService } from '@/modules/otp/services/otp.service';
 import { MedicineDao } from '@/modules/medicine/dao/medicine.dao';
 import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SharedEvents } from '@/shared/events/shared.events';
+import { EntityCreatedDto } from '@/shared/dto/shared.dto';
 
 @Injectable()
 export class DoctorService {
@@ -34,8 +36,8 @@ export class DoctorService {
     private readonly hospitalDao: HospitalDao,
     private readonly patientDao: PatientDao,
     private readonly patientGuard: PatientGuard,
-    private readonly otpService: OtpService,
     private readonly medicineDao: MedicineDao,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async getPendingDoctors() {
@@ -145,10 +147,9 @@ export class DoctorService {
 
       try {
         hospital.doctors.push(doctorPreview);
-        await this.otpService.deliverOtp(
-          args.walletAddress,
-          doctor.email,
-          'doctor',
+        this.eventEmitter.emit(
+          SharedEvents.ENTITY_CREATED,
+          new EntityCreatedDto(args.walletAddress, doctor.email, 'doctor'),
         );
       } catch (error) {
         await this.doctorDao.deleteDoctor(args.walletAddress);
