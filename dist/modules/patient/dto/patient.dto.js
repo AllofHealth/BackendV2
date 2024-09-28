@@ -9,12 +9,117 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateFamilyMemberApprovalDto = exports.CreateApprovalDto = exports.SharePrescriptionDto = exports.UpdateFamilyMemberDto = exports.CreateFamilyMemberDto = exports.UpdatePatientProfileDto = exports.FamilyMemberDto = exports.PatientDto = exports.CreatePatientDto = void 0;
+exports.CreateFamilyMemberApprovalDto = exports.CreateApprovalDto = exports.SharePrescriptionDto = exports.UpdateFamilyMemberDto = exports.CreateFamilyMemberDto = exports.UpdatePatientProfileDto = exports.PatientDto = exports.FamilyMemberDto = exports.CreatePatientDto = exports.PrescriptionDto = exports.ReceiptDto = exports.MedicalRecordDto = void 0;
 const class_validator_1 = require("class-validator");
 const mongoose_1 = require("mongoose");
 const swagger_1 = require("@nestjs/swagger");
 const mongoose_2 = require("@nestjs/mongoose");
-const patient_schema_1 = require("../schemas/patient.schema");
+const medicine_dto_1 = require("../../medicine/dto/medicine.dto");
+class MedicalRecordDto {
+}
+exports.MedicalRecordDto = MedicalRecordDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Number, description: 'blockchain id' }),
+    __metadata("design:type", Number)
+], MedicalRecordDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String }),
+    __metadata("design:type", String)
+], MedicalRecordDto.prototype, "principalPatient", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String }),
+    __metadata("design:type", String)
+], MedicalRecordDto.prototype, "doctorAddress", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ type: String }),
+    __metadata("design:type", String)
+], MedicalRecordDto.prototype, "diagnosis", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String }),
+    __metadata("design:type", String)
+], MedicalRecordDto.prototype, "doctorsName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String }),
+    __metadata("design:type", String)
+], MedicalRecordDto.prototype, "hospitalName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Date }),
+    __metadata("design:type", Date)
+], MedicalRecordDto.prototype, "date", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: mongoose_1.Types.ObjectId }),
+    __metadata("design:type", mongoose_1.Types.ObjectId)
+], MedicalRecordDto.prototype, "_id", void 0);
+class ReceiptDto {
+}
+exports.ReceiptDto = ReceiptDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String }),
+    __metadata("design:type", String)
+], ReceiptDto.prototype, "productDispensed", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Date }),
+    __metadata("design:type", Date)
+], ReceiptDto.prototype, "dateDispensed", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String }),
+    __metadata("design:type", String)
+], ReceiptDto.prototype, "directions", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String }),
+    __metadata("design:type", String)
+], ReceiptDto.prototype, "quantity", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String }),
+    __metadata("design:type", String)
+], ReceiptDto.prototype, "price", void 0);
+class PrescriptionDto {
+}
+exports.PrescriptionDto = PrescriptionDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: 'id', description: 'blockchain id', type: Number }),
+    __metadata("design:type", Number)
+], PrescriptionDto.prototype, "recordId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: 'doctorName', type: String }),
+    __metadata("design:type", String)
+], PrescriptionDto.prototype, "doctorName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        name: 'doctorAddress',
+        type: String,
+        description: 'doctor ethereum address',
+    }),
+    __metadata("design:type", String)
+], PrescriptionDto.prototype, "doctorAddress", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: 'institution name', type: String }),
+    __metadata("design:type", String)
+], PrescriptionDto.prototype, "institutionName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: 'patient name', type: String }),
+    __metadata("design:type", String)
+], PrescriptionDto.prototype, "patientName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: 'patient ethereum address', type: String }),
+    __metadata("design:type", String)
+], PrescriptionDto.prototype, "patientAddress", void 0);
+__decorate([
+    (0, mongoose_2.Prop)({ type: [{ type: medicine_dto_1.MedicineDto }] }),
+    __metadata("design:type", Array)
+], PrescriptionDto.prototype, "medicine", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: 'date', type: Date }),
+    __metadata("design:type", Date)
+], PrescriptionDto.prototype, "date", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ name: 'status', type: String, default: 'pending' }),
+    __metadata("design:type", String)
+], PrescriptionDto.prototype, "status", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: mongoose_1.Types.ObjectId }),
+    __metadata("design:type", mongoose_1.Types.ObjectId)
+], PrescriptionDto.prototype, "_id", void 0);
 class CreatePatientDto {
 }
 exports.CreatePatientDto = CreatePatientDto;
@@ -85,6 +190,68 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreatePatientDto.prototype, "category", void 0);
+class FamilyMemberDto {
+}
+exports.FamilyMemberDto = FamilyMemberDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: 'id', description: 'blockchain id', type: Number }),
+    (0, mongoose_2.Prop)({ required: true }),
+    __metadata("design:type", Number)
+], FamilyMemberDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: 'principalPatient', type: String }),
+    (0, mongoose_2.Prop)({ required: true }),
+    __metadata("design:type", String)
+], FamilyMemberDto.prototype, "principalPatient", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: 'name', type: String }),
+    (0, mongoose_2.Prop)({ required: true }),
+    __metadata("design:type", String)
+], FamilyMemberDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ name: 'relationship', type: String }),
+    (0, mongoose_2.Prop)({ required: true }),
+    __metadata("design:type", String)
+], FamilyMemberDto.prototype, "relationship", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: 'email', type: String }),
+    (0, mongoose_2.Prop)({ required: true }),
+    __metadata("design:type", String)
+], FamilyMemberDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: 'address', type: String }),
+    (0, mongoose_2.Prop)({ required: true }),
+    __metadata("design:type", String)
+], FamilyMemberDto.prototype, "address", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: 'age', type: Number }),
+    (0, mongoose_2.Prop)({ required: true }),
+    __metadata("design:type", Number)
+], FamilyMemberDto.prototype, "age", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: 'dob', type: Date }),
+    (0, mongoose_2.Prop)({ sparse: true }),
+    __metadata("design:type", Date)
+], FamilyMemberDto.prototype, "dob", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: 'bloodGroup', type: String }),
+    (0, mongoose_2.Prop)({ required: true }),
+    __metadata("design:type", String)
+], FamilyMemberDto.prototype, "bloodGroup", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: 'genotype', type: String }),
+    (0, mongoose_2.Prop)({ required: true }),
+    __metadata("design:type", String)
+], FamilyMemberDto.prototype, "genotype", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: 'medicalRecords', type: [MedicalRecordDto] }),
+    __metadata("design:type", Array)
+], FamilyMemberDto.prototype, "medicalRecord", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ name: '_id', type: mongoose_1.Types.ObjectId }),
+    (0, mongoose_2.Prop)(),
+    __metadata("design:type", mongoose_1.Types.ObjectId)
+], FamilyMemberDto.prototype, "_id", void 0);
 class PatientDto {
 }
 exports.PatientDto = PatientDto;
@@ -154,18 +321,15 @@ __decorate([
     __metadata("design:type", String)
 ], PatientDto.prototype, "genotype", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ name: 'medicalRecords', type: [patient_schema_1.MedicalRecordPreviewSchema] }),
-    (0, mongoose_2.Prop)({ type: [{ type: patient_schema_1.MedicalRecordPreviewSchema, unique: true }] }),
+    (0, swagger_1.ApiProperty)({ name: 'medicalRecords', type: [MedicalRecordDto] }),
     __metadata("design:type", Array)
 ], PatientDto.prototype, "medicalRecords", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ name: 'prescriptions', type: [patient_schema_1.PrescriptionsSchema] }),
-    (0, mongoose_2.Prop)({ type: [{ type: patient_schema_1.PrescriptionsSchema, unique: true }] }),
+    (0, swagger_1.ApiProperty)({ name: 'prescriptions', type: [PrescriptionDto] }),
     __metadata("design:type", Array)
 ], PatientDto.prototype, "prescriptions", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ name: 'familyMembers', type: [patient_schema_1.FamilyMemberSchema] }),
-    (0, mongoose_2.Prop)({ type: [{ type: patient_schema_1.FamilyMemberSchema, unique: true }] }),
+    (0, swagger_1.ApiProperty)({ name: 'familyMembers', type: [FamilyMemberDto] }),
     __metadata("design:type", Array)
 ], PatientDto.prototype, "familyMembers", void 0);
 __decorate([
@@ -183,69 +347,6 @@ __decorate([
     (0, mongoose_2.Prop)(),
     __metadata("design:type", mongoose_1.Types.ObjectId)
 ], PatientDto.prototype, "_id", void 0);
-class FamilyMemberDto {
-}
-exports.FamilyMemberDto = FamilyMemberDto;
-__decorate([
-    (0, swagger_1.ApiProperty)({ name: 'id', description: 'blockchain id', type: Number }),
-    (0, mongoose_2.Prop)({ required: true }),
-    __metadata("design:type", Number)
-], FamilyMemberDto.prototype, "id", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ name: 'principalPatient', type: String }),
-    (0, mongoose_2.Prop)({ required: true }),
-    __metadata("design:type", String)
-], FamilyMemberDto.prototype, "principalPatient", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ name: 'name', type: String }),
-    (0, mongoose_2.Prop)({ required: true }),
-    __metadata("design:type", String)
-], FamilyMemberDto.prototype, "name", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ name: 'relationship', type: String }),
-    (0, mongoose_2.Prop)({ required: true }),
-    __metadata("design:type", String)
-], FamilyMemberDto.prototype, "relationship", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ name: 'email', type: String }),
-    (0, mongoose_2.Prop)({ required: true }),
-    __metadata("design:type", String)
-], FamilyMemberDto.prototype, "email", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ name: 'address', type: String }),
-    (0, mongoose_2.Prop)({ required: true }),
-    __metadata("design:type", String)
-], FamilyMemberDto.prototype, "address", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ name: 'age', type: Number }),
-    (0, mongoose_2.Prop)({ required: true }),
-    __metadata("design:type", Number)
-], FamilyMemberDto.prototype, "age", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ name: 'dob', type: Date }),
-    (0, mongoose_2.Prop)({ sparse: true }),
-    __metadata("design:type", Date)
-], FamilyMemberDto.prototype, "dob", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ name: 'bloodGroup', type: String }),
-    (0, mongoose_2.Prop)({ required: true }),
-    __metadata("design:type", String)
-], FamilyMemberDto.prototype, "bloodGroup", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ name: 'genotype', type: String }),
-    (0, mongoose_2.Prop)({ required: true }),
-    __metadata("design:type", String)
-], FamilyMemberDto.prototype, "genotype", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ name: 'medicalRecords', type: [patient_schema_1.MedicalRecordPreviewSchema] }),
-    (0, mongoose_2.Prop)({ type: [{ type: patient_schema_1.MedicalRecordPreviewSchema, unique: true }] }),
-    __metadata("design:type", Array)
-], FamilyMemberDto.prototype, "medicalRecord", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ name: '_id', type: mongoose_1.Types.ObjectId }),
-    (0, mongoose_2.Prop)(),
-    __metadata("design:type", mongoose_1.Types.ObjectId)
-], FamilyMemberDto.prototype, "_id", void 0);
 class UpdatePatientProfileDto {
 }
 exports.UpdatePatientProfileDto = UpdatePatientProfileDto;

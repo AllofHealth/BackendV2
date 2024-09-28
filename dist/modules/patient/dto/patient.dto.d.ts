@@ -23,7 +23,36 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import { Types } from 'mongoose';
-import { FamilyMember, MedicalRecordPreviewDocument, Prescriptions } from '@/modules/patient/schemas/patient.schema';
+import { MedicineDto } from '@/modules/medicine/dto/medicine.dto';
+export declare class MedicalRecordDto {
+    id: number;
+    principalPatient: string;
+    doctorAddress: string;
+    diagnosis: string;
+    doctorsName: string;
+    hospitalName: string;
+    date: Date;
+    _id: Types.ObjectId;
+}
+export declare class ReceiptDto {
+    productDispensed: string;
+    dateDispensed: Date;
+    directions: string;
+    quantity: string;
+    price: string;
+}
+export declare class PrescriptionDto {
+    recordId: number;
+    doctorName: string;
+    doctorAddress: string;
+    institutionName: string;
+    patientName: string;
+    patientAddress: string;
+    medicine: MedicineDto[];
+    date: Date;
+    status: string;
+    _id: Types.ObjectId;
+}
 export declare class CreatePatientDto {
     id: number;
     name: string;
@@ -37,6 +66,20 @@ export declare class CreatePatientDto {
     genotype: string;
     walletAddress: string;
     category?: string;
+}
+export declare class FamilyMemberDto {
+    id: number;
+    principalPatient: string;
+    name: string;
+    relationship: string;
+    email: string;
+    address: string;
+    age: number;
+    dob: Date;
+    bloodGroup: string;
+    genotype: string;
+    medicalRecord: MedicalRecordDto[];
+    _id: Types.ObjectId;
 }
 export declare class PatientDto {
     id: number;
@@ -52,25 +95,11 @@ export declare class PatientDto {
     walletAddress: string;
     bloodGroup: string;
     genotype: string;
-    medicalRecords: MedicalRecordPreviewDocument[];
-    prescriptions: Prescriptions[];
-    familyMembers: FamilyMember[];
+    medicalRecords: MedicalRecordDto[];
+    prescriptions: PrescriptionDto[];
+    familyMembers: FamilyMemberDto[];
     category: string;
     isVerified: boolean;
-    _id: Types.ObjectId;
-}
-export declare class FamilyMemberDto {
-    id: number;
-    principalPatient: string;
-    name: string;
-    relationship: string;
-    email: string;
-    address: string;
-    age: number;
-    dob: Date;
-    bloodGroup: string;
-    genotype: string;
-    medicalRecord: MedicalRecordPreviewDocument[];
     _id: Types.ObjectId;
 }
 export declare class UpdatePatientProfileDto {

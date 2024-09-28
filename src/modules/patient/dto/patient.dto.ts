@@ -17,31 +17,24 @@ import { MedicineDto } from '@/modules/medicine/dto/medicine.dto';
 
 export class MedicalRecordDto {
   @ApiProperty({ type: Number, description: 'blockchain id' })
-  @Prop({ required: true })
   id: number;
 
   @ApiProperty({ type: String })
-  @Prop({ required: true })
   principalPatient: string;
 
   @ApiProperty({ type: String })
-  @Prop({ required: true })
   doctorAddress: string;
 
   @ApiPropertyOptional({ type: String })
-  @Prop()
   diagnosis: string;
 
   @ApiProperty({ type: String })
-  @Prop({ required: true })
   doctorsName: string;
 
   @ApiProperty({ type: String })
-  @Prop({ required: true })
   hospitalName: string;
 
   @ApiProperty({ type: Date })
-  @Prop({ required: true, default: Date.now() })
   date: Date;
 
   @ApiProperty({ type: Types.ObjectId })
@@ -50,33 +43,26 @@ export class MedicalRecordDto {
 
 export class ReceiptDto {
   @ApiProperty({ type: String })
-  @Prop({ required: true })
   productDispensed: string;
 
   @ApiProperty({ type: Date })
-  @Prop({ required: true, default: new Date(Date.now()) })
   dateDispensed: Date;
 
   @ApiProperty({ type: String })
-  @Prop({ required: true })
   directions: string;
 
   @ApiProperty({ type: String })
-  @Prop({ required: true })
   quantity: string;
 
   @ApiProperty({ type: String })
-  @Prop({ required: true })
   price: string;
 }
 
 export class PrescriptionDto {
   @ApiProperty({ name: 'id', description: 'blockchain id', type: Number })
-  @Prop({ required: true })
   recordId: number;
 
   @ApiProperty({ name: 'doctorName', type: String })
-  @Prop({ required: true })
   doctorName: string;
 
   @ApiProperty({
@@ -84,31 +70,28 @@ export class PrescriptionDto {
     type: String,
     description: 'doctor ethereum address',
   })
-  @Prop({ required: true })
   doctorAddress: string;
 
   @ApiProperty({ name: 'institution name', type: String })
-  @Prop()
   institutionName: string;
 
   @ApiProperty({ name: 'patient name', type: String })
-  @Prop()
   patientName: string;
 
   @ApiProperty({ name: 'patient ethereum address', type: String })
-  @Prop({ required: true })
   patientAddress: string;
 
   @Prop({ type: [{ type: MedicineDto }] })
   medicine: MedicineDto[];
 
   @ApiProperty({ name: 'date', type: Date })
-  @Prop({ default: Date.now() })
   date: Date;
 
   @ApiPropertyOptional({ name: 'status', type: String, default: 'pending' })
-  @Prop()
   status: string;
+
+  @ApiProperty({ type: Types.ObjectId })
+  _id: Types.ObjectId;
 }
 
 export class CreatePatientDto {
