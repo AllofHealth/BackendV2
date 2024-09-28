@@ -72,13 +72,13 @@ export class PrescriptionDto {
   })
   doctorAddress: string;
 
-  @ApiProperty({ name: 'institution name', type: String })
+  @ApiProperty({ name: 'institutionName', type: String })
   institutionName: string;
 
-  @ApiProperty({ name: 'patient name', type: String })
+  @ApiProperty({ name: 'patientName', type: String })
   patientName: string;
 
-  @ApiProperty({ name: 'patient ethereum address', type: String })
+  @ApiProperty({ name: 'patientAddress', type: String })
   patientAddress: string;
 
   @Prop({ type: [{ type: MedicineDto }] })
