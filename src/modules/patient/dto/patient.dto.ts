@@ -14,6 +14,7 @@ import { Types } from 'mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Prop } from '@nestjs/mongoose';
 import { MedicineDto } from '@/modules/medicine/dto/medicine.dto';
+import { TApprovalType } from '@/modules/patient/interface/patient.interface';
 
 export class MedicalRecordDto {
   @ApiProperty({ type: Number, description: 'blockchain id' })
@@ -455,7 +456,7 @@ export class CreateApprovalDto {
   @ApiProperty({ name: 'approvalType', type: String })
   @IsNotEmpty()
   @IsString()
-  approvalType: string;
+  approvalType: TApprovalType;
 
   @ApiProperty({ name: 'approvalDurationInSec', type: Number })
   @IsNotEmpty()
@@ -495,7 +496,7 @@ export class CreateFamilyMemberApprovalDto {
   @ApiProperty({ name: 'approvalType', type: String })
   @IsNotEmpty()
   @IsString()
-  approvalType: string;
+  approvalType: TApprovalType;
 
   @ApiProperty({ name: 'approvalDurationInSec', type: Number })
   @IsNotEmpty()
