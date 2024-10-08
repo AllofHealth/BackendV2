@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Patient } from '../schemas/patient.schema';
 import {
-  ApprovalType,
   IApprovalInput,
   ICreateApproval,
   ICreateApprovalInput,
@@ -21,7 +20,7 @@ import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
 import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
 import { PatientProvider } from '../provider/patient.provider';
 import { PROFILE_PLACEHOLDER } from '@/shared/constants';
-import { ApprovalStatus, PatientError } from '@/shared';
+import { ApprovalStatus } from '@/shared';
 import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
 import {
   PatientErrors,
@@ -49,16 +48,6 @@ export class PatientService {
     private readonly doctorDao: DoctorDao,
     private readonly eventEmitter: EventEmitter2,
   ) {}
-
-  private getApprovalType(approvalType: string): string {
-    const upperCaseType = approvalType.toUpperCase();
-    if (upperCaseType === ApprovalType.FULL) {
-      return ApprovalType.FULL;
-    } else if (upperCaseType === ApprovalType.READ) {
-      return ApprovalType.READ;
-    }
-    throw new PatientError('Invalid approval type');
-  }
 
   private createApprovalInputs(args: ICreateApprovalInput): ICreateApproval[] {
     const {
@@ -553,7 +542,6 @@ export class PatientService {
         };
       }
 
-      const sanitizedApprovalType = this.getApprovalType(approvalType);
       const durationTime = this.provider.returnDuration(approvalDurationInSecs);
 
       const approvalInputs = this.createApprovalInputs({
@@ -561,7 +549,7 @@ export class PatientService {
         name: patient.name,
         recordIds: recordId,
         profilePicture: patient.profilePicture,
-        approvalType: sanitizedApprovalType,
+        approvalType,
         approvalDuration: durationTime,
         recordOwner: patient.walletAddress,
         recordTag: 'patient',
@@ -634,7 +622,6 @@ export class PatientService {
         };
       }
 
-      const sanitizedApprovalType = this.getApprovalType(approvalType);
       const durationTime = this.provider.returnDuration(approvalDurationInSecs);
 
       const approvalInputs = this.createApprovalInputs({
@@ -642,7 +629,7 @@ export class PatientService {
         name: familyMember.name,
         recordIds: recordId,
         profilePicture: PROFILE_PLACEHOLDER,
-        approvalType: sanitizedApprovalType,
+        approvalType: approvalType,
         approvalDuration: durationTime,
         recordOwner: familyMember.principalPatient,
         recordTag: 'familyMember',
