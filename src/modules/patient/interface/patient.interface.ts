@@ -1,10 +1,7 @@
 import { Types } from 'mongoose';
 
 export type RecordTag = 'patient' | 'familyMember';
-export enum ApprovalType {
-  READ = 'READ',
-  FULL = 'FULL',
-}
+export type TApprovalType = 'view' | 'modify' | 'view & modify';
 export type RelationShipType =
   | 'father'
   | 'mother'
@@ -86,7 +83,7 @@ export interface ICreateApproval {
   patientName: string;
   recordId?: number;
   profilePicture: string;
-  approvalType: string;
+  approvalType: TApprovalType;
   approvalStatus?: string;
   approvalDuration: Date;
   recordOwner?: string;
@@ -98,7 +95,7 @@ export interface ICreateApprovalInput {
   name: string;
   recordIds?: number[];
   profilePicture: string;
-  approvalType: string;
+  approvalType: TApprovalType;
   approvalDuration: Date;
   recordOwner?: string;
   recordTag?: RecordTag;
@@ -126,7 +123,7 @@ export interface IApprovalInput {
   recordId?: number[];
   patientAddress: string;
   doctorAddress: string;
-  approvalType: string;
+  approvalType: TApprovalType;
   approvalDurationInSecs: number;
   recordTag?: string;
 }
