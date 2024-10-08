@@ -16,7 +16,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PatientService = void 0;
 const common_1 = require("@nestjs/common");
 const patient_schema_1 = require("../schemas/patient.schema");
-const patient_interface_1 = require("../interface/patient.interface");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const patient_dao_1 = require("../dao/patient.dao");
@@ -43,16 +42,6 @@ let PatientService = PatientService_1 = class PatientService {
         this.eventEmitter = eventEmitter;
         this.logger = new my_logger_service_1.MyLoggerService(PatientService_1.name);
         this.provider = patient_provider_1.PatientProvider.useFactory();
-    }
-    getApprovalType(approvalType) {
-        const upperCaseType = approvalType.toUpperCase();
-        if (upperCaseType === patient_interface_1.ApprovalType.FULL) {
-            return patient_interface_1.ApprovalType.FULL;
-        }
-        else if (upperCaseType === patient_interface_1.ApprovalType.READ) {
-            return patient_interface_1.ApprovalType.READ;
-        }
-        throw new shared_1.PatientError('Invalid approval type');
     }
     createApprovalInputs(args) {
         const { id, name, recordIds, profilePicture, approvalType, approvalDuration, recordOwner, recordTag, } = args;
@@ -409,14 +398,13 @@ let PatientService = PatientService_1 = class PatientService {
                     message: patient_data_1.PatientErrors.DOCTOR_NOT_APPROVED,
                 };
             }
-            const sanitizedApprovalType = this.getApprovalType(approvalType);
             const durationTime = this.provider.returnDuration(approvalDurationInSecs);
             const approvalInputs = this.createApprovalInputs({
                 id: patient.id,
                 name: patient.name,
                 recordIds: recordId,
                 profilePicture: patient.profilePicture,
-                approvalType: sanitizedApprovalType,
+                approvalType,
                 approvalDuration: durationTime,
                 recordOwner: patient.walletAddress,
                 recordTag: 'patient',
@@ -464,14 +452,13 @@ let PatientService = PatientService_1 = class PatientService {
                     message: patient_data_1.PatientErrors.INVALID_PRINCIPAL_PATIENT,
                 };
             }
-            const sanitizedApprovalType = this.getApprovalType(approvalType);
             const durationTime = this.provider.returnDuration(approvalDurationInSecs);
             const approvalInputs = this.createApprovalInputs({
                 id: familyMember.id,
                 name: familyMember.name,
                 recordIds: recordId,
                 profilePicture: constants_1.PROFILE_PLACEHOLDER,
-                approvalType: sanitizedApprovalType,
+                approvalType: approvalType,
                 approvalDuration: durationTime,
                 recordOwner: familyMember.principalPatient,
                 recordTag: 'familyMember',

@@ -24,6 +24,7 @@
 /// <reference types="mongoose/types/inferschematype" />
 import { Types } from 'mongoose';
 import { MedicineDto } from '@/modules/medicine/dto/medicine.dto';
+import { TApprovalType } from '@/modules/patient/interface/patient.interface';
 export declare class MedicalRecordDto {
     id: number;
     principalPatient: string;
@@ -143,13 +144,13 @@ export declare class SharePrescriptionDto {
 export declare class CreateApprovalDto {
     recordId?: number[];
     doctorAddress: string;
-    approvalType: string;
+    approvalType: TApprovalType;
     approvalDurationInSec: number;
 }
 export declare class CreateFamilyMemberApprovalDto {
     familyMemberId: number;
     recordId?: number[];
     doctorAddress: string;
-    approvalType: string;
+    approvalType: TApprovalType;
     approvalDurationInSec: number;
 }

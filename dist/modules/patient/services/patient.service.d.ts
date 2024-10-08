@@ -44,7 +44,6 @@ export declare class PatientService {
     private readonly logger;
     private provider;
     constructor(patientModel: Model<Patient>, patientDao: PatientDao, patientGuard: PatientGuard, pharmacistGuard: PharmacistGuard, pharmacistDao: PharmacistDao, doctorDao: DoctorDao, eventEmitter: EventEmitter2);
-    private getApprovalType;
     private createApprovalInputs;
     createNewPatient(args: ICreatePatient): Promise<{
         success: HttpStatus;

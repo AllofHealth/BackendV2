@@ -93,15 +93,15 @@ __decorate([
     __metadata("design:type", String)
 ], PrescriptionDto.prototype, "doctorAddress", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ name: 'institution name', type: String }),
+    (0, swagger_1.ApiProperty)({ name: 'institutionName', type: String }),
     __metadata("design:type", String)
 ], PrescriptionDto.prototype, "institutionName", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ name: 'patient name', type: String }),
+    (0, swagger_1.ApiProperty)({ name: 'patientName', type: String }),
     __metadata("design:type", String)
 ], PrescriptionDto.prototype, "patientName", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ name: 'patient ethereum address', type: String }),
+    (0, swagger_1.ApiProperty)({ name: 'patientAddress', type: String }),
     __metadata("design:type", String)
 ], PrescriptionDto.prototype, "patientAddress", void 0);
 __decorate([
