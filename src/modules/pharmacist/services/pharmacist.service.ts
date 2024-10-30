@@ -17,7 +17,7 @@ import { Category, ErrorCodes, PharmacistError } from '@/shared';
 import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
 import { MongooseError, Types } from 'mongoose';
 import { PatientDao } from '@/modules/patient/dao/patient.dao';
-import { OtpService } from '@/modules/otp/services/otp.service';
+
 import {
   DrugClassDescriptionInterface,
   drugClassesDescription,
@@ -30,9 +30,11 @@ import { PreviewType } from '@/modules/hospital/interface/hospital.interface';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SharedEvents } from '@/shared/events/shared.events';
 import { EntityCreatedDto } from '@/shared/dto/shared.dto';
+import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
 
 @Injectable()
 export class PharmacistService {
+  private logger = new MyLoggerService(PharmacistService.name);
   constructor(
     private readonly pharmacistDao: PharmacistDao,
     private readonly pharmacistGuard: PharmacistGuard,
