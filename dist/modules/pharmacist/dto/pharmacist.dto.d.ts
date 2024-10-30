@@ -25,6 +25,7 @@
 import { Prescriptions } from '@/modules/patient/schemas/patient.schema';
 import { ApprovalList, Inventory } from '@/modules/pharmacist/schema/pharmacist.schema';
 import { Types } from 'mongoose';
+import { MedicineDto, ProductDto } from '@/modules/medicine/dto/medicine.dto';
 export declare class CreatePharmacistDto {
     id: number;
     hospitalIds?: number;
@@ -82,4 +83,20 @@ export declare class DispenseMedicationDto {
     directions: string;
     quantity: number;
     medicineId: string;
+}
+export declare class DispenseReceiptDto {
+    productToDispense: string;
+    quantity: number;
+    price: string;
+}
+export declare class InventoryDto {
+    numberOfMedicine: number;
+    numberOfCategories: number;
+    numberOfMedicineSold: number;
+    products: ProductDto[];
+}
+export declare class ProductExistDto {
+    medicineExist: boolean;
+    categoryExist: boolean;
+    availableMedications: MedicineDto[];
 }

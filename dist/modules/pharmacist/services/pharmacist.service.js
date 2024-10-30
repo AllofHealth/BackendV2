@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var PharmacistService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PharmacistService = void 0;
 const common_1 = require("@nestjs/common");
@@ -22,7 +23,8 @@ const medicine_service_1 = require("../../medicine/service/medicine.service");
 const event_emitter_1 = require("@nestjs/event-emitter");
 const shared_events_1 = require("../../../shared/events/shared.events");
 const shared_dto_1 = require("../../../shared/dto/shared.dto");
-let PharmacistService = class PharmacistService {
+const my_logger_service_1 = require("../../my-logger/my-logger.service");
+let PharmacistService = PharmacistService_1 = class PharmacistService {
     constructor(pharmacistDao, pharmacistGuard, hospitalDao, patientDao, medicineService, eventEmitter) {
         this.pharmacistDao = pharmacistDao;
         this.pharmacistGuard = pharmacistGuard;
@@ -30,6 +32,7 @@ let PharmacistService = class PharmacistService {
         this.patientDao = patientDao;
         this.medicineService = medicineService;
         this.eventEmitter = eventEmitter;
+        this.logger = new my_logger_service_1.MyLoggerService(PharmacistService_1.name);
     }
     async createPharmacist(args) {
         const pharmacistExists = await this.pharmacistGuard.validatePharmacistExists(args.walletAddress);
@@ -606,7 +609,7 @@ let PharmacistService = class PharmacistService {
     }
 };
 exports.PharmacistService = PharmacistService;
-exports.PharmacistService = PharmacistService = __decorate([
+exports.PharmacistService = PharmacistService = PharmacistService_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [pharmacist_dao_1.PharmacistDao,
         pharmacist_guard_1.PharmacistGuard,

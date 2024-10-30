@@ -34,3 +34,8 @@ export declare class MedicineDto {
     receipt: ReceiptDto;
     _id: Types.ObjectId;
 }
+export declare class ProductDto {
+    category: string;
+    description?: string;
+    medications: MedicineDto[];
+}

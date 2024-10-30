@@ -41,6 +41,7 @@ export declare class PharmacistService {
     private readonly patientDao;
     private readonly medicineService;
     private readonly eventEmitter;
+    private logger;
     constructor(pharmacistDao: PharmacistDao, pharmacistGuard: PharmacistGuard, hospitalDao: HospitalDao, patientDao: PatientDao, medicineService: MedicineService, eventEmitter: EventEmitter2);
     createPharmacist(args: CreatePharmacistType): Promise<{
         success: HttpStatus;

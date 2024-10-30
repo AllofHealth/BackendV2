@@ -21,6 +21,8 @@ const mongoose_1 = require("mongoose");
 const pharmacist_auth_guard_1 = require("../guards/pharmacist.auth.guard");
 const my_logger_service_1 = require("../../my-logger/my-logger.service");
 const swagger_1 = require("@nestjs/swagger");
+const medicine_dto_1 = require("../../medicine/dto/medicine.dto");
+const patient_dto_1 = require("../../patient/dto/patient.dto");
 let PharmacistController = PharmacistController_1 = class PharmacistController {
     constructor(pharmacistService) {
         this.pharmacistService = pharmacistService;
@@ -127,7 +129,7 @@ let PharmacistController = PharmacistController_1 = class PharmacistController {
         });
     }
     async checkProductExist(ip, walletAddress, category, productPrescribed) {
-        this.logger.log(`Create Product Availabilty Request\t${ip}`);
+        this.logger.log(`Create Product Availability Request\t${ip}`);
         return await this.pharmacistService.checkMedicineExist({
             walletAddress,
             category,
@@ -138,6 +140,19 @@ let PharmacistController = PharmacistController_1 = class PharmacistController {
 exports.PharmacistController = PharmacistController;
 __decorate([
     (0, common_1.Post)('createPharmacist'),
+    (0, swagger_1.ApiOperation)({ summary: 'Create Pharmacist' }),
+    (0, swagger_1.ApiConflictResponse)({
+        status: common_1.HttpStatus.CONFLICT,
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Pharmacist created successfully',
+        type: pharmacist_dto_1.PharmacistDto,
+        isArray: false,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Body)(common_1.ValidationPipe)),
     __metadata("design:type", Function),
@@ -147,6 +162,16 @@ __decorate([
 __decorate([
     (0, common_1.Post)('updatePharmacist'),
     (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Update Pharmacist' }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Pharmacist updated successfully',
+        type: pharmacist_dto_1.PharmacistDto,
+        isArray: false,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress')),
     __param(2, (0, common_1.Body)()),
@@ -157,6 +182,14 @@ __decorate([
 __decorate([
     (0, common_1.Post)('addMedicine'),
     (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Add Medicine' }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        isArray: false,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Body)(new common_1.ValidationPipe({ transform: true }))),
@@ -167,6 +200,32 @@ __decorate([
 __decorate([
     (0, common_1.Post)('removeMedicine'),
     (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Remove Medicine' }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        isArray: false,
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        required: true,
+        type: String,
+        description: 'Wallet Address',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'productId',
+        required: true,
+        type: String,
+        description: 'Product Id',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'medicineId',
+        required: true,
+        type: String,
+        description: 'Medicine Id',
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Query)('productId', new common_1.ValidationPipe({ transform: true }))),
@@ -178,6 +237,25 @@ __decorate([
 __decorate([
     (0, common_1.Post)('updateMedicine'),
     (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Update Medicine' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        required: true,
+        type: String,
+        description: 'wallet address',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'productId',
+        required: true,
+        type: String,
+        description: 'Product Id',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'medicineId',
+        required: true,
+        type: String,
+        description: 'Medicine Id',
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Query)('medicineId', new common_1.ValidationPipe({ transform: true }))),
@@ -190,6 +268,33 @@ __decorate([
 __decorate([
     (0, common_1.Post)('dispensePrescription'),
     (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'dispense Prescription' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'patientAddress',
+        required: true,
+        type: String,
+        description: 'Patient Address',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'pharmacistAddress',
+        required: true,
+        type: String,
+        description: 'Pharmacist Address',
+    }),
+    (0, swagger_1.ApiNotFoundResponse)({
+        status: common_1.HttpStatus.NOT_FOUND,
+    }),
+    (0, swagger_1.ApiBadRequestResponse)({
+        status: common_1.HttpStatus.BAD_REQUEST,
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        isArray: false,
+        type: pharmacist_dto_1.DispenseReceiptDto,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('patientAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Query)('pharmacistAddress', new common_1.ValidationPipe({ transform: true }))),
@@ -201,6 +306,26 @@ __decorate([
 __decorate([
     (0, common_1.Post)('removePrescription'),
     (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Remove Prescription' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        required: true,
+        type: String,
+        description: 'wallet address',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'prescriptionId',
+        required: true,
+        type: String,
+        description: 'prescription id',
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        isArray: false,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Query)('prescriptionId', new common_1.ValidationPipe({ transform: true }))),
@@ -210,6 +335,21 @@ __decorate([
 ], PharmacistController.prototype, "removePrescription", null);
 __decorate([
     (0, common_1.Get)('getPharmacist'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get Pharmacist' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        required: true,
+        type: String,
+        description: 'wallet address',
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        isArray: false,
+        type: pharmacist_dto_1.PharmacistDto,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress')),
     __metadata("design:type", Function),
@@ -218,6 +358,15 @@ __decorate([
 ], PharmacistController.prototype, "getPharmacist", null);
 __decorate([
     (0, common_1.Get)('approvedPharmacists'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get Approved Pharmacists' }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        isArray: false,
+        type: pharmacist_dto_1.PharmacistDto,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -225,6 +374,15 @@ __decorate([
 ], PharmacistController.prototype, "getApprovedPharmacists", null);
 __decorate([
     (0, common_1.Get)('pendingPharmacists'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get Pending Pharmacists' }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        isArray: false,
+        type: pharmacist_dto_1.PharmacistDto,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -232,6 +390,15 @@ __decorate([
 ], PharmacistController.prototype, "getPendingPharmacists", null);
 __decorate([
     (0, common_1.Get)('getAllPharmacists'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get All Pharmacists' }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        isArray: true,
+        type: pharmacist_dto_1.PharmacistDto,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -240,6 +407,20 @@ __decorate([
 __decorate([
     (0, common_1.Delete)('deletePharmacist'),
     (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistExist),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete Pharmacist' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        required: true,
+        type: String,
+        description: 'wallet address',
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        isArray: false,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress')),
     __metadata("design:type", Function),
@@ -249,6 +430,33 @@ __decorate([
 __decorate([
     (0, common_1.Get)('getMedicine'),
     (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Get Medicine' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        required: true,
+        type: String,
+        description: 'wallet address',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'productId',
+        required: true,
+        type: String,
+        description: 'Product Id',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'medicineId',
+        required: true,
+        type: String,
+        description: 'Medicine Id',
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        isArray: false,
+        type: medicine_dto_1.MedicineDto,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Query)('productId', new common_1.ValidationPipe({ transform: true }))),
@@ -260,6 +468,27 @@ __decorate([
 __decorate([
     (0, common_1.Get)('getProduct'),
     (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Get Product' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        required: true,
+        type: String,
+        description: 'wallet address',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'productId',
+        required: true,
+        type: String,
+        description: 'Product Id',
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        isArray: false,
+        type: medicine_dto_1.ProductDto,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress')),
     __param(2, (0, common_1.Query)('productId')),
@@ -270,6 +499,21 @@ __decorate([
 __decorate([
     (0, common_1.Get)('getAllProducts'),
     (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Get All Products' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        required: true,
+        type: String,
+        description: 'wallet address',
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        isArray: true,
+        type: medicine_dto_1.ProductDto,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
@@ -279,6 +523,21 @@ __decorate([
 __decorate([
     (0, common_1.Get)('getInventory'),
     (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Get Inventory' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        required: true,
+        type: String,
+        description: 'wallet address',
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        isArray: false,
+        type: pharmacist_dto_1.InventoryDto,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe())),
     __metadata("design:type", Function),
@@ -288,6 +547,21 @@ __decorate([
 __decorate([
     (0, common_1.Get)('getAllSharedPrescriptions'),
     (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Get All Shared Prescriptions' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        required: true,
+        type: String,
+        description: 'wallet address',
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        isArray: true,
+        type: patient_dto_1.PrescriptionDto,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
@@ -297,6 +571,21 @@ __decorate([
 __decorate([
     (0, common_1.Get)('getSharedPrescription'),
     (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Get Shared Prescription' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        required: true,
+        type: String,
+        description: 'wallet address',
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        isArray: false,
+        type: patient_dto_1.PrescriptionDto,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Query)('prescriptionId', new common_1.ValidationPipe({ transform: true }))),
@@ -307,6 +596,32 @@ __decorate([
 __decorate([
     (0, common_1.Get)('checkProductAvailability'),
     (0, common_1.UseGuards)(pharmacist_auth_guard_1.PharmacistAuthGuard, pharmacist_auth_guard_1.PharmacistVerificationGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Check Product Availability' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'walletAddress',
+        required: true,
+        type: String,
+        description: 'wallet address',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'category',
+        required: true,
+        type: String,
+        description: 'product category',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'medication',
+        required: true,
+        type: String,
+        description: 'medicine name',
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        status: common_1.HttpStatus.OK,
+        type: pharmacist_dto_1.ProductExistDto,
+    }),
+    (0, swagger_1.ApiInternalServerErrorResponse)({
+        status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+    }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('walletAddress')),
     __param(2, (0, common_1.Query)('category')),

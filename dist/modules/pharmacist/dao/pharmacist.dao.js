@@ -125,8 +125,7 @@ let PharmacistDao = class PharmacistDao {
     }
     async findMedicineById(walletAddress, medicineId, productId) {
         const product = await this.fetchProductById(productId, walletAddress);
-        const medicine = product.medications.find((med) => med._id.toString() === medicineId.toString());
-        return medicine;
+        return product.medications.find((med) => med._id.toString() === medicineId.toString());
     }
     async pullMedicineById(pharmacistAddress, productId, medicineId) {
         return await this.pharmacistModel.findOneAndUpdate({ walletAddress: pharmacistAddress, 'inventory.products._id': productId }, { $pull: { 'inventory.products.$.medications': { _id: medicineId } } }, { new: true });
