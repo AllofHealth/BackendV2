@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEmail,
   IsEthereumAddress,
   IsNotEmpty,
@@ -19,6 +20,7 @@ import {
 } from '@/modules/pharmacist/schema/pharmacist.schema';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Types } from 'mongoose';
+import { MedicineDto, ProductDto } from '@/modules/medicine/dto/medicine.dto';
 
 export class CreatePharmacistDto {
   @ApiProperty({ type: Number })
@@ -242,4 +244,56 @@ export class DispenseMedicationDto {
   @IsNotEmpty()
   @IsString()
   medicineId: string;
+}
+
+export class DispenseRecieptDto {
+  @ApiProperty({ type: String })
+  @IsNotEmpty()
+  @IsString()
+  productToDispense: string;
+
+  @ApiProperty({ type: Number })
+  @IsNotEmpty()
+  @IsNumber()
+  quantity: number;
+
+  @ApiProperty({ type: String })
+  @IsNotEmpty()
+  @IsString()
+  price: string;
+}
+
+export class InventoryDto {
+  @ApiProperty({ type: Number, default: 0 })
+  @IsNotEmpty()
+  @IsNumber()
+  numberOfMedicine: number;
+
+  @ApiProperty({ type: Number, default: 0 })
+  @IsNotEmpty()
+  @IsNumber()
+  numberOfCategories: number;
+
+  @ApiProperty({ type: Number, default: 0 })
+  @IsNotEmpty()
+  @IsNumber()
+  numberOfMedicineSold: number;
+
+  @ApiProperty({ type: [ProductDto] })
+  products: ProductDto[];
+}
+
+export class ProductExistDto {
+  @ApiProperty({ type: Boolean })
+  @IsNotEmpty()
+  @IsBoolean()
+  medicineExist: boolean;
+
+  @ApiProperty({ type: Boolean })
+  @IsNotEmpty()
+  @IsBoolean()
+  categoryExist: boolean;
+
+  @ApiProperty({ type: [MedicineDto] })
+  availableMedications: MedicineDto[];
 }
