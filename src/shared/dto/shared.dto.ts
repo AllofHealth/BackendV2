@@ -9,5 +9,8 @@ export class EntityCreatedDto {
 }
 
 export class InstitutionJoinedDto {
-  constructor(readonly walletAddress: string) {}
+  constructor(
+    readonly walletAddress: string,
+    readonly role: RoleType,
+  ) {}
 }
