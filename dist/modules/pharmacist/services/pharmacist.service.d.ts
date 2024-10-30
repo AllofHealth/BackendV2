@@ -129,8 +129,15 @@ export declare class PharmacistService {
         product: Product;
     }>;
     fetchInventory(walletAddress: string): Promise<{
+        status: HttpStatus;
+        message: string;
+        success?: undefined;
+        inventory?: undefined;
+    } | {
         success: HttpStatus;
         inventory: import("../schema/pharmacist.schema").Inventory;
+        status?: undefined;
+        message?: undefined;
     }>;
     updateMedicine(args: FetchMedicineInterface, update: UpdateMedicineType): Promise<{
         success: HttpStatus;

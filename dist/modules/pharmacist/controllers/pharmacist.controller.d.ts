@@ -124,8 +124,15 @@ export declare class PharmacistController {
         products: import("../schema/pharmacist.schema").Product[];
     }>;
     getInventory(ip: string, walletAddress: string): Promise<{
+        status: HttpStatus;
+        message: string;
+        success?: undefined;
+        inventory?: undefined;
+    } | {
         success: HttpStatus;
         inventory: import("../schema/pharmacist.schema").Inventory;
+        status?: undefined;
+        message?: undefined;
     }>;
     getAllSharedPrescriptions(ip: string, walletAddress: string): Promise<{
         success: HttpStatus;

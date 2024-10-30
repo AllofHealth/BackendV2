@@ -410,7 +410,10 @@ let PharmacistService = PharmacistService_1 = class PharmacistService {
             const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
             const inventory = pharmacist.inventory;
             if (!inventory) {
-                throw new common_1.HttpException({ message: 'inventory not found' }, common_1.HttpStatus.NOT_FOUND);
+                return {
+                    status: common_1.HttpStatus.NOT_FOUND,
+                    message: 'no products found',
+                };
             }
             return {
                 success: common_1.HttpStatus.OK,

@@ -290,7 +290,7 @@ __decorate([
     (0, swagger_1.ApiOkResponse)({
         status: common_1.HttpStatus.OK,
         isArray: false,
-        type: pharmacist_dto_1.DispenseReceiptDto,
+        type: patient_dto_1.ReceiptDto,
     }),
     (0, swagger_1.ApiInternalServerErrorResponse)({
         status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,

@@ -24,8 +24,8 @@ let PharmacistAuthGuard = class PharmacistAuthGuard {
             throw new common_1.ForbiddenException('Invalid request');
         }
         const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(pharmacistAddress);
-        if (!pharmacist && pharmacist.status !== shared_1.ApprovalStatus.Approved) {
-            throw new common_1.UnauthorizedException('Pharmacist not found or not approved');
+        if (!pharmacist || pharmacist.status !== shared_1.ApprovalStatus.Approved) {
+            throw new common_1.UnauthorizedException('Pharmacist not found or not approved by any institution');
         }
         return true;
     }
