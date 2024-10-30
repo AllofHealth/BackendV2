@@ -110,10 +110,7 @@ export class PharmacistService {
         );
       } catch (error) {
         await this.pharmacistDao.deletePharmacist(pharmacist.walletAddress);
-        this.eventEmitter.emit(
-          SharedEvents.INSTITUTION_JOINED,
-          new InstitutionJoinedDto(args.walletAddress, 'pharmacist'),
-        );
+
         throw new HttpException(
           { message: 'an error occurred while joining institution' },
           HttpStatus.BAD_REQUEST,
