@@ -15,7 +15,6 @@ import {
   AddMedicineDto,
   CreatePharmacistDto,
   DispenseMedicationDto,
-  DispenseReceiptDto,
   InventoryDto,
   PharmacistDto,
   ProductExistDto,
@@ -40,12 +39,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { MedicineDto, ProductDto } from '@/modules/medicine/dto/medicine.dto';
-import { PrescriptionDto } from '@/modules/patient/dto/patient.dto';
+import { PrescriptionDto, ReceiptDto } from '@/modules/patient/dto/patient.dto';
 
 @ApiTags('pharmacist')
 @Controller('pharmacist')
 export class PharmacistController {
   private readonly logger = new MyLoggerService(PharmacistController.name);
+
   constructor(private readonly pharmacistService: PharmacistService) {}
 
   @Post('createPharmacist')
@@ -229,7 +229,7 @@ export class PharmacistController {
   @ApiOkResponse({
     status: HttpStatus.OK,
     isArray: false,
-    type: DispenseReceiptDto,
+    type: ReceiptDto,
   })
   @ApiInternalServerErrorResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
