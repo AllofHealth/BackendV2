@@ -1,11 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Types } from 'mongoose';
 import { ReceiptDto } from '@/modules/patient/dto/patient.dto';
-import { Prop } from '@nestjs/mongoose';
-import {
-  Medicine,
-  MedicineSchema,
-} from '@/modules/pharmacist/schema/pharmacist.schema';
 
 export class MedicineDto {
   @ApiProperty({ type: String })
@@ -26,7 +21,7 @@ export class MedicineDto {
   @ApiProperty({ type: Boolean, default: false })
   isDispensed: boolean;
 
-  @ApiPropertyOptional({ type: ReceiptDto })
+  @ApiProperty({ type: () => ReceiptDto })
   receipt: ReceiptDto;
 
   @ApiProperty({ type: Types.ObjectId })
@@ -41,5 +36,5 @@ export class ProductDto {
   description?: string;
 
   @ApiProperty({ type: [MedicineDto] })
-  medications: Medicine[];
+  medications: MedicineDto[];
 }
