@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Ip,
   Post,
   Query,
@@ -14,6 +15,10 @@ import {
   AddMedicineDto,
   CreatePharmacistDto,
   DispenseMedicationDto,
+  DispenseRecieptDto,
+  InventoryDto,
+  PharmacistDto,
+  ProductExistDto,
   UpdateMedicineDto,
   UpdatePharmacistDto,
 } from '../dto/pharmacist.dto';
@@ -24,16 +29,39 @@ import {
   PharmacistVerificationGuard,
 } from '../guards/pharmacist.auth.guard';
 import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiConflictResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+import { MedicineDto, ProductDto } from '@/modules/medicine/dto/medicine.dto';
+import { PrescriptionDto } from '@/modules/patient/dto/patient.dto';
 
 @ApiTags('pharmacist')
 @Controller('pharmacist')
 export class PharmacistController {
   private readonly logger = new MyLoggerService(PharmacistController.name);
-
   constructor(private readonly pharmacistService: PharmacistService) {}
 
   @Post('createPharmacist')
+  @ApiOperation({ summary: 'Create Pharmacist' })
+  @ApiConflictResponse({
+    status: HttpStatus.CONFLICT,
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Pharmacist created successfully',
+    type: PharmacistDto,
+    isArray: false,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async createPharmacist(
     @Ip() ip: string,
     @Body(ValidationPipe) createPharmacistDto: CreatePharmacistDto,
@@ -44,6 +72,16 @@ export class PharmacistController {
 
   @Post('updatePharmacist')
   @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
+  @ApiOperation({ summary: 'Update Pharmacist' })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Pharmacist updated successfully',
+    type: PharmacistDto,
+    isArray: false,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async updatePharmacist(
     @Ip() ip: string,
     @Query('walletAddress') walletAddress: string,
@@ -58,6 +96,14 @@ export class PharmacistController {
 
   @Post('addMedicine')
   @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
+  @ApiOperation({ summary: 'Add Medicine' })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: false,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async addMedicine(
     @Ip() ip: string,
     @Query('walletAddress', new ValidationPipe({ transform: true }))
@@ -74,6 +120,32 @@ export class PharmacistController {
 
   @Post('removeMedicine')
   @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
+  @ApiOperation({ summary: 'Remove Medicine' })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: false,
+  })
+  @ApiQuery({
+    name: 'walletAddress',
+    required: true,
+    type: String,
+    description: 'Wallet Address',
+  })
+  @ApiQuery({
+    name: 'productId',
+    required: true,
+    type: String,
+    description: 'Product Id',
+  })
+  @ApiQuery({
+    name: 'medicineId',
+    required: true,
+    type: String,
+    description: 'Medicine Id',
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async removeMedicine(
     @Ip() ip: string,
     @Query('walletAddress', new ValidationPipe({ transform: true }))
@@ -93,6 +165,25 @@ export class PharmacistController {
 
   @Post('updateMedicine')
   @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
+  @ApiOperation({ summary: 'Update Medicine' })
+  @ApiQuery({
+    name: 'walletAddress',
+    required: true,
+    type: String,
+    description: 'wallet address',
+  })
+  @ApiQuery({
+    name: 'productId',
+    required: true,
+    type: String,
+    description: 'Product Id',
+  })
+  @ApiQuery({
+    name: 'medicineId',
+    required: true,
+    type: String,
+    description: 'Medicine Id',
+  })
   async updateMedicine(
     @Ip() ip: string,
     @Query('walletAddress', new ValidationPipe({ transform: true }))
@@ -116,6 +207,33 @@ export class PharmacistController {
 
   @Post('dispensePrescription')
   @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
+  @ApiOperation({ summary: 'dispense Prescription' })
+  @ApiQuery({
+    name: 'patientAddress',
+    required: true,
+    type: String,
+    description: 'Patient Address',
+  })
+  @ApiQuery({
+    name: 'pharmacistAddress',
+    required: true,
+    type: String,
+    description: 'Pharmacist Address',
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.BAD_REQUEST,
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: false,
+    type: DispenseRecieptDto,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async dispensePrescription(
     @Ip() ip: string,
     @Query('patientAddress', new ValidationPipe({ transform: true }))
@@ -137,6 +255,26 @@ export class PharmacistController {
 
   @Post('removePrescription')
   @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
+  @ApiOperation({ summary: 'Remove Prescription' })
+  @ApiQuery({
+    name: 'walletAddress',
+    required: true,
+    type: String,
+    description: 'wallet address',
+  })
+  @ApiQuery({
+    name: 'prescriptionId',
+    required: true,
+    type: String,
+    description: 'prescription id',
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: false,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async removePrescription(
     @Ip() ip: string,
     @Query('walletAddress', new ValidationPipe({ transform: true }))
@@ -152,6 +290,21 @@ export class PharmacistController {
   }
 
   @Get('getPharmacist')
+  @ApiOperation({ summary: 'Get Pharmacist' })
+  @ApiQuery({
+    name: 'walletAddress',
+    required: true,
+    type: String,
+    description: 'wallet address',
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: false,
+    type: PharmacistDto,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async getPharmacist(
     @Ip() ip: string,
     @Query('walletAddress') walletAddress: string,
@@ -161,18 +314,45 @@ export class PharmacistController {
   }
 
   @Get('approvedPharmacists')
+  @ApiOperation({ summary: 'Get Approved Pharmacists' })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: false,
+    type: PharmacistDto,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async getApprovedPharmacists(@Ip() ip: string) {
     this.logger.log(`Get Approved Pharmacist Request\t${ip}`);
     return await this.pharmacistService.getApprovedPharmacists();
   }
 
   @Get('pendingPharmacists')
+  @ApiOperation({ summary: 'Get Pending Pharmacists' })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: false,
+    type: PharmacistDto,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async getPendingPharmacists(@Ip() ip: string) {
     this.logger.log(`Get Pending Pharmacist Request\t${ip}`);
     return await this.pharmacistService.getPendingPharmacists();
   }
 
   @Get('getAllPharmacists')
+  @ApiOperation({ summary: 'Get All Pharmacists' })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: true,
+    type: PharmacistDto,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async getAllPharmacists(@Ip() ip: string) {
     this.logger.log(`Create New Patient Request\t${ip}`);
     return await this.pharmacistService.getAllPharmacists();
@@ -180,6 +360,20 @@ export class PharmacistController {
 
   @Delete('deletePharmacist')
   @UseGuards(PharmacistExist)
+  @ApiOperation({ summary: 'Delete Pharmacist' })
+  @ApiQuery({
+    name: 'walletAddress',
+    required: true,
+    type: String,
+    description: 'wallet address',
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: false,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async deletePharmacistByAddress(
     @Ip() ip: string,
     @Query('walletAddress') walletAddress: string,
@@ -190,6 +384,33 @@ export class PharmacistController {
 
   @Get('getMedicine')
   @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
+  @ApiOperation({ summary: 'Get Medicine' })
+  @ApiQuery({
+    name: 'walletAddress',
+    required: true,
+    type: String,
+    description: 'wallet address',
+  })
+  @ApiQuery({
+    name: 'productId',
+    required: true,
+    type: String,
+    description: 'Product Id',
+  })
+  @ApiQuery({
+    name: 'medicineId',
+    required: true,
+    type: String,
+    description: 'Medicine Id',
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: false,
+    type: MedicineDto,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async getMedicine(
     @Ip() ip: string,
     @Query('walletAddress', new ValidationPipe({ transform: true }))
@@ -209,6 +430,27 @@ export class PharmacistController {
 
   @Get('getProduct')
   @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
+  @ApiOperation({ summary: 'Get Product' })
+  @ApiQuery({
+    name: 'walletAddress',
+    required: true,
+    type: String,
+    description: 'wallet address',
+  })
+  @ApiQuery({
+    name: 'productId',
+    required: true,
+    type: String,
+    description: 'Product Id',
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: false,
+    type: ProductDto,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async fetchProduct(
     @Ip() ip: string,
     @Query('walletAddress') walletAddress: string,
@@ -223,6 +465,21 @@ export class PharmacistController {
 
   @Get('getAllProducts')
   @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
+  @ApiOperation({ summary: 'Get All Products' })
+  @ApiQuery({
+    name: 'walletAddress',
+    required: true,
+    type: String,
+    description: 'wallet address',
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: true,
+    type: ProductDto,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async getAllProducts(
     @Ip() ip: string,
     @Query('walletAddress', new ValidationPipe({ transform: true }))
@@ -234,6 +491,21 @@ export class PharmacistController {
 
   @Get('getInventory')
   @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
+  @ApiOperation({ summary: 'Get Inventory' })
+  @ApiQuery({
+    name: 'walletAddress',
+    required: true,
+    type: String,
+    description: 'wallet address',
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: false,
+    type: InventoryDto,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async getInventory(
     @Ip() ip: string,
     @Query('walletAddress', new ValidationPipe()) walletAddress: string,
@@ -244,6 +516,21 @@ export class PharmacistController {
 
   @Get('getAllSharedPrescriptions')
   @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
+  @ApiOperation({ summary: 'Get All Shared Prescriptions' })
+  @ApiQuery({
+    name: 'walletAddress',
+    required: true,
+    type: String,
+    description: 'wallet address',
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: true,
+    type: PrescriptionDto,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async getAllSharedPrescriptions(
     @Ip() ip: string,
     @Query('walletAddress', new ValidationPipe({ transform: true }))
@@ -257,6 +544,21 @@ export class PharmacistController {
 
   @Get('getSharedPrescription')
   @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
+  @ApiOperation({ summary: 'Get Shared Prescription' })
+  @ApiQuery({
+    name: 'walletAddress',
+    required: true,
+    type: String,
+    description: 'wallet address',
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    isArray: false,
+    type: PrescriptionDto,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async getSharedPrescription(
     @Ip() ip: string,
     @Query('walletAddress', new ValidationPipe({ transform: true }))
@@ -273,13 +575,39 @@ export class PharmacistController {
 
   @Get('checkProductAvailability')
   @UseGuards(PharmacistAuthGuard, PharmacistVerificationGuard)
+  @ApiOperation({ summary: 'Check Product Availability' })
+  @ApiQuery({
+    name: 'walletAddress',
+    required: true,
+    type: String,
+    description: 'wallet address',
+  })
+  @ApiQuery({
+    name: 'category',
+    required: true,
+    type: String,
+    description: 'product category',
+  })
+  @ApiQuery({
+    name: 'medication',
+    required: true,
+    type: String,
+    description: 'medicine name',
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    type: ProductExistDto,
+  })
+  @ApiInternalServerErrorResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  })
   async checkProductExist(
     @Ip() ip: string,
     @Query('walletAddress') walletAddress: string,
     @Query('category') category: string,
     @Query('medication') productPrescribed: string,
   ) {
-    this.logger.log(`Create Product Availabilty Request\t${ip}`);
+    this.logger.log(`Create Product Availability Request\t${ip}`);
     return await this.pharmacistService.checkMedicineExist({
       walletAddress,
       category,
