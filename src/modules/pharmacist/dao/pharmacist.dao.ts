@@ -178,11 +178,9 @@ export class PharmacistDao {
   ) {
     const product = await this.fetchProductById(productId, walletAddress);
 
-    const medicine = product.medications.find(
+    return product.medications.find(
       (med: MedicineType) => med._id.toString() === medicineId.toString(),
     );
-
-    return medicine;
   }
 
   async pullMedicineById(
