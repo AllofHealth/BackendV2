@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -11,6 +12,7 @@ import {
   ApprovePractitionerType,
   CreateHospitalType,
   HospitalType,
+  IPurgePractitioner,
   JoinHospitalType,
   PreviewType,
   RemovePractitionerType,
@@ -24,7 +26,7 @@ import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
 import { DoctorGuard } from '@/modules/doctor/guards/doctor.guard';
 import { PharmacistGuard } from '@/modules/pharmacist/guards/pharmacist.guard';
 import { EncryptionService } from '@/shared/utils/encryption/service/encryption.service';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { SharedEvents } from '@/shared/events/shared.events';
 import { EntityCreatedDto } from '@/shared/dto/shared.dto';
 
@@ -948,6 +950,30 @@ export class HospitalService {
     } catch (error) {
       console.error(error);
       throw new HospitalError('An error occurred while fetching hospitals');
+    }
+  }
+
+  @OnEvent(SharedEvents.INSTITUTION_JOINED, { async: true })
+  async purgePractitioner(args: IPurgePractitioner) {
+    const { walletAddress, hospitalId, role } = args;
+    try {
+      switch (role) {
+        case 'doctor':
+          await this.removeDoctorFromHospital(hospitalId, walletAddress);
+          break;
+        case 'pharmacist':
+          await this.removePharmacistFromHospital(hospitalId, walletAddress);
+          break;
+
+        default:
+          throw new BadRequestException('Invalid role');
+      }
+    } catch (e) {
+      this.logger.log(e.message);
+      throw new HttpException(
+        { message: 'an error occurred while purging practitioner' },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
