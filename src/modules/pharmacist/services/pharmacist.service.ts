@@ -29,10 +29,7 @@ import { Product } from '../schema/pharmacist.schema';
 import { PreviewType } from '@/modules/hospital/interface/hospital.interface';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SharedEvents } from '@/shared/events/shared.events';
-import {
-  EntityCreatedDto,
-  InstitutionJoinedDto,
-} from '@/shared/dto/shared.dto';
+import { EntityCreatedDto } from '@/shared/dto/shared.dto';
 import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
 
 @Injectable()
@@ -763,12 +760,10 @@ export class PharmacistService {
 
       const sharedPrescription = pharmacist.sharedPrescriptions;
       if (sharedPrescription.length < 1) {
-        throw new HttpException(
-          {
-            message: 'no shared prescriptions available',
-          },
-          HttpStatus.NOT_FOUND,
-        );
+        return {
+          status: HttpStatus.NOT_FOUND,
+          message: 'no prescription found',
+        };
       }
 
       const prescription = sharedPrescription.find(
@@ -777,10 +772,10 @@ export class PharmacistService {
       );
 
       if (!prescription) {
-        throw new HttpException(
-          { message: 'no prescription associated with patient found' },
-          HttpStatus.NOT_FOUND,
-        );
+        return {
+          status: HttpStatus.NOT_FOUND,
+          message: 'no prescription associated with patient found',
+        };
       }
 
       const medicine = prescription.medicine.find(
@@ -788,10 +783,10 @@ export class PharmacistService {
       );
 
       if (!medicine) {
-        throw new HttpException(
-          { message: 'invalid medicine id' },
-          HttpStatus.BAD_REQUEST,
-        );
+        return {
+          status: HttpStatus.NOT_FOUND,
+          message: 'invalid medicine id',
+        };
       }
 
       const result = await this.checkMedicineExist({
@@ -805,10 +800,10 @@ export class PharmacistService {
         (!result.data.medicineExist &&
           result.data.availableMedications.length < 1)
       ) {
-        throw new HttpException(
-          { message: 'product not available' },
-          HttpStatus.NOT_FOUND,
-        );
+        return {
+          status: HttpStatus.NOT_FOUND,
+          message: 'product not available',
+        };
       }
 
       /**
@@ -825,10 +820,10 @@ export class PharmacistService {
             med.name.toLowerCase() === productToDispense.toLowerCase(),
         )?.quantity < quantity
       ) {
-        throw new HttpException(
-          { message: 'invalid quantity selected' },
-          HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE,
-        );
+        return {
+          status: HttpStatus.BAD_REQUEST,
+          message: 'invalid quantity selected',
+        };
       }
 
       const prescriptionReceipt =
@@ -840,16 +835,17 @@ export class PharmacistService {
         });
 
       if (!prescriptionReceipt.receipt) {
-        throw new HttpException(
-          { message: 'an error occurred while creating receipt' },
-          HttpStatus.BAD_REQUEST,
-        );
+        return {
+          status: HttpStatus.BAD_REQUEST,
+          message: 'an error occurred while creating receipt',
+        };
       }
 
       const patient =
         await this.patientDao.fetchPatientByAddress(patientAddress);
       const patientPrescriptionData = patient.prescriptions.find(
-        (prescription: Prescriptions) => prescription._id === prescription._id,
+        (_prescription: Prescriptions) =>
+          _prescription._id === prescription._id,
       );
       const medicationData = patientPrescriptionData.medicine.find(
         (med: Medication) => med._id === medicine._id,
