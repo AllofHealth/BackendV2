@@ -29,7 +29,10 @@ import { Product } from '../schema/pharmacist.schema';
 import { PreviewType } from '@/modules/hospital/interface/hospital.interface';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SharedEvents } from '@/shared/events/shared.events';
-import { EntityCreatedDto } from '@/shared/dto/shared.dto';
+import {
+  EntityCreatedDto,
+  InstitutionJoinedDto,
+} from '@/shared/dto/shared.dto';
 import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
 
 @Injectable()
@@ -107,7 +110,14 @@ export class PharmacistService {
         );
       } catch (error) {
         await this.pharmacistDao.deletePharmacist(pharmacist.walletAddress);
-        throw new PharmacistError('Error adding pharmacist to hospital');
+        this.eventEmitter.emit(
+          SharedEvents.INSTITUTION_JOINED,
+          new InstitutionJoinedDto(args.walletAddress, 'pharmacist'),
+        );
+        throw new HttpException(
+          { message: 'an error occurred while joining institution' },
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       await pharmacist.save();
