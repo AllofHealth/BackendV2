@@ -15,7 +15,7 @@ import {
   AddMedicineDto,
   CreatePharmacistDto,
   DispenseMedicationDto,
-  DispenseRecieptDto,
+  DispenseReceiptDto,
   InventoryDto,
   PharmacistDto,
   ProductExistDto,
@@ -229,7 +229,7 @@ export class PharmacistController {
   @ApiOkResponse({
     status: HttpStatus.OK,
     isArray: false,
-    type: DispenseRecieptDto,
+    type: DispenseReceiptDto,
   })
   @ApiInternalServerErrorResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
