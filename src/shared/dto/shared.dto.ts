@@ -7,3 +7,7 @@ export class EntityCreatedDto {
     readonly role: RoleType,
   ) {}
 }
+
+export class InstitutionJoinedDto {
+  constructor(readonly walletAddress: string) {}
+}
