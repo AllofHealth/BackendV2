@@ -25,7 +25,7 @@
 import { HttpStatus } from '@nestjs/common';
 import { Hospital } from '../schema/hospital.schema';
 import { Model, Types } from 'mongoose';
-import { ApprovePractitionerType, CreateHospitalType, HospitalType, JoinHospitalType, PreviewType, RemovePractitionerType, UpdateHospitalProfileType } from '../interface/hospital.interface';
+import { ApprovePractitionerType, CreateHospitalType, HospitalType, IPurgePractitioner, JoinHospitalType, PreviewType, RemovePractitionerType, UpdateHospitalProfileType } from '../interface/hospital.interface';
 import { ErrorCodes } from '@/shared';
 import { HospitalDao } from '../dao/hospital.dao';
 import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
@@ -195,4 +195,5 @@ export declare class HospitalService {
         })[];
         message?: undefined;
     }>;
+    purgePractitioner(args: IPurgePractitioner): Promise<void>;
 }

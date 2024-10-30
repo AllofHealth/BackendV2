@@ -5,3 +5,8 @@ export declare class EntityCreatedDto {
     readonly role: RoleType;
     constructor(walletAddress: string, email: string, role: RoleType);
 }
+export declare class InstitutionJoinedDto {
+    readonly walletAddress: string;
+    readonly role: RoleType;
+    constructor(walletAddress: string, role: RoleType);
+}

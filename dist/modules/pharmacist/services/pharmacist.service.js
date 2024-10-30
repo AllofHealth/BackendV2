@@ -65,7 +65,8 @@ let PharmacistService = PharmacistService_1 = class PharmacistService {
             }
             catch (error) {
                 await this.pharmacistDao.deletePharmacist(pharmacist.walletAddress);
-                throw new shared_1.PharmacistError('Error adding pharmacist to hospital');
+                this.eventEmitter.emit(shared_events_1.SharedEvents.INSTITUTION_JOINED, new shared_dto_1.InstitutionJoinedDto(args.walletAddress, 'pharmacist'));
+                throw new common_1.HttpException({ message: 'an error occurred while joining institution' }, common_1.HttpStatus.BAD_REQUEST);
             }
             await pharmacist.save();
             await hospital.save();

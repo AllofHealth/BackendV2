@@ -34,7 +34,7 @@ let PatientVerificationGuard = class PatientVerificationGuard {
         const request = context.switchToHttp().getRequest();
         const patientAddress = request.query.walletAddress;
         const patient = await this.patientDao.fetchPatientByAddress(patientAddress);
-        if (!patient && !patient.isVerified) {
+        if (!patient || !patient.isVerified) {
             throw new common_1.ForbiddenException('please complete verification');
         }
         return true;

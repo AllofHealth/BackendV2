@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EntityCreatedDto = void 0;
+exports.InstitutionJoinedDto = exports.EntityCreatedDto = void 0;
 class EntityCreatedDto {
     constructor(walletAddress, email, role) {
         this.walletAddress = walletAddress;
@@ -9,4 +9,11 @@ class EntityCreatedDto {
     }
 }
 exports.EntityCreatedDto = EntityCreatedDto;
+class InstitutionJoinedDto {
+    constructor(walletAddress, role) {
+        this.walletAddress = walletAddress;
+        this.role = role;
+    }
+}
+exports.InstitutionJoinedDto = InstitutionJoinedDto;
 //# sourceMappingURL=shared.dto.js.map

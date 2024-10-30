@@ -777,8 +777,33 @@ let HospitalService = class HospitalService {
             throw new shared_1.HospitalError('An error occurred while fetching hospitals');
         }
     }
+    async purgePractitioner(args) {
+        const { walletAddress, hospitalId, role } = args;
+        try {
+            switch (role) {
+                case 'doctor':
+                    await this.removeDoctorFromHospital(hospitalId, walletAddress);
+                    break;
+                case 'pharmacist':
+                    await this.removePharmacistFromHospital(hospitalId, walletAddress);
+                    break;
+                default:
+                    throw new common_1.BadRequestException('Invalid role');
+            }
+        }
+        catch (e) {
+            this.logger.log(e.message);
+            throw new common_1.HttpException({ message: 'an error occurred while purging practitioner' }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 };
 exports.HospitalService = HospitalService;
+__decorate([
+    (0, event_emitter_1.OnEvent)(shared_events_1.SharedEvents.INSTITUTION_JOINED, { async: true }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], HospitalService.prototype, "purgePractitioner", null);
 exports.HospitalService = HospitalService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(hospital_schema_1.Hospital.name)),
