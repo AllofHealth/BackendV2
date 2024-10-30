@@ -29,7 +29,7 @@ export class PatientVerificationGuard implements CanActivate {
     const patientAddress = request.query.walletAddress;
     const patient = await this.patientDao.fetchPatientByAddress(patientAddress);
 
-    if (!patient && !patient.isVerified) {
+    if (!patient || !patient.isVerified) {
       throw new ForbiddenException('please complete verification');
     }
     return true;
