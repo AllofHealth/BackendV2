@@ -37,7 +37,7 @@ export class CreatePharmacistDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ type: IsEmail })
+  @ApiProperty({ type: String })
   @IsEmail()
   @IsNotEmpty()
   email: string;
@@ -66,19 +66,15 @@ export class CreatePharmacistDto {
 
 export class PharmacistDto {
   @ApiProperty({ type: Number })
-  @Prop({ required: true, unique: true })
   id: number;
 
   @ApiProperty({ type: [Number] })
-  @Prop([Number])
   hospitalIds: number[];
 
   @ApiProperty({ type: Number })
-  @Prop({ required: true, default: 0 })
   numberOfApprovals: number;
 
   @ApiProperty({ type: String })
-  @Prop({ required: true })
   name: string;
 
   @ApiProperty({ type: String })
@@ -110,15 +106,12 @@ export class PharmacistDto {
   status: string;
 
   @ApiProperty({ type: InventorySchema })
-  @Prop({ type: InventorySchema })
   inventory: Inventory;
 
   @ApiProperty({ type: [ApprovalListSchema] })
-  @Prop({ type: [{ type: ApprovalListSchema }] })
   approvalList: ApprovalList[];
 
   @ApiProperty({ type: [PrescriptionsSchema] })
-  @Prop({ type: [{ type: PrescriptionsSchema }] })
   sharedPrescriptions: Prescriptions[];
 
   @ApiProperty({ type: String, default: 'pharmacist' })
@@ -246,7 +239,7 @@ export class DispenseMedicationDto {
   medicineId: string;
 }
 
-export class DispenseRecieptDto {
+export class DispenseReceiptDto {
   @ApiProperty({ type: String })
   @IsNotEmpty()
   @IsString()
