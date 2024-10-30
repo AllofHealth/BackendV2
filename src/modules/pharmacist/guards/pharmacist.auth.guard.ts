@@ -22,8 +22,10 @@ export class PharmacistAuthGuard implements CanActivate {
 
     const pharmacist =
       await this.pharmacistDao.fetchPharmacistByAddress(pharmacistAddress);
-    if (!pharmacist && pharmacist.status !== ApprovalStatus.Approved) {
-      throw new UnauthorizedException('Pharmacist not found or not approved');
+    if (!pharmacist || pharmacist.status !== ApprovalStatus.Approved) {
+      throw new UnauthorizedException(
+        'Pharmacist not found or not approved by any institution',
+      );
     }
     return true;
   }
