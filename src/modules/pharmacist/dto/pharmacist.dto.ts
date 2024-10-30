@@ -21,33 +21,41 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Types } from 'mongoose';
 
 export class CreatePharmacistDto {
+  @ApiProperty({ type: Number })
   @IsNumber()
   @IsNotEmpty()
   id: number;
 
+  @ApiPropertyOptional({ type: Number })
   @IsOptional()
   hospitalIds?: number;
 
+  @ApiProperty({ type: String })
   @IsString()
   @IsNotEmpty()
   name: string;
 
+  @ApiProperty({ type: IsEmail })
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
+  @ApiPropertyOptional({ type: String })
   @IsOptional()
   @IsString()
   profilePicture?: string;
 
+  @ApiProperty({ type: String })
   @IsString()
   @IsNotEmpty()
   location: string;
 
+  @ApiProperty({ type: String })
   @IsString()
   @IsNotEmpty()
   phoneNumber: string;
 
+  @ApiProperty({ type: String })
   @IsString()
   @IsNotEmpty()
   @IsEthereumAddress()
@@ -124,92 +132,113 @@ export class PharmacistDto {
 }
 
 export class UpdatePharmacistDto {
+  @ApiPropertyOptional({ type: String })
   @IsOptional()
   @IsString()
   name?: string;
 
+  @ApiPropertyOptional({ type: String })
   @IsOptional()
   @IsEmail()
   email?: string;
 
+  @ApiPropertyOptional({ type: String })
   @IsString()
   @IsOptional()
   about?: string;
 
+  @ApiPropertyOptional({ type: String })
   @IsOptional()
   @IsString()
   profilePicture?: string;
 
+  @ApiPropertyOptional({ type: String })
   @IsOptional()
   @IsString()
   location?: string;
 
+  @ApiPropertyOptional({ type: String })
   @IsOptional()
   @IsString()
   phoneNumber?: string;
 }
 
 export class AddMedicineDto {
-  @IsString()
+  @ApiProperty({ type: String })
   @IsNotEmpty()
+  @IsString()
   name: string;
 
-  @IsNumber()
+  @ApiProperty({ type: Number })
   @IsNotEmpty()
+  @IsNumber()
   price: number;
 
-  @IsNumber()
+  @ApiProperty({ type: Number })
   @IsNotEmpty()
+  @IsNumber()
   quantity: number;
 
+  @ApiPropertyOptional({ type: String })
   @IsOptional()
   @IsString()
   sideEffects?: string;
 
+  @ApiPropertyOptional({ type: String })
   @IsOptional()
   @IsString()
   image?: string;
 
-  @IsString()
+  @ApiProperty({ type: String })
   @IsNotEmpty()
+  @IsString()
   category: string;
 }
 
 export class UpdateMedicineDto {
+  @ApiPropertyOptional({ type: String })
   @IsOptional()
   @IsString()
   name?: string;
 
+  @ApiPropertyOptional({ type: Number })
   @IsOptional()
   @IsNumber()
   price?: number;
 
+  @ApiPropertyOptional({ type: Number })
   @IsOptional()
   @IsNumber()
   quantity?: number;
 
+  @ApiPropertyOptional({ type: String })
   @IsOptional()
   @IsString()
   sideEffects?: string;
 
+  @ApiPropertyOptional({ type: String })
   @IsOptional()
   @IsString()
   image?: string;
 }
 
 export class DispenseMedicationDto {
+  @ApiProperty({ type: String })
   @IsNotEmpty()
   @IsString()
   productToDispense: string;
 
+  @ApiProperty({ type: String })
   @IsNotEmpty()
   @IsString()
   directions: string;
 
+  @ApiProperty({ type: Number })
   @IsNotEmpty()
   @IsNumber()
   quantity: number;
 
+  @ApiProperty({ type: String })
   @IsNotEmpty()
   @IsString()
   medicineId: string;
