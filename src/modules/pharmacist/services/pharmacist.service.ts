@@ -591,10 +591,10 @@ export class PharmacistService {
 
       const inventory = pharmacist.inventory;
       if (!inventory) {
-        throw new HttpException(
-          { message: 'inventory not found' },
-          HttpStatus.NOT_FOUND,
-        );
+        return {
+          status: HttpStatus.NOT_FOUND,
+          message: 'no products found',
+        };
       }
 
       return {
