@@ -35,6 +35,7 @@ import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
 @Injectable()
 export class PharmacistService {
   private logger = new MyLoggerService(PharmacistService.name);
+
   constructor(
     private readonly pharmacistDao: PharmacistDao,
     private readonly pharmacistGuard: PharmacistGuard,
