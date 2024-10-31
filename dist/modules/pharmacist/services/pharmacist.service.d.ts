@@ -32,7 +32,6 @@ import { Types } from 'mongoose';
 import { PatientDao } from '@/modules/patient/dao/patient.dao';
 import { MedicineService } from '@/modules/medicine/service/medicine.service';
 import { Prescriptions } from '@/modules/patient/schemas/patient.schema';
-import { Product } from '../schema/pharmacist.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 export declare class PharmacistService {
     private readonly pharmacistDao;
@@ -118,7 +117,7 @@ export declare class PharmacistService {
     } | {
         success: HttpStatus;
         message: string;
-        products: Product[];
+        products: import("../schema/pharmacist.schema").Product[];
     }>;
     fetchProduct(args: {
         walletAddress: string;
@@ -126,7 +125,7 @@ export declare class PharmacistService {
     }): Promise<{
         success: HttpStatus;
         message: string;
-        product: Product;
+        product: import("../schema/pharmacist.schema").Product;
     }>;
     fetchInventory(walletAddress: string): Promise<{
         status: HttpStatus;
@@ -159,6 +158,11 @@ export declare class PharmacistService {
         prescription: Prescriptions;
     }>;
     dispensePrescription(args: DispenseMedicineInterface): Promise<{
+        status: HttpStatus;
+        message: string;
+        success?: undefined;
+        data?: undefined;
+    } | {
         success: HttpStatus;
         message: string;
         data: {
@@ -166,6 +170,7 @@ export declare class PharmacistService {
             quantity: number;
             price: string;
         };
+        status?: undefined;
     }>;
     removePrescription(args: {
         walletAddress: string;

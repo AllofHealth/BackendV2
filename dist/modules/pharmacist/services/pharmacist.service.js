@@ -65,7 +65,6 @@ let PharmacistService = PharmacistService_1 = class PharmacistService {
             }
             catch (error) {
                 await this.pharmacistDao.deletePharmacist(pharmacist.walletAddress);
-                this.eventEmitter.emit(shared_events_1.SharedEvents.INSTITUTION_JOINED, new shared_dto_1.InstitutionJoinedDto(args.walletAddress, 'pharmacist'));
                 throw new common_1.HttpException({ message: 'an error occurred while joining institution' }, common_1.HttpStatus.BAD_REQUEST);
             }
             await pharmacist.save();
@@ -273,12 +272,14 @@ let PharmacistService = PharmacistService_1 = class PharmacistService {
         }
     }
     async handleInventoryUpdate(args) {
-        const { pharmacistAddress, category, medicineId, quantity } = args;
+        const { pharmacistAddress, category, medicineName, quantity } = args;
         try {
             const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(pharmacistAddress);
             const inventory = pharmacist.inventory;
-            const product = inventory.products.find((prod) => prod.category.toLowerCase() === category.toLowerCase());
-            const medication = product.medications.find((med) => med._id == medicineId);
+            const productIndex = pharmacist.inventory.products.findIndex((prod) => prod.category.toLowerCase() === category.toLowerCase());
+            console.log(`inventory updated product ${productIndex}`);
+            const medication = inventory.products[productIndex].medications.find((_med) => _med.name.toLowerCase() === medicineName.toLowerCase());
+            console.log(`inventory updated medication ${medication}`);
             medication.quantity -= quantity;
             inventory.numberOfMedicine -= quantity;
             inventory.numberOfMedicineSold += quantity;
@@ -299,9 +300,9 @@ let PharmacistService = PharmacistService_1 = class PharmacistService {
                 await this.handleNoInventoryCreated(walletAddress, category, args);
             }
             else {
-                const medicine = await this.initMedication(args);
                 const productIndex = pharmacist.inventory.products.findIndex((prod) => prod.category.toLowerCase() === category.toLowerCase());
                 if (productIndex === -1) {
+                    const medicine = await this.initMedication(args);
                     const newProduct = await this.pharmacistDao.createProduct({
                         category: this.capitalizeFirstLetter(category),
                         description: await this.fetchClassDescription(category),
@@ -310,11 +311,19 @@ let PharmacistService = PharmacistService_1 = class PharmacistService {
                     pharmacist.inventory.products.push(newProduct);
                 }
                 else {
-                    pharmacist.inventory.products[productIndex].medications.push(medicine);
+                    const medication = pharmacist.inventory.products[productIndex].medications.find((_med) => _med.name.toLowerCase() === args.name.toLowerCase());
+                    if (medication) {
+                        medication.quantity += args.quantity;
+                        await pharmacist.save();
+                    }
+                    else {
+                        const medicine = await this.initMedication(args);
+                        pharmacist.inventory.products[productIndex].medications.push(medicine);
+                    }
                 }
                 pharmacist.inventory.numberOfCategories =
                     pharmacist.inventory.products.length;
-                pharmacist.inventory.numberOfMedicine++;
+                pharmacist.inventory.numberOfMedicine += args.quantity;
                 await pharmacist.save();
                 return {
                     success: common_1.HttpStatus.OK,
@@ -522,31 +531,59 @@ let PharmacistService = PharmacistService_1 = class PharmacistService {
             const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(pharmacistAddress);
             const sharedPrescription = pharmacist.sharedPrescriptions;
             if (sharedPrescription.length < 1) {
-                throw new common_1.HttpException({
-                    message: 'no shared prescriptions available',
-                }, common_1.HttpStatus.NOT_FOUND);
+                return {
+                    status: common_1.HttpStatus.NOT_FOUND,
+                    message: 'no prescription found',
+                };
             }
             const prescription = sharedPrescription.find((prescription) => prescription.patientAddress === patientAddress);
             if (!prescription) {
-                throw new common_1.HttpException({ message: 'no prescription associated with patient found' }, common_1.HttpStatus.NOT_FOUND);
+                return {
+                    status: common_1.HttpStatus.NOT_FOUND,
+                    message: 'no prescription associated with patient found',
+                };
             }
-            const medicine = prescription.medicine.find((med) => med._id === medicineId);
+            const medicine = prescription.medicine.find((med) => med._id.toString().toLowerCase() ===
+                medicineId.toString().toLowerCase());
             if (!medicine) {
-                throw new common_1.HttpException({ message: 'invalid medicine id' }, common_1.HttpStatus.BAD_REQUEST);
+                return {
+                    status: common_1.HttpStatus.NOT_FOUND,
+                    message: 'invalid medicine id',
+                };
             }
+            console.log(medicine);
             const result = await this.checkMedicineExist({
                 walletAddress: pharmacistAddress,
                 category: medicine.productCategory,
                 productPrescribed: medicine.productPrescribed,
             });
+            console.log(result);
             if (!result.data.categoryExist ||
                 (!result.data.medicineExist &&
                     result.data.availableMedications.length < 1)) {
-                throw new common_1.HttpException({ message: 'product not available' }, common_1.HttpStatus.NOT_FOUND);
+                return {
+                    status: common_1.HttpStatus.NOT_FOUND,
+                    message: 'product not available',
+                };
             }
-            const medicationPrice = result.data.availableMedications.find((med) => med.name.toLowerCase() === productToDispense.toLowerCase())?.price;
-            if (result.data.availableMedications.find((med) => med.name.toLowerCase() === productToDispense.toLowerCase())?.quantity < quantity) {
-                throw new common_1.HttpException({ message: 'invalid quantity selected' }, common_1.HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
+            const availableMed = result.data.availableMedications
+                .flat()
+                .find((med) => med.name.toLowerCase() === productToDispense.toLowerCase());
+            console.log(availableMed);
+            if (!availableMed) {
+                return {
+                    status: common_1.HttpStatus.NOT_FOUND,
+                    message: 'no available medication found',
+                };
+            }
+            const medicationPrice = availableMed.price;
+            console.log(medicationPrice);
+            console.log(availableMed.quantity);
+            if (availableMed.quantity < quantity || 0) {
+                return {
+                    status: common_1.HttpStatus.BAD_REQUEST,
+                    message: 'invalid quantity selected or out of stock',
+                };
             }
             const prescriptionReceipt = await this.medicineService.createPrescriptionReceipt({
                 productDispensed: productToDispense,
@@ -554,17 +591,26 @@ let PharmacistService = PharmacistService_1 = class PharmacistService {
                 quantity: String(quantity),
                 price: String(medicationPrice * quantity),
             });
+            console.log(`prescriptionReceipt: ${prescriptionReceipt.receipt}`);
             if (!prescriptionReceipt.receipt) {
-                throw new common_1.HttpException({ message: 'an error occurred while creating receipt' }, common_1.HttpStatus.BAD_REQUEST);
+                return {
+                    status: common_1.HttpStatus.BAD_REQUEST,
+                    message: 'an error occurred while creating receipt',
+                };
             }
             const patient = await this.patientDao.fetchPatientByAddress(patientAddress);
-            const patientPrescriptionData = patient.prescriptions.find((prescription) => prescription._id === prescription._id);
-            const medicationData = patientPrescriptionData.medicine.find((med) => med._id === medicine._id);
+            const patientPrescriptionData = patient.prescriptions.find((_prescription) => _prescription._id.toString().toLowerCase() ===
+                prescription._id.toString().toLowerCase());
+            console.log(`patient prescription data : ${patientPrescriptionData}`);
+            const medicationData = patientPrescriptionData.medicine.find((med) => med._id.toString().toLowerCase() ===
+                medicine._id.toString().toLowerCase());
+            console.log(`patient medication data: ${medicationData}`);
             medicationData.receipt = prescriptionReceipt.receipt;
+            medicationData.isDispensed = true;
             await this.handleInventoryUpdate({
                 pharmacistAddress,
                 category: medicine.productCategory,
-                medicineId,
+                medicineName: productToDispense,
                 quantity,
             });
             await patient.save();

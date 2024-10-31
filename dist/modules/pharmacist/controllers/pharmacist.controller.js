@@ -56,11 +56,11 @@ let PharmacistController = PharmacistController_1 = class PharmacistController {
             medicineId,
         }, data);
     }
-    async dispensePrescription(ip, patientAddress, pharmacistAddress, dispenseDto) {
+    async dispensePrescription(ip, patientAddress, walletAddress, dispenseDto) {
         this.logger.log(`Dispense Prescription Request\t${ip}`);
         return await this.pharmacistService.dispensePrescription({
             patientAddress,
-            pharmacistAddress,
+            pharmacistAddress: walletAddress,
             productToDispense: dispenseDto.productToDispense,
             directions: dispenseDto.directions,
             quantity: dispenseDto.quantity,
@@ -297,7 +297,7 @@ __decorate([
     }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('patientAddress', new common_1.ValidationPipe({ transform: true }))),
-    __param(2, (0, common_1.Query)('pharmacistAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(2, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(3, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, String, pharmacist_dto_1.DispenseMedicationDto]),

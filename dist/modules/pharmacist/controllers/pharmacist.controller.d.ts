@@ -59,7 +59,12 @@ export declare class PharmacistController {
         success: HttpStatus;
         message: string;
     }>;
-    dispensePrescription(ip: string, patientAddress: string, pharmacistAddress: string, dispenseDto: DispenseMedicationDto): Promise<{
+    dispensePrescription(ip: string, patientAddress: string, walletAddress: string, dispenseDto: DispenseMedicationDto): Promise<{
+        status: HttpStatus;
+        message: string;
+        success?: undefined;
+        data?: undefined;
+    } | {
         success: HttpStatus;
         message: string;
         data: {
@@ -67,6 +72,7 @@ export declare class PharmacistController {
             quantity: number;
             price: string;
         };
+        status?: undefined;
     }>;
     removePrescription(ip: string, walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
         success: HttpStatus;
