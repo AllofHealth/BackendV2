@@ -238,14 +238,14 @@ export class PharmacistController {
     @Ip() ip: string,
     @Query('patientAddress', new ValidationPipe({ transform: true }))
     patientAddress: string,
-    @Query('pharmacistAddress', new ValidationPipe({ transform: true }))
-    pharmacistAddress: string,
+    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    walletAddress: string,
     @Body() dispenseDto: DispenseMedicationDto,
   ) {
     this.logger.log(`Dispense Prescription Request\t${ip}`);
     return await this.pharmacistService.dispensePrescription({
       patientAddress,
-      pharmacistAddress,
+      pharmacistAddress: walletAddress,
       productToDispense: dispenseDto.productToDispense,
       directions: dispenseDto.directions,
       quantity: dispenseDto.quantity,
