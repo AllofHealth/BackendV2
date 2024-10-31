@@ -25,7 +25,6 @@ import {
 import { MedicineService } from '@/modules/medicine/service/medicine.service';
 import { Prescriptions } from '@/modules/patient/schemas/patient.schema';
 import { Medication } from '@/modules/medicine/schema/medicine.schema';
-import { Product } from '../schema/pharmacist.schema';
 import { PreviewType } from '@/modules/hospital/interface/hospital.interface';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SharedEvents } from '@/shared/events/shared.events';
@@ -384,21 +383,25 @@ export class PharmacistService {
   private async handleInventoryUpdate(args: {
     pharmacistAddress: string;
     category: string;
-    medicineId: Types.ObjectId;
+    medicineName: string;
     quantity: number;
   }) {
-    const { pharmacistAddress, category, medicineId, quantity } = args;
+    const { pharmacistAddress, category, medicineName, quantity } = args;
     try {
       const pharmacist =
         await this.pharmacistDao.fetchPharmacistByAddress(pharmacistAddress);
       const inventory = pharmacist.inventory;
-      const product = inventory.products.find(
-        (prod: Product) =>
+      const productIndex = pharmacist.inventory.products.findIndex(
+        (prod: ProductType) =>
           prod.category.toLowerCase() === category.toLowerCase(),
       );
-      const medication = product.medications.find(
-        (med: MedicineType) => med._id == medicineId,
+
+      console.log(`inventory updated product ${productIndex}`);
+      const medication = inventory.products[productIndex].medications.find(
+        (_med) => _med.name.toLowerCase() === medicineName.toLowerCase(),
       );
+
+      console.log(`inventory updated medication ${medication}`);
 
       medication.quantity -= quantity;
       inventory.numberOfMedicine -= quantity;
@@ -429,13 +432,13 @@ export class PharmacistService {
       if (!pharmacist.inventory) {
         await this.handleNoInventoryCreated(walletAddress, category, args);
       } else {
-        const medicine = await this.initMedication(args);
         const productIndex = pharmacist.inventory.products.findIndex(
           (prod: ProductType) =>
             prod.category.toLowerCase() === category.toLowerCase(),
         );
 
         if (productIndex === -1) {
+          const medicine = await this.initMedication(args);
           const newProduct = await this.pharmacistDao.createProduct({
             category: this.capitalizeFirstLetter(category),
             description: await this.fetchClassDescription(category),
@@ -443,13 +446,26 @@ export class PharmacistService {
           });
           pharmacist.inventory.products.push(newProduct);
         } else {
-          pharmacist.inventory.products[productIndex].medications.push(
-            medicine,
+          const medication = pharmacist.inventory.products[
+            productIndex
+          ].medications.find(
+            (_med) => _med.name.toLowerCase() === args.name.toLowerCase(),
           );
+
+          if (medication) {
+            medication.quantity += args.quantity;
+            await pharmacist.save();
+          } else {
+            const medicine = await this.initMedication(args);
+            pharmacist.inventory.products[productIndex].medications.push(
+              medicine,
+            );
+          }
         }
+
         pharmacist.inventory.numberOfCategories =
           pharmacist.inventory.products.length;
-        pharmacist.inventory.numberOfMedicine++;
+        pharmacist.inventory.numberOfMedicine += args.quantity;
         await pharmacist.save();
 
         return {
@@ -779,7 +795,9 @@ export class PharmacistService {
       }
 
       const medicine = prescription.medicine.find(
-        (med: Medication) => med._id === medicineId,
+        (med: Medication) =>
+          med._id.toString().toLowerCase() ===
+          medicineId.toString().toLowerCase(),
       );
 
       if (!medicine) {
@@ -789,11 +807,15 @@ export class PharmacistService {
         };
       }
 
+      console.log(medicine);
+
       const result = await this.checkMedicineExist({
         walletAddress: pharmacistAddress,
         category: medicine.productCategory,
         productPrescribed: medicine.productPrescribed,
       });
+
+      console.log(result);
 
       if (
         !result.data.categoryExist ||
@@ -809,20 +831,31 @@ export class PharmacistService {
       /**
        * @todo: convert to helper function to get price and quantity
        */
-      const medicationPrice = result.data.availableMedications.find(
-        (med: MedicineType) =>
-          med.name.toLowerCase() === productToDispense.toLowerCase(),
-      )?.price;
-
-      if (
-        result.data.availableMedications.find(
+      const availableMed = result.data.availableMedications
+        .flat()
+        .find(
           (med: MedicineType) =>
             med.name.toLowerCase() === productToDispense.toLowerCase(),
-        )?.quantity < quantity
-      ) {
+        );
+
+      console.log(availableMed);
+
+      if (!availableMed) {
+        return {
+          status: HttpStatus.NOT_FOUND,
+          message: 'no available medication found',
+        };
+      }
+
+      const medicationPrice = availableMed.price;
+
+      console.log(medicationPrice);
+      console.log(availableMed.quantity);
+
+      if (availableMed.quantity < quantity || 0) {
         return {
           status: HttpStatus.BAD_REQUEST,
-          message: 'invalid quantity selected',
+          message: 'invalid quantity selected or out of stock',
         };
       }
 
@@ -833,6 +866,8 @@ export class PharmacistService {
           quantity: String(quantity),
           price: String(medicationPrice * quantity),
         });
+
+      console.log(`prescriptionReceipt: ${prescriptionReceipt.receipt}`);
 
       if (!prescriptionReceipt.receipt) {
         return {
@@ -845,17 +880,25 @@ export class PharmacistService {
         await this.patientDao.fetchPatientByAddress(patientAddress);
       const patientPrescriptionData = patient.prescriptions.find(
         (_prescription: Prescriptions) =>
-          _prescription._id === prescription._id,
+          _prescription._id.toString().toLowerCase() ===
+          prescription._id.toString().toLowerCase(),
       );
+
+      console.log(`patient prescription data : ${patientPrescriptionData}`);
       const medicationData = patientPrescriptionData.medicine.find(
-        (med: Medication) => med._id === medicine._id,
+        (med: Medication) =>
+          med._id.toString().toLowerCase() ===
+          medicine._id.toString().toLowerCase(),
       );
+
+      console.log(`patient medication data: ${medicationData}`);
       medicationData.receipt = prescriptionReceipt.receipt;
+      medicationData.isDispensed = true;
 
       await this.handleInventoryUpdate({
         pharmacistAddress,
         category: medicine.productCategory,
-        medicineId,
+        medicineName: productToDispense,
         quantity,
       });
 
