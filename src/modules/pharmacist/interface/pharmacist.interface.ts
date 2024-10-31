@@ -1,4 +1,8 @@
 import mongoose, { Types } from 'mongoose';
+import {
+  Patient,
+  Prescriptions,
+} from '@/modules/patient/schemas/patient.schema';
 
 export interface MedicineType {
   name: string;
@@ -53,6 +57,19 @@ export interface ReturnMedicationStatus {
   medicineExist?: boolean;
   categoryExist?: boolean;
   availableMedications?: MedicineType[];
+}
+
+export interface IHandleMedAvailability {
+  medicineName: string;
+  availableMedications: MedicineType[];
+}
+
+export interface IHandlePatientPrescriptionUpdate {
+  prescription: Prescriptions;
+  patient: Document<unknown, NonNullable<unknown>, Patient> &
+    Patient & { _id: Types.ObjectId };
+  prescriptionReceipt: Document<unknown, NonNullable<unknown>, Receipt> &
+    Receipt & { _id: Types.ObjectId };
 }
 
 export interface InventoryType {
