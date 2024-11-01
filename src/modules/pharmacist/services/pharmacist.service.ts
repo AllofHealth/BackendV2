@@ -344,8 +344,7 @@ export class PharmacistService {
       const pharmacist =
         await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
 
-      const inventory = await this.initInventory();
-      pharmacist.inventory = inventory;
+      pharmacist.inventory = await this.initInventory();
       await pharmacist.save();
 
       const medicine = await this.initMedication(args);
@@ -355,15 +354,11 @@ export class PharmacistService {
         medications: [medicine],
       });
 
-      console.log(product);
-
       if (!product) {
-        throw new HttpException(
-          {
-            message: 'an error occurred while adding medication to inventory',
-          },
-          HttpStatus.BAD_REQUEST,
-        );
+        return {
+          status: HttpStatus.BAD_REQUEST,
+          message: 'an error occurred while creating product',
+        };
       }
 
       pharmacist.inventory.products.push(product);
@@ -456,12 +451,13 @@ export class PharmacistService {
     }
   }
 
-  private handlePatientPrescriptionUpdate(
+  private async handlePatientPrescriptionUpdate(
     args: IHandlePatientPrescriptionUpdate,
   ) {
-    const { patient, prescription, prescriptionReceipt } = args;
+    const { patient, prescription, prescriptionReceipt, medicineId } = args;
+
     try {
-      const patientPrescriptionData = patient.prescriptions.find(
+      const patientPrescriptionData: Prescriptions = patient.prescriptions.find(
         (_prescription: Prescriptions) =>
           _prescription._id.toString().toLowerCase() ===
           prescription._id.toString().toLowerCase(),
@@ -476,7 +472,7 @@ export class PharmacistService {
       const medicationData = patientPrescriptionData.medicine.find(
         (med: Medication) =>
           med._id.toString().toLowerCase() ===
-          medicine._id.toString().toLowerCase(),
+          medicineId.toString().toLowerCase(),
       );
 
       if (!medicationData) {
@@ -907,7 +903,7 @@ export class PharmacistService {
 
       const {
         data: { price, medQuantity },
-      } = await this.handleMedicineAvailability({
+      } = this.handleMedicineAvailability({
         availableMedications: result.data.availableMedications,
         medicineName: productToDispense,
       });
@@ -940,6 +936,7 @@ export class PharmacistService {
         patient,
         prescription,
         prescriptionReceipt: prescriptionReceipt.receipt,
+        medicineId,
       });
 
       await this.handleInventoryUpdate({
@@ -963,7 +960,7 @@ export class PharmacistService {
         data: {
           productName: productToDispense,
           quantity,
-          price: String(medicationPrice * quantity),
+          price: String(price * quantity),
         },
       };
     } catch (error) {
