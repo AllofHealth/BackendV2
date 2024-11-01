@@ -1,8 +1,9 @@
-import mongoose, { Types } from 'mongoose';
+import mongoose, { Document, Types } from 'mongoose';
 import {
   Patient,
   Prescriptions,
 } from '@/modules/patient/schemas/patient.schema';
+import { Receipt } from '@/modules/medicine/schema/medicine.schema';
 
 export interface MedicineType {
   name: string;
@@ -70,6 +71,7 @@ export interface IHandlePatientPrescriptionUpdate {
     Patient & { _id: Types.ObjectId };
   prescriptionReceipt: Document<unknown, NonNullable<unknown>, Receipt> &
     Receipt & { _id: Types.ObjectId };
+  medicineId: Types.ObjectId;
 }
 
 export interface InventoryType {
