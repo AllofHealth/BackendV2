@@ -6,6 +6,8 @@ import {
   DispenseHelper,
   DispenseMedicineInterface,
   FetchMedicineInterface,
+  IHandleMedAvailability,
+  IHandlePatientPrescriptionUpdate,
   MedicineType,
   ProductType,
   ReturnMedicationStatus,
@@ -420,6 +422,84 @@ export class PharmacistService {
     }
   }
 
+  private handleMedicineAvailability(args: IHandleMedAvailability) {
+    const { medicineName, availableMedications } = args;
+    try {
+      const availableMed = availableMedications
+        .flat()
+        .find(
+          (med: MedicineType) =>
+            med.name.toLowerCase() === medicineName.toLowerCase(),
+        );
+
+      if (!availableMed) {
+        return {
+          status: HttpStatus.NOT_FOUND,
+          message: 'no available medication found',
+        };
+      }
+
+      return {
+        status: HttpStatus.OK,
+        message: 'medicine available',
+        data: {
+          price: availableMed.price,
+          medQuantity: availableMed.quantity,
+        },
+      };
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: 'an error occurred while handling medicine availability ' },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  private handlePatientPrescriptionUpdate(
+    args: IHandlePatientPrescriptionUpdate,
+  ) {
+    const { patient, prescription, prescriptionReceipt } = args;
+    try {
+      const patientPrescriptionData = patient.prescriptions.find(
+        (_prescription: Prescriptions) =>
+          _prescription._id.toString().toLowerCase() ===
+          prescription._id.toString().toLowerCase(),
+      );
+
+      if (!patientPrescriptionData) {
+        return {
+          status: HttpStatus.NOT_FOUND,
+          message: 'patient prescription not found',
+        };
+      }
+      const medicationData = patientPrescriptionData.medicine.find(
+        (med: Medication) =>
+          med._id.toString().toLowerCase() ===
+          medicine._id.toString().toLowerCase(),
+      );
+
+      if (!medicationData) {
+        return {
+          status: HttpStatus.NOT_FOUND,
+          message: 'patient prescription medicine not found',
+        };
+      }
+
+      medicationData.receipt = prescriptionReceipt;
+      medicationData.isDispensed = true;
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        {
+          message:
+            'an error occurred while handling patient prescription update ',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async addMedicine(
     walletAddress: string,
     category: string,
@@ -807,52 +887,32 @@ export class PharmacistService {
         };
       }
 
-      console.log(medicine);
-
       const result = await this.checkMedicineExist({
         walletAddress: pharmacistAddress,
         category: medicine.productCategory,
         productPrescribed: medicine.productPrescribed,
       });
 
-      console.log(result);
-
-      if (
+      const productNotAvailable =
         !result.data.categoryExist ||
         (!result.data.medicineExist &&
-          result.data.availableMedications.length < 1)
-      ) {
+          result.data.availableMedications.length < 1);
+
+      if (productNotAvailable) {
         return {
           status: HttpStatus.NOT_FOUND,
           message: 'product not available',
         };
       }
 
-      /**
-       * @todo: convert to helper function to get price and quantity
-       */
-      const availableMed = result.data.availableMedications
-        .flat()
-        .find(
-          (med: MedicineType) =>
-            med.name.toLowerCase() === productToDispense.toLowerCase(),
-        );
+      const {
+        data: { price, medQuantity },
+      } = await this.handleMedicineAvailability({
+        availableMedications: result.data.availableMedications,
+        medicineName: productToDispense,
+      });
 
-      console.log(availableMed);
-
-      if (!availableMed) {
-        return {
-          status: HttpStatus.NOT_FOUND,
-          message: 'no available medication found',
-        };
-      }
-
-      const medicationPrice = availableMed.price;
-
-      console.log(medicationPrice);
-      console.log(availableMed.quantity);
-
-      if (availableMed.quantity < quantity || 0) {
+      if (medQuantity < quantity || 0 || !medQuantity || !price) {
         return {
           status: HttpStatus.BAD_REQUEST,
           message: 'invalid quantity selected or out of stock',
@@ -864,10 +924,8 @@ export class PharmacistService {
           productDispensed: productToDispense,
           directions,
           quantity: String(quantity),
-          price: String(medicationPrice * quantity),
+          price: String(price * quantity),
         });
-
-      console.log(`prescriptionReceipt: ${prescriptionReceipt.receipt}`);
 
       if (!prescriptionReceipt.receipt) {
         return {
@@ -878,22 +936,11 @@ export class PharmacistService {
 
       const patient =
         await this.patientDao.fetchPatientByAddress(patientAddress);
-      const patientPrescriptionData = patient.prescriptions.find(
-        (_prescription: Prescriptions) =>
-          _prescription._id.toString().toLowerCase() ===
-          prescription._id.toString().toLowerCase(),
-      );
-
-      console.log(`patient prescription data : ${patientPrescriptionData}`);
-      const medicationData = patientPrescriptionData.medicine.find(
-        (med: Medication) =>
-          med._id.toString().toLowerCase() ===
-          medicine._id.toString().toLowerCase(),
-      );
-
-      console.log(`patient medication data: ${medicationData}`);
-      medicationData.receipt = prescriptionReceipt.receipt;
-      medicationData.isDispensed = true;
+      await this.handlePatientPrescriptionUpdate({
+        patient,
+        prescription,
+        prescriptionReceipt: prescriptionReceipt.receipt,
+      });
 
       await this.handleInventoryUpdate({
         pharmacistAddress,
