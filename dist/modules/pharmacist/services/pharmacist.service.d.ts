@@ -98,6 +98,8 @@ export declare class PharmacistService {
     private initInventory;
     private handleNoInventoryCreated;
     private handleInventoryUpdate;
+    private handleMedicineAvailability;
+    private handlePatientPrescriptionUpdate;
     addMedicine(walletAddress: string, category: string, args: MedicineType): Promise<{
         success: HttpStatus;
         message: string;
