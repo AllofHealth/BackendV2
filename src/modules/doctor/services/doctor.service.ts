@@ -12,6 +12,7 @@ import {
   ApproveMedicalRecordAccessRequestType,
   CreateDoctorType,
   CreateMedicalRecordType,
+  DoctorType,
   UpdateDoctorType,
 } from '../interface/doctor.interface';
 import { ApprovalStatus, Category, DoctorError } from '@/shared';
@@ -190,10 +191,35 @@ export class DoctorService {
           message: "Doctor doesn't exist",
         };
       }
+      const hospitalName = await this.hospitalDao
+        .fetchHospitalWithBlockchainId(doctor.hospitalIds[0])
+        .then((hospital) => hospital.name);
 
+      const doctorData: DoctorType = {
+        _id: doctor._id,
+        id: doctor.id,
+        hospitalIds: doctor.hospitalIds,
+        name: doctor.name,
+        email: doctor.email,
+        profilePicture: doctor.profilePicture,
+        specialty: doctor.specialty,
+        location: doctor.location,
+        phoneNumber: doctor.phoneNumber,
+        walletAddress: doctor.walletAddress,
+        numberOfApprovals: doctor.numberOfApprovals,
+        status: doctor.status,
+        category: doctor.category,
+        isVerified: doctor.isVerified,
+        activeApprovals: doctor.activeApprovals,
+      };
+
+      const data = {
+        hospitalName,
+        ...doctorData,
+      };
       return {
         success: HttpStatus.OK,
-        doctor,
+        doctor: data,
       };
     } catch (error) {
       console.error(error.message);
