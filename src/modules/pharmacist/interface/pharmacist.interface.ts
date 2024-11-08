@@ -4,6 +4,10 @@ import {
   Prescriptions,
 } from '@/modules/patient/schemas/patient.schema';
 import { Receipt } from '@/modules/medicine/schema/medicine.schema';
+import {
+  PharmacistDocument,
+  Pharmacist,
+} from '@/modules/pharmacist/schema/pharmacist.schema';
 
 export interface MedicineType {
   name: string;
@@ -108,8 +112,6 @@ export interface UpdatePharmacistType {
   phoneNumber?: string;
 }
 
-export interface PharmacistType extends CreatePharmacistType {
-  inventory: InventoryType;
-  category: string;
-  _id: mongoose.Types.ObjectId;
+export interface PharmacistType extends Pharmacist {
+  _id: Types.ObjectId;
 }
