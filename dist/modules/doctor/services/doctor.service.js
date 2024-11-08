@@ -160,9 +160,33 @@ let DoctorService = class DoctorService {
                     message: "Doctor doesn't exist",
                 };
             }
+            const hospitalName = await this.hospitalDao
+                .fetchHospitalWithBlockchainId(doctor.hospitalIds[0])
+                .then((hospital) => hospital.name);
+            const doctorData = {
+                _id: doctor._id,
+                id: doctor.id,
+                hospitalIds: doctor.hospitalIds,
+                name: doctor.name,
+                email: doctor.email,
+                profilePicture: doctor.profilePicture,
+                specialty: doctor.specialty,
+                location: doctor.location,
+                phoneNumber: doctor.phoneNumber,
+                walletAddress: doctor.walletAddress,
+                numberOfApprovals: doctor.numberOfApprovals,
+                status: doctor.status,
+                category: doctor.category,
+                isVerified: doctor.isVerified,
+                activeApprovals: doctor.activeApprovals,
+            };
+            const data = {
+                hospitalName,
+                ...doctorData,
+            };
             return {
                 success: common_1.HttpStatus.OK,
-                doctor,
+                doctor: data,
             };
         }
         catch (error) {

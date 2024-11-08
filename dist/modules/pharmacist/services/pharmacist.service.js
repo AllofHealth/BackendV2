@@ -130,9 +130,35 @@ let PharmacistService = PharmacistService_1 = class PharmacistService {
                     message: 'Pharmacist does not exist',
                 };
             }
+            const hospitalName = await this.hospitalDao
+                .fetchHospitalWithBlockchainId(pharmacist.hospitalIds[0])
+                .then((hospital) => hospital.name);
+            const pharmacistData = {
+                _id: pharmacist._id,
+                id: pharmacist.id,
+                hospitalIds: pharmacist.hospitalIds,
+                numberOfApprovals: pharmacist.numberOfApprovals,
+                name: pharmacist.name,
+                email: pharmacist.email,
+                about: pharmacist.about,
+                profilePicture: pharmacist.profilePicture,
+                location: pharmacist.location,
+                phoneNumber: pharmacist.phoneNumber,
+                walletAddress: pharmacist.walletAddress,
+                status: pharmacist.status,
+                inventory: pharmacist.inventory,
+                approvalList: pharmacist.approvalList,
+                sharedPrescriptions: pharmacist.sharedPrescriptions,
+                category: pharmacist.category,
+                isVerified: pharmacist.isVerified,
+            };
+            const data = {
+                hospitalName,
+                ...pharmacistData,
+            };
             return {
                 success: shared_1.ErrorCodes.Success,
-                pharmacist: pharmacist,
+                pharmacist: data,
             };
         }
         catch (error) {

@@ -84,8 +84,25 @@ export declare class PharmacistController {
         pharmacist?: undefined;
     } | {
         success: import("../../../shared").ErrorCodes;
-        pharmacist: import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {
+        pharmacist: {
             _id: Types.ObjectId;
+            id: number;
+            hospitalIds: number[];
+            numberOfApprovals: number;
+            name: string;
+            email?: string;
+            about?: string;
+            profilePicture: string;
+            location: string;
+            phoneNumber: string;
+            walletAddress: string;
+            status: string;
+            inventory: import("../schema/pharmacist.schema").Inventory;
+            approvalList: import("../schema/pharmacist.schema").ApprovalList[];
+            sharedPrescriptions: import("../../patient/schemas/patient.schema").Prescriptions[];
+            category: string;
+            isVerified: boolean;
+            hospitalName: string;
         };
         message?: undefined;
     }>;

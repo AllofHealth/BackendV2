@@ -25,6 +25,7 @@
 import mongoose, { Document, Types } from 'mongoose';
 import { Patient, Prescriptions } from '@/modules/patient/schemas/patient.schema';
 import { Receipt } from '@/modules/medicine/schema/medicine.schema';
+import { Pharmacist } from '@/modules/pharmacist/schema/pharmacist.schema';
 export interface MedicineType {
     name: string;
     price: number;
@@ -117,8 +118,6 @@ export interface UpdatePharmacistType {
     location?: string;
     phoneNumber?: string;
 }
-export interface PharmacistType extends CreatePharmacistType {
-    inventory: InventoryType;
-    category: string;
-    _id: mongoose.Types.ObjectId;
+export interface PharmacistType extends Pharmacist {
+    _id: Types.ObjectId;
 }

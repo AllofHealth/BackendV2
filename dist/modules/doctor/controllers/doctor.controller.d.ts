@@ -81,8 +81,23 @@ export declare class DoctorController {
         doctor?: undefined;
     } | {
         success: import("@nestjs/common").HttpStatus;
-        doctor: import("mongoose").Document<unknown, {}, import("../schema/doctor.schema").Doctor> & import("../schema/doctor.schema").Doctor & {
+        doctor: {
+            id: number;
             _id: Types.ObjectId;
+            hospitalIds?: number[];
+            name: string;
+            email: string;
+            profilePicture?: string;
+            specialty: string;
+            location: string;
+            phoneNumber: string;
+            walletAddress: string;
+            numberOfApprovals: number;
+            status: string;
+            category: string;
+            isVerified: boolean;
+            activeApprovals: import("../schema/doctor.schema").Approval[];
+            hospitalName: string;
         };
         message?: undefined;
     }>;
