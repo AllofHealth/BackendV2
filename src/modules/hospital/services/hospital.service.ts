@@ -614,9 +614,19 @@ export class HospitalService {
         };
       }
 
+      const decryptedHospital: any = [];
+
+      hospitals.forEach((hospital) => {
+        const _decryptedHospital = {
+          ...hospital.toObject(),
+          regNo: this.encryptionService.decrypt({ data: hospital.regNo }),
+        };
+        decryptedHospital.push(_decryptedHospital);
+      });
+
       return {
         success: ErrorCodes.Success,
-        hospitals,
+        hospital: decryptedHospital,
       };
     } catch (error) {
       this.logger.info('Error fetching all hospitals');
