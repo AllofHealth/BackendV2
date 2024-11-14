@@ -22,8 +22,9 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import mongoose, { Types } from 'mongoose';
+import mongoose, { Document, Types } from 'mongoose';
 import { RoleType } from '@/modules/otp/interface/otp.interface';
+import { Hospital } from '@/modules/hospital/schema/hospital.schema';
 export type InstitutionType = 'general' | 'paediatric' | 'optical' | 'dental' | 'diagnostic' | 'physiotherapy' | 'referrals';
 export interface CreateHospitalType {
     id: number;
@@ -73,4 +74,9 @@ export interface IPurgePractitioner {
     walletAddress: string;
     hospitalId: Types.ObjectId;
     role: RoleType;
+}
+export interface IHospitalArray {
+    decryptedHospital: Document<unknown, NonNullable<unknown>, Hospital> & Hospital & {
+        _id: Types.ObjectId;
+    };
 }

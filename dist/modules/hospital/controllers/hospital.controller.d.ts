@@ -94,9 +94,12 @@ export declare class HospitalController {
     }>;
     getAllHospitals(ip: string): Promise<{
         success: import("../../../shared").ErrorCodes;
-        hospitals: (import("mongoose").Document<unknown, {}, import("../schema/hospital.schema").Hospital> & import("../schema/hospital.schema").Hospital & {
-            _id: Types.ObjectId;
-        })[];
+        hospitals: any[];
+        hospital?: undefined;
+    } | {
+        success: import("../../../shared").ErrorCodes;
+        hospital: any;
+        hospitals?: undefined;
     }>;
     getApprovedHospitals(ip: string): Promise<{
         success: number;

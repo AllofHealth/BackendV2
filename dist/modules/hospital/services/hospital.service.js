@@ -490,9 +490,17 @@ let HospitalService = class HospitalService {
                     hospitals: [],
                 };
             }
+            const decryptedHospital = [];
+            hospitals.forEach((hospital) => {
+                const _decryptedHospital = {
+                    ...hospital.toObject(),
+                    regNo: this.encryptionService.decrypt({ data: hospital.regNo }),
+                };
+                decryptedHospital.push(_decryptedHospital);
+            });
             return {
                 success: shared_1.ErrorCodes.Success,
-                hospitals,
+                hospital: decryptedHospital,
             };
         }
         catch (error) {

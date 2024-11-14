@@ -120,9 +120,12 @@ export declare class HospitalService {
     }>;
     fetchAllHospitals(): Promise<{
         success: ErrorCodes;
-        hospitals: (import("mongoose").Document<unknown, {}, Hospital> & Hospital & {
-            _id: Types.ObjectId;
-        })[];
+        hospitals: any[];
+        hospital?: undefined;
+    } | {
+        success: ErrorCodes;
+        hospital: any;
+        hospitals?: undefined;
     }>;
     fetchHospitalById(id: Types.ObjectId): Promise<{
         success: ErrorCodes;
