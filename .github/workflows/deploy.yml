@@ -58,5 +58,5 @@ jobs:
           script: |
             cd ~/BackendV2
             npm install --production
-            pm2 restart 6
+            pm2 restart 1
             sudo systemctl restart nginx 
