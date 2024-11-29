@@ -24,7 +24,7 @@
 /// <reference types="mongoose/types/inferschematype" />
 import { HttpStatus } from '@nestjs/common';
 import { Patient } from '../schemas/patient.schema';
-import { IApprovalInput, ICreatePatient, IFamilyMember, IFamilyMemberApprovalInput, ISharePrescription, IUpdateFamilyMember, IUpdatePatientProfile } from '../interface/patient.interface';
+import { IApprovalInput, ICreatePatient, IFamilyMember, IFamilyMemberApprovalInput, IFamilyMemberRecord, ISharePrescription, IUpdateFamilyMember, IUpdatePatientProfile } from '../interface/patient.interface';
 import { Model, Types } from 'mongoose';
 import { PatientDao } from '../dao/patient.dao';
 import { PatientGuard } from '../guards/patient.guard';
@@ -203,5 +203,9 @@ export declare class PatientService {
             message: string;
         };
         message?: undefined;
+    }>;
+    fetchFamilyMemberRecordById(args: IFamilyMemberRecord): Promise<import("../schemas/patient.schema").MedicalRecordPreviewDocument | {
+        success: HttpStatus;
+        message: string;
     }>;
 }

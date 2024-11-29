@@ -155,6 +155,10 @@ export declare class PatientController {
         records: import("../schemas/patient.schema").MedicalRecordPreviewDocument[];
         message?: undefined;
     }>;
+    getFamilyMemberRecordById(ip: string, principalPatientAddress: string, familyMemberId: number, recordId: number): Promise<import("../schemas/patient.schema").MedicalRecordPreviewDocument | {
+        success: HttpStatus;
+        message: string;
+    }>;
     getMedicalRecord(ip: string, walletAddress: string, recordId: number): Promise<{
         success: HttpStatus;
         message: PatientErrors;

@@ -539,6 +539,16 @@ let PatientService = PatientService_1 = class PatientService {
             throw new common_1.HttpException({ message: patient_data_1.PatientErrors.RECORD_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    async fetchFamilyMemberRecordById(args) {
+        const { principalPatientAddress, familyMemberId, recordId } = args;
+        try {
+            return await this.patientDao.findOneFamilyMemberRecord(principalPatientAddress, familyMemberId, recordId);
+        }
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: patient_data_1.PatientErrors.FETCH_FAMILY_MEDICAL_RECORD }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 };
 exports.PatientService = PatientService;
 exports.PatientService = PatientService = PatientService_1 = __decorate([

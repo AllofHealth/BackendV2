@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PatientVerificationGuard = exports.PatientAuthGuard = void 0;
+exports.FamilyMemberGuard = exports.PatientVerificationGuard = exports.PatientAuthGuard = void 0;
 const common_1 = require("@nestjs/common");
 const patient_dao_1 = require("../dao/patient.dao");
 let PatientAuthGuard = class PatientAuthGuard {
@@ -45,4 +45,26 @@ exports.PatientVerificationGuard = PatientVerificationGuard = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [patient_dao_1.PatientDao])
 ], PatientVerificationGuard);
+let FamilyMemberGuard = class FamilyMemberGuard {
+    constructor(patientDao) {
+        this.patientDao = patientDao;
+    }
+    async canActivate(context) {
+        const request = context.switchToHttp().getRequest();
+        const principalPatientAddress = request.query.principalPatientAddress;
+        const patient = await this.patientDao.fetchPatientByAddress(principalPatientAddress);
+        if (!patient) {
+            throw new common_1.ForbiddenException('please complete verification');
+        }
+        if (patient.isVerified === false) {
+            throw new common_1.UnauthorizedException();
+        }
+        return true;
+    }
+};
+exports.FamilyMemberGuard = FamilyMemberGuard;
+exports.FamilyMemberGuard = FamilyMemberGuard = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [patient_dao_1.PatientDao])
+], FamilyMemberGuard);
 //# sourceMappingURL=patient.auth.guard.js.map

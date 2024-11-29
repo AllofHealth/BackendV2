@@ -121,6 +121,14 @@ let PatientController = PatientController_1 = class PatientController {
             familyMemberId,
         });
     }
+    async getFamilyMemberRecordById(ip, principalPatientAddress, familyMemberId, recordId) {
+        this.logger.log(`Get Family Member record by id Request\t${ip}`);
+        return await this.patientService.fetchFamilyMemberRecordById({
+            principalPatientAddress,
+            familyMemberId,
+            recordId,
+        });
+    }
     async getMedicalRecord(ip, walletAddress, recordId) {
         this.logger.log(`Get Medical Record By Id Request\t${ip}`);
         return await this.patientService.fetchMedicalRecordById({
@@ -460,14 +468,25 @@ __decorate([
 ], PatientController.prototype, "getAllMedicalRecords", null);
 __decorate([
     (0, common_1.Get)('familyMemberMedicalRecords'),
-    (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),
+    (0, common_1.UseGuards)(patient_auth_guard_1.FamilyMemberGuard),
     __param(0, (0, common_1.Ip)()),
-    __param(1, (0, common_1.Query)('walletAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(1, (0, common_1.Query)('principalPatientAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Query)('familyMemberId', new common_1.ValidationPipe({ transform: true }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, Number]),
     __metadata("design:returntype", Promise)
 ], PatientController.prototype, "getFamilyMemberMedicalRecords", null);
+__decorate([
+    (0, common_1.Get)('familyMemberRecordById'),
+    (0, common_1.UseGuards)(patient_auth_guard_1.FamilyMemberGuard),
+    __param(0, (0, common_1.Ip)()),
+    __param(1, (0, common_1.Query)('principalPatientAddress', new common_1.ValidationPipe({ transform: true }))),
+    __param(2, (0, common_1.Query)('familyMemberId', new common_1.ValidationPipe({ transform: true }))),
+    __param(3, (0, common_1.Query)('recordId', new common_1.ValidationPipe({ transform: true }))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Number, Number]),
+    __metadata("design:returntype", Promise)
+], PatientController.prototype, "getFamilyMemberRecordById", null);
 __decorate([
     (0, common_1.Get)('medicalRecordById'),
     (0, common_1.UseGuards)(patient_auth_guard_1.PatientAuthGuard, patient_auth_guard_1.PatientVerificationGuard),

@@ -8,3 +8,8 @@ export declare class PatientVerificationGuard implements CanActivate {
     constructor(patientDao: PatientDao);
     canActivate(context: ExecutionContext): Promise<boolean>;
 }
+export declare class FamilyMemberGuard implements CanActivate {
+    private readonly patientDao;
+    constructor(patientDao: PatientDao);
+    canActivate(context: ExecutionContext): Promise<boolean>;
+}
