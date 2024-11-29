@@ -483,6 +483,7 @@ export class PatientController {
 
   @Get('familyMemberRecordById')
   @UseGuards(FamilyMemberGuard)
+  @ApiOperation({ summary: 'fetch a family member record' })
   async getFamilyMemberRecordById(
     @Ip() ip: string,
     @Query('principalPatientAddress', new ValidationPipe({ transform: true }))
