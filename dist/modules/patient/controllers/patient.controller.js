@@ -479,6 +479,7 @@ __decorate([
 __decorate([
     (0, common_1.Get)('familyMemberRecordById'),
     (0, common_1.UseGuards)(patient_auth_guard_1.FamilyMemberGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'fetch a family member record' }),
     __param(0, (0, common_1.Ip)()),
     __param(1, (0, common_1.Query)('principalPatientAddress', new common_1.ValidationPipe({ transform: true }))),
     __param(2, (0, common_1.Query)('familyMemberId', new common_1.ValidationPipe({ transform: true }))),
