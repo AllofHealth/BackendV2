@@ -174,3 +174,9 @@ export interface IUpdatePrescription {
   description?: string;
   sideEffects?: string;
 }
+
+export interface IFamilyMemberRecord {
+  principalPatientAddress: string;
+  familyMemberId: number;
+  recordId: number;
+}

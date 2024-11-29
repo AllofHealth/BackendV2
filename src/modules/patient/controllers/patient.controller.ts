@@ -24,6 +24,7 @@ import {
 } from '../dto/patient.dto';
 import { Types } from 'mongoose';
 import {
+  FamilyMemberGuard,
   PatientAuthGuard,
   PatientVerificationGuard,
 } from '../guards/patient.auth.guard';
@@ -465,10 +466,10 @@ export class PatientController {
   }
 
   @Get('familyMemberMedicalRecords')
-  @UseGuards(PatientAuthGuard, PatientVerificationGuard)
+  @UseGuards(FamilyMemberGuard)
   async getFamilyMemberMedicalRecords(
     @Ip() ip: string,
-    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    @Query('principalPatientAddress', new ValidationPipe({ transform: true }))
     principalPatientAddress: string,
     @Query('familyMemberId', new ValidationPipe({ transform: true }))
     familyMemberId: number,
@@ -477,6 +478,25 @@ export class PatientController {
     return await this.patientService.fetchAllMedicalRecordsForFamilyMember({
       principalPatientAddress,
       familyMemberId,
+    });
+  }
+
+  @Get('familyMemberRecordById')
+  @UseGuards(FamilyMemberGuard)
+  async getFamilyMemberRecordById(
+    @Ip() ip: string,
+    @Query('principalPatientAddress', new ValidationPipe({ transform: true }))
+    principalPatientAddress: string,
+    @Query('familyMemberId', new ValidationPipe({ transform: true }))
+    familyMemberId: number,
+    @Query('recordId', new ValidationPipe({ transform: true }))
+    recordId: number,
+  ) {
+    this.logger.log(`Get Family Member record by id Request\t${ip}`);
+    return await this.patientService.fetchFamilyMemberRecordById({
+      principalPatientAddress,
+      familyMemberId,
+      recordId,
     });
   }
 

@@ -7,6 +7,7 @@ import {
   ICreatePatient,
   IFamilyMember,
   IFamilyMemberApprovalInput,
+  IFamilyMemberRecord,
   ISharePrescription,
   IUpdateFamilyMember,
   IUpdatePatientProfile,
@@ -742,6 +743,23 @@ export class PatientService {
       this.logger.error(e.message);
       throw new HttpException(
         { message: PatientErrors.RECORD_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async fetchFamilyMemberRecordById(args: IFamilyMemberRecord) {
+    const { principalPatientAddress, familyMemberId, recordId } = args;
+    try {
+      return await this.patientDao.findOneFamilyMemberRecord(
+        principalPatientAddress,
+        familyMemberId,
+        recordId,
+      );
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.FETCH_FAMILY_MEDICAL_RECORD },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

@@ -35,3 +35,25 @@ export class PatientVerificationGuard implements CanActivate {
     return true;
   }
 }
+
+@Injectable()
+export class FamilyMemberGuard implements CanActivate {
+  constructor(private readonly patientDao: PatientDao) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const principalPatientAddress = request.query.principalPatientAddress;
+    const patient = await this.patientDao.fetchPatientByAddress(
+      principalPatientAddress,
+    );
+
+    if (!patient) {
+      throw new ForbiddenException('please complete verification');
+    }
+
+    if (patient.isVerified === false) {
+      throw new UnauthorizedException();
+    }
+    return true;
+  }
+}
