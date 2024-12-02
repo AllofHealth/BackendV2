@@ -292,10 +292,10 @@ export class PatientController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: PatientErrors.APPROVE_MEDICAL_RECORD_FAMILY,
   })
-  @UseGuards(PatientAuthGuard, PatientVerificationGuard)
+  @UseGuards(FamilyMemberGuard)
   async approveFamilyMemberRecordAccess(
     @Ip() ip: string,
-    @Query('walletAddress', new ValidationPipe({ transform: true }))
+    @Query('principalPatientAddress', new ValidationPipe({ transform: true }))
     walletAddress: string,
     @Body(new ValidationPipe({ transform: true }))
     createApprovalDto: CreateFamilyMemberApprovalDto,
