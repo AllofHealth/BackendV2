@@ -9,6 +9,7 @@ async function bootstrap() {
         .setTitle('All of Health')
         .setDescription('Complete API for Server Operations')
         .setVersion('1.0')
+        .addTag('health')
         .build();
     app.enableCors();
     app.setGlobalPrefix('api');
