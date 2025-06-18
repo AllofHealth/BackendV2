@@ -25,8 +25,8 @@ jobs:
       - name: Copy Environment Variables
         run: echo "${{ secrets.ENV_FILE }}" > .env.production && echo "${{ secrets.ENV_FILE }}" > .env
 
-    #   - name: Build Application
-    #     run: npm run build
+      - name: Build Application
+        run: npm run build
 
       - name: Clean Server Directory
         uses: appleboy/ssh-action@master
