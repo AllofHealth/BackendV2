@@ -39,6 +39,7 @@ exports.AppModule = AppModule = __decorate([
                 cache: true,
                 load: [config_2.default],
             }),
+            configify_1.ConfigifyModule.forRootAsync(),
             throttler_1.ThrottlerModule.forRoot([
                 {
                     name: 'short',
@@ -51,6 +52,12 @@ exports.AppModule = AppModule = __decorate([
                     limit: 100,
                 },
             ]),
+            my_logger_module_1.MyLoggerModule,
+            patient_module_1.PatientModule,
+            admin_module_1.AdminModule,
+            hospital_module_1.HospitalModule,
+            doctor_module_1.DoctorModule,
+            pharmacist_module_1.PharmacistModule,
             mongoose_1.MongooseModule.forRootAsync({
                 imports: [config_1.ConfigModule],
                 useFactory: async (config) => ({
@@ -59,17 +66,10 @@ exports.AppModule = AppModule = __decorate([
                 }),
                 inject: [config_1.ConfigService],
             }),
-            my_logger_module_1.MyLoggerModule,
-            patient_module_1.PatientModule,
-            admin_module_1.AdminModule,
-            hospital_module_1.HospitalModule,
-            doctor_module_1.DoctorModule,
-            pharmacist_module_1.PharmacistModule,
             otp_module_1.OtpModule,
             termill_module_1.TermillModule,
             postmark_module_1.PostmarkModule,
             encryption_module_1.EncryptionModule,
-            configify_1.ConfigifyModule.forRootAsync(),
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, { provide: core_1.APP_GUARD, useClass: throttler_1.ThrottlerGuard }],

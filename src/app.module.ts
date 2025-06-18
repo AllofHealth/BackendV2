@@ -27,6 +27,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
       cache: true,
       load: [config],
     }),
+    ConfigifyModule.forRootAsync(),
     ThrottlerModule.forRoot([
       {
         name: 'short',
@@ -39,6 +40,12 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
         limit: 100,
       },
     ]),
+    MyLoggerModule,
+    PatientModule,
+    AdminModule,
+    HospitalModule,
+    DoctorModule,
+    PharmacistModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (config) => ({
@@ -47,17 +54,11 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
       }),
       inject: [ConfigService],
     }),
-    MyLoggerModule,
-    PatientModule,
-    AdminModule,
-    HospitalModule,
-    DoctorModule,
-    PharmacistModule,
+
     OtpModule,
     TermillModule,
     PostmarkModule,
     EncryptionModule,
-    ConfigifyModule.forRootAsync(),
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
