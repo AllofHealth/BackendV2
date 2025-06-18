@@ -2,8 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { MONGODB_URI } from './shared/constants';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { MyLoggerModule } from './modules/my-logger/my-logger.module';
 import { PatientModule } from './modules/patient/patient.module';
@@ -16,9 +15,18 @@ import { TermillModule } from './modules/termill/termill.module';
 import { PostmarkModule } from './modules/postmark/postmark.module';
 import { ConfigifyModule } from '@itgorillaz/configify';
 import { EncryptionModule } from './shared/utils/encryption/encryption.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import config from '@/shared/config/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      cache: true,
+      load: [config],
+    }),
     ThrottlerModule.forRoot([
       {
         name: 'short',
@@ -31,8 +39,13 @@ import { EncryptionModule } from './shared/utils/encryption/encryption.module';
         limit: 100,
       },
     ]),
-    MongooseModule.forRoot(MONGODB_URI, {
-      dbName: 'Pharmalink',
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (config) => ({
+        uri: config.get('database.mongodb_uri'),
+        dbName: config.get('database.dbName'),
+      }),
+      inject: [ConfigService],
     }),
     MyLoggerModule,
     PatientModule,

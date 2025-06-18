@@ -22,13 +22,25 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import { Medicine } from '../schema/medicine.schema';
-import { Model } from 'mongoose';
-import { CreateMedicineInterface } from '../interface/medicine.interface';
+import { Medication, MedicineCategories, Receipt } from '../schema/medicine.schema';
+import { Model, Types } from 'mongoose';
+import { CreateMedicineInterface, CreateReceiptInterface } from '../interface/medicine.interface';
 export declare class MedicineDao {
     private readonly medicine;
-    constructor(medicine: Model<Medicine>);
-    createMedicine(args: CreateMedicineInterface): Promise<import("mongoose").Document<unknown, {}, Medicine> & Medicine & {
-        _id: import("mongoose").Types.ObjectId;
+    private readonly categories;
+    private readonly receipt;
+    constructor(medicine: Model<Medication>, categories: Model<MedicineCategories>, receipt: Model<Receipt>);
+    createMedicine(args: CreateMedicineInterface): Promise<import("mongoose").Document<unknown, {}, Medication> & Medication & {
+        _id: Types.ObjectId;
     }>;
+    createReceipt(args: CreateReceiptInterface): Promise<import("mongoose").Document<unknown, {}, Receipt> & Receipt & {
+        _id: Types.ObjectId;
+    }>;
+    getAllCategories(): Promise<(import("mongoose").Document<unknown, {}, MedicineCategories> & MedicineCategories & {
+        _id: Types.ObjectId;
+    })[]>;
+    createCategories(): Promise<import("mongoose").Document<unknown, {}, MedicineCategories> & MedicineCategories & {
+        _id: Types.ObjectId;
+    }>;
+    deleteReceipt(id: Types.ObjectId): Promise<import("mongodb").DeleteResult>;
 }

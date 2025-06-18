@@ -23,6 +23,37 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import { Types } from 'mongoose';
+import { MedicineDto } from '@/modules/medicine/dto/medicine.dto';
+import { TApprovalType } from '@/modules/patient/interface/patient.interface';
+export declare class MedicalRecordDto {
+    id: number;
+    principalPatient: string;
+    doctorAddress: string;
+    diagnosis: string;
+    doctorsName: string;
+    hospitalName: string;
+    date: Date;
+    _id: Types.ObjectId;
+}
+export declare class ReceiptDto {
+    productDispensed: string;
+    dateDispensed: Date;
+    directions: string;
+    quantity: string;
+    price: string;
+}
+export declare class PrescriptionDto {
+    recordId: number;
+    doctorName: string;
+    doctorAddress: string;
+    institutionName: string;
+    patientName: string;
+    patientAddress: string;
+    medicine: MedicineDto[];
+    date: Date;
+    status: string;
+    _id: Types.ObjectId;
+}
 export declare class CreatePatientDto {
     id: number;
     name: string;
@@ -37,12 +68,47 @@ export declare class CreatePatientDto {
     walletAddress: string;
     category?: string;
 }
+export declare class FamilyMemberDto {
+    id: number;
+    principalPatient: string;
+    name: string;
+    relationship: string;
+    email: string;
+    address: string;
+    age: number;
+    dob: Date;
+    bloodGroup: string;
+    genotype: string;
+    medicalRecord: MedicalRecordDto[];
+    _id: Types.ObjectId;
+}
+export declare class PatientDto {
+    id: number;
+    appointmentCount: number;
+    name: string;
+    lastName: string;
+    age: number;
+    email: string;
+    phoneNo: string;
+    profilePicture: string;
+    address: string;
+    city: string;
+    walletAddress: string;
+    bloodGroup: string;
+    genotype: string;
+    medicalRecords: MedicalRecordDto[];
+    prescriptions: PrescriptionDto[];
+    familyMembers: FamilyMemberDto[];
+    category: string;
+    isVerified: boolean;
+    _id: Types.ObjectId;
+}
 export declare class UpdatePatientProfileDto {
     name?: string;
     lastName?: string;
     age?: string;
-    email: string;
-    phoneNo: string;
+    email?: string;
+    phoneNo?: string;
     profilePicture?: string;
     address?: string;
     city?: string;
@@ -51,7 +117,6 @@ export declare class UpdatePatientProfileDto {
 }
 export declare class CreateFamilyMemberDto {
     id: number;
-    principalPatient?: string;
     name: string;
     profilePicture?: string;
     relationship: string;
@@ -64,6 +129,7 @@ export declare class CreateFamilyMemberDto {
 }
 export declare class UpdateFamilyMemberDto {
     name?: string;
+    profilePicture?: string;
     relationship?: string;
     email?: string;
     address?: string;
@@ -77,14 +143,14 @@ export declare class SharePrescriptionDto {
 }
 export declare class CreateApprovalDto {
     recordId?: number[];
-    patientAddress: string;
-    approvalType: string;
+    doctorAddress: string;
+    approvalType: TApprovalType;
     approvalDurationInSec: number;
 }
 export declare class CreateFamilyMemberApprovalDto {
     familyMemberId: number;
     recordId?: number[];
-    principalPatientAddress: string;
-    approvalType: string;
+    doctorAddress: string;
+    approvalType: TApprovalType;
     approvalDurationInSec: number;
 }

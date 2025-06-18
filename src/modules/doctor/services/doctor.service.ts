@@ -12,6 +12,7 @@ import {
   ApproveMedicalRecordAccessRequestType,
   CreateDoctorType,
   CreateMedicalRecordType,
+  DoctorType,
   UpdateDoctorType,
 } from '../interface/doctor.interface';
 import { ApprovalStatus, Category, DoctorError } from '@/shared';
@@ -20,20 +21,24 @@ import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
 import { PreviewType } from '@/modules/hospital/interface/hospital.interface';
 import { PatientDao } from '@/modules/patient/dao/patient.dao';
 import { PatientGuard } from '@/modules/patient/guards/patient.guard';
-import { OtpService } from '@/modules/otp/services/otp.service';
 import { MedicineDao } from '@/modules/medicine/dao/medicine.dao';
-import { Medicine } from '@/modules/medicine/schema/medicine.schema';
+import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SharedEvents } from '@/shared/events/shared.events';
+import { EntityCreatedDto } from '@/shared/dto/shared.dto';
 
 @Injectable()
 export class DoctorService {
+  private readonly logger = new MyLoggerService('DoctorService');
+
   constructor(
     private readonly doctorDao: DoctorDao,
     private readonly doctorGuard: DoctorGuard,
     private readonly hospitalDao: HospitalDao,
     private readonly patientDao: PatientDao,
     private readonly patientGuard: PatientGuard,
-    private readonly otpService: OtpService,
     private readonly medicineDao: MedicineDao,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async getPendingDoctors() {
@@ -117,8 +122,7 @@ export class DoctorService {
         };
       }
 
-      let doctor = await this.doctorDao.createNewDoctor(args);
-      doctor = await this.doctorDao.fetchDoctorByAddress(args.walletAddress);
+      const doctor = await this.doctorDao.createNewDoctor(args);
 
       if (args.walletAddress === hospital.admin) {
         doctor.status = ApprovalStatus.Approved;
@@ -133,20 +137,20 @@ export class DoctorService {
       }
 
       const doctorPreview = {
+        id: doctor.id,
         walletAddress: doctor.walletAddress,
         hospitalIds: doctor.hospitalIds,
         profilePicture: doctor.profilePicture,
         name: doctor.name,
         status: doctor.status,
         category: Category.Doctor,
-      };
+      } as PreviewType;
 
       try {
-        hospital.doctors.push(doctorPreview as PreviewType);
-        await this.otpService.deliverOtp(
-          args.walletAddress,
-          doctor.email,
-          'doctor',
+        hospital.doctors.push(doctorPreview);
+        this.eventEmitter.emit(
+          SharedEvents.ENTITY_CREATED,
+          new EntityCreatedDto(args.walletAddress, doctor.email, 'doctor'),
         );
       } catch (error) {
         await this.doctorDao.deleteDoctor(args.walletAddress);
@@ -187,10 +191,35 @@ export class DoctorService {
           message: "Doctor doesn't exist",
         };
       }
+      const hospitalName = await this.hospitalDao
+        .fetchHospitalWithBlockchainId(doctor.hospitalIds[0])
+        .then((hospital) => hospital.name);
 
+      const doctorData: DoctorType = {
+        _id: doctor._id,
+        id: doctor.id,
+        hospitalIds: doctor.hospitalIds,
+        name: doctor.name,
+        email: doctor.email,
+        profilePicture: doctor.profilePicture,
+        specialty: doctor.specialty,
+        location: doctor.location,
+        phoneNumber: doctor.phoneNumber,
+        walletAddress: doctor.walletAddress,
+        numberOfApprovals: doctor.numberOfApprovals,
+        status: doctor.status,
+        category: doctor.category,
+        isVerified: doctor.isVerified,
+        activeApprovals: doctor.activeApprovals,
+      };
+
+      const data = {
+        hospitalName,
+        ...doctorData,
+      };
       return {
         success: HttpStatus.OK,
-        doctor,
+        doctor: data,
       };
     } catch (error) {
       console.error(error.message);
@@ -317,12 +346,12 @@ export class DoctorService {
         };
       }
 
-      const medication: Medicine[] = [];
-
-      medicine.forEach(async (medicine) => {
-        const newMedicine = await this.addMedication(medicine);
-        medication.push(newMedicine);
+      const medicationPromises = medicine.map(async (med) => {
+        return await this.addMedication(med);
       });
+
+      const medication = await Promise.all(medicationPromises);
+      console.log(medication);
 
       const newPrescriptionArgs = {
         recordId: recordId,
@@ -333,7 +362,7 @@ export class DoctorService {
         patientAddress: patientAddress,
         medicine: medication,
       };
-
+      this.logger.log(medication);
       const prescription =
         await this.patientDao.createPrescription(newPrescriptionArgs);
       patient.prescriptions.push(prescription);
@@ -636,6 +665,25 @@ export class DoctorService {
       console.error(error);
       throw new DoctorError(
         'An error occurred while deleting all approval requests',
+      );
+    }
+  }
+
+  async swapId(walletAddress: string, id: number) {
+    try {
+      const doctor = await this.doctorDao.fetchDoctorByAddress(walletAddress);
+      doctor.id = id;
+      await doctor.save();
+
+      return {
+        success: HttpStatus.OK,
+        message: 'swapped id successfully',
+      };
+    } catch (e) {
+      this.logger.error(e);
+      throw new HttpException(
+        'an error occurred while swapping id',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }

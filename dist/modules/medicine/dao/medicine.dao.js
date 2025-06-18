@@ -17,18 +17,43 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const medicine_schema_1 = require("../schema/medicine.schema");
 const mongoose_2 = require("mongoose");
+const constants_1 = require("../../../shared/constants");
 let MedicineDao = class MedicineDao {
-    constructor(medicine) {
+    constructor(medicine, categories, receipt) {
         this.medicine = medicine;
+        this.categories = categories;
+        this.receipt = receipt;
     }
     async createMedicine(args) {
         return await this.medicine.create(args);
+    }
+    async createReceipt(args) {
+        return await this.receipt.create({
+            productDispensed: args.productDispensed,
+            dateDispensed: new Date(Date.now()),
+            directions: args.directions,
+            quantity: args.quantity,
+            price: args.price,
+        });
+    }
+    async getAllCategories() {
+        return await this.categories.find();
+    }
+    async createCategories() {
+        return await this.categories.create({ category: constants_1.drugClasses });
+    }
+    async deleteReceipt(id) {
+        return this.receipt.deleteOne({ _id: id });
     }
 };
 exports.MedicineDao = MedicineDao;
 exports.MedicineDao = MedicineDao = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, mongoose_1.InjectModel)(medicine_schema_1.Medicine.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __param(0, (0, mongoose_1.InjectModel)(medicine_schema_1.Medication.name)),
+    __param(1, (0, mongoose_1.InjectModel)(medicine_schema_1.MedicineCategories.name)),
+    __param(2, (0, mongoose_1.InjectModel)(medicine_schema_1.Receipt.name)),
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model,
+        mongoose_2.Model])
 ], MedicineDao);
 //# sourceMappingURL=medicine.dao.js.map

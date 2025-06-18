@@ -17,7 +17,6 @@ const common_1 = require("@nestjs/common");
 const hospital_schema_1 = require("../schema/hospital.schema");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
-const hospital_guard_1 = require("../guard/hospital.guard");
 const shared_1 = require("../../../shared");
 const my_logger_service_1 = require("../../my-logger/my-logger.service");
 const hospital_dao_1 = require("../dao/hospital.dao");
@@ -25,18 +24,19 @@ const doctor_dao_1 = require("../../doctor/dao/doctor.dao");
 const pharmacist_dao_1 = require("../../pharmacist/dao/pharmacist.dao");
 const doctor_guard_1 = require("../../doctor/guards/doctor.guard");
 const pharmacist_guard_1 = require("../../pharmacist/guards/pharmacist.guard");
-const otp_service_1 = require("../../otp/services/otp.service");
 const encryption_service_1 = require("../../../shared/utils/encryption/service/encryption.service");
+const event_emitter_1 = require("@nestjs/event-emitter");
+const shared_events_1 = require("../../../shared/events/shared.events");
+const shared_dto_1 = require("../../../shared/dto/shared.dto");
 let HospitalService = class HospitalService {
-    constructor(hospitalModel, hospitalDao, hospitalGuard, doctorDao, pharmacistDao, doctorGuard, pharmacistGuard, otpService, encryptionService) {
+    constructor(hospitalModel, hospitalDao, doctorDao, pharmacistDao, doctorGuard, pharmacistGuard, eventEmitter, encryptionService) {
         this.hospitalModel = hospitalModel;
         this.hospitalDao = hospitalDao;
-        this.hospitalGuard = hospitalGuard;
         this.doctorDao = doctorDao;
         this.pharmacistDao = pharmacistDao;
         this.doctorGuard = doctorGuard;
         this.pharmacistGuard = pharmacistGuard;
-        this.otpService = otpService;
+        this.eventEmitter = eventEmitter;
         this.encryptionService = encryptionService;
         this.logger = new my_logger_service_1.MyLoggerService('HospitalService');
     }
@@ -62,13 +62,13 @@ let HospitalService = class HospitalService {
                 };
             }
             try {
-                await this.otpService.deliverOtp(args.admin, args.email, 'institution');
+                this.eventEmitter.emit(shared_events_1.SharedEvents.ENTITY_CREATED, new shared_dto_1.EntityCreatedDto(args.admin, hospital.email, 'institution'));
             }
             catch (error) {
                 await this.hospitalDao.removeHospitalById(hospital._id);
                 return {
                     success: common_1.HttpStatus.BAD_REQUEST,
-                    message: 'An error occurred while creating instiution',
+                    message: 'An error occurred while creating institution',
                 };
             }
             return {
@@ -273,6 +273,7 @@ let HospitalService = class HospitalService {
                 }
                 const doctor = await this.doctorDao.fetchDoctorByAddress(walletAddress);
                 const doctorPreview = {
+                    id: doctor.id,
                     walletAddress,
                     profilePicture: doctor.profilePicture,
                     name: doctor.name,
@@ -305,6 +306,7 @@ let HospitalService = class HospitalService {
                 }
                 const pharmacist = await this.pharmacistDao.fetchPharmacistByAddress(walletAddress);
                 const pharmacistPreview = {
+                    id: pharmacist.id,
                     walletAddress,
                     profilePicture: pharmacist.profilePicture,
                     name: pharmacist.name,
@@ -400,18 +402,26 @@ let HospitalService = class HospitalService {
                 practitioner.status = shared_1.ApprovalStatus.Approved;
                 await practitioner.save();
             }
-            const practitionerList = isDoctor
-                ? hospital.doctors
-                : hospital.pharmacists;
-            const practitionerPreview = practitionerList.find((p) => p.walletAddress === walletAddress);
-            if (practitionerPreview.status === shared_1.ApprovalStatus.Approved) {
-                return {
-                    success: common_1.HttpStatus.ACCEPTED,
-                    message: 'practitioner already approved',
-                };
+            if (isDoctor) {
+                const doctorStatus = hospital.doctors.find((p) => p.walletAddress === walletAddress).status;
+                if (doctorStatus == shared_1.ApprovalStatus.Approved) {
+                    return {
+                        success: common_1.HttpStatus.ACCEPTED,
+                        message: 'practitioner already approved',
+                    };
+                }
+                await this.hospitalDao.updateDoctorStatus(walletAddress, shared_1.ApprovalStatus.Approved);
             }
-            practitionerPreview.status = shared_1.ApprovalStatus.Approved;
-            await hospital.save();
+            else if (isPharmacist) {
+                const pharmacistStatus = hospital.pharmacists.find((p) => p.walletAddress === walletAddress).status;
+                if (pharmacistStatus == shared_1.ApprovalStatus.Approved) {
+                    return {
+                        success: common_1.HttpStatus.ACCEPTED,
+                        message: 'practitioner already approved',
+                    };
+                }
+                await this.hospitalDao.updatePharmacistStatus(walletAddress, shared_1.ApprovalStatus.Approved);
+            }
             return {
                 success: common_1.HttpStatus.OK,
                 message: 'practitioner approved successfully',
@@ -419,6 +429,10 @@ let HospitalService = class HospitalService {
         }
         catch (error) {
             console.error(error);
+            return {
+                success: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+                message: 'internal server error',
+            };
         }
     }
     async fetchApprovedHospitals() {
@@ -476,9 +490,17 @@ let HospitalService = class HospitalService {
                     hospitals: [],
                 };
             }
+            const decryptedHospital = [];
+            hospitals.forEach((hospital) => {
+                const _decryptedHospital = {
+                    ...hospital.toObject(),
+                    regNo: this.encryptionService.decrypt({ data: hospital.regNo }),
+                };
+                decryptedHospital.push(_decryptedHospital);
+            });
             return {
                 success: shared_1.ErrorCodes.Success,
-                hospitals,
+                hospital: decryptedHospital,
             };
         }
         catch (error) {
@@ -495,10 +517,9 @@ let HospitalService = class HospitalService {
                     message: 'Hospital not found',
                 };
             }
-            const { regNo, ...rest } = hospital;
             const decryptedHospital = {
-                ...rest,
-                regNo: this.encryptionService.decrypt({ data: regNo }),
+                ...hospital.toObject(),
+                regNo: this.encryptionService.decrypt({ data: hospital.regNo }),
             };
             return {
                 success: shared_1.ErrorCodes.Success,
@@ -639,9 +660,6 @@ let HospitalService = class HospitalService {
         }
         try {
             const { hospital } = await this.fetchHospitalById(hospitalId);
-            if (!hospital) {
-                throw new shared_1.HospitalError("hospital doesn't exist");
-            }
             const doctors = hospital.doctors;
             if (!doctors) {
                 return {
@@ -660,14 +678,8 @@ let HospitalService = class HospitalService {
         }
     }
     async fetchAllPharmacists(hospitalId) {
-        if (!hospitalId) {
-            throw new shared_1.HospitalError('Invalid or missing hospital id');
-        }
         try {
             const { hospital } = await this.fetchHospitalById(hospitalId);
-            if (!hospital) {
-                throw new shared_1.HospitalError("hospital doesn't exist");
-            }
             const pharmacists = hospital.pharmacists;
             if (!pharmacists) {
                 return {
@@ -687,6 +699,10 @@ let HospitalService = class HospitalService {
     }
     async fetchHospitalPractitioners(hospitalId) {
         try {
+            const hospital = await this.hospitalDao.fetchHospitalWithId(hospitalId);
+            if (!hospital) {
+                throw new common_1.HttpException({ message: 'invalid hospital id' }, common_1.HttpStatus.BAD_REQUEST);
+            }
             const { doctors } = await this.fetchAllDoctors(hospitalId);
             const { pharmacists } = await this.fetchAllPharmacists(hospitalId);
             const allPractitioners = doctors.concat(pharmacists);
@@ -769,19 +785,43 @@ let HospitalService = class HospitalService {
             throw new shared_1.HospitalError('An error occurred while fetching hospitals');
         }
     }
+    async purgePractitioner(args) {
+        const { walletAddress, hospitalId, role } = args;
+        try {
+            switch (role) {
+                case 'doctor':
+                    await this.removeDoctorFromHospital(hospitalId, walletAddress);
+                    break;
+                case 'pharmacist':
+                    await this.removePharmacistFromHospital(hospitalId, walletAddress);
+                    break;
+                default:
+                    throw new common_1.BadRequestException('Invalid role');
+            }
+        }
+        catch (e) {
+            this.logger.log(e.message);
+            throw new common_1.HttpException({ message: 'an error occurred while purging practitioner' }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 };
 exports.HospitalService = HospitalService;
+__decorate([
+    (0, event_emitter_1.OnEvent)(shared_events_1.SharedEvents.INSTITUTION_JOINED, { async: true }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], HospitalService.prototype, "purgePractitioner", null);
 exports.HospitalService = HospitalService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(hospital_schema_1.Hospital.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
         hospital_dao_1.HospitalDao,
-        hospital_guard_1.HospitalGuard,
         doctor_dao_1.DoctorDao,
         pharmacist_dao_1.PharmacistDao,
         doctor_guard_1.DoctorGuard,
         pharmacist_guard_1.PharmacistGuard,
-        otp_service_1.OtpService,
+        event_emitter_1.EventEmitter2,
         encryption_service_1.EncryptionService])
 ], HospitalService);
 //# sourceMappingURL=hospital.service.js.map

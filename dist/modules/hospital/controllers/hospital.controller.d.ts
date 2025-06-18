@@ -27,8 +27,9 @@ import { Types } from 'mongoose';
 import { CreateHospitalDto, UpdateHospitalProfileDto } from '../dto/hospital.dto';
 export declare class HospitalController {
     private readonly hospitalService;
+    private readonly logger;
     constructor(hospitalService: HospitalService);
-    createHospital(createHospitalDto: CreateHospitalDto): Promise<{
+    createHospital(ip: string, createHospitalDto: CreateHospitalDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
         hospital?: undefined;
@@ -39,23 +40,23 @@ export declare class HospitalController {
         };
         message: string;
     }>;
-    joinHospital(hospitalId: Types.ObjectId, joinHospitalDto: string): Promise<{
+    joinHospital(ip: string, hospitalId: Types.ObjectId, joinHospitalDto: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    approvePractitioner(adminAddress: string, hospitalId: Types.ObjectId, practitionerAddress: string): Promise<{
+    approvePractitioner(ip: string, adminAddress: string, hospitalId: Types.ObjectId, practitionerAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    removePractitioner(adminAddress: string, hospitalId: Types.ObjectId, practitionerAddress: string): Promise<{
+    removePractitioner(ip: string, adminAddress: string, hospitalId: Types.ObjectId, practitionerAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
     }>;
-    delegateAdmin(adminAddress: string, newAdminAddress: string, hospitalId: Types.ObjectId): Promise<{
+    delegateAdmin(ip: string, adminAddress: string, newAdminAddress: string, hospitalId: Types.ObjectId): Promise<{
         success: number;
         message: string;
     }>;
-    updateHospital(adminAddress: string, hospitalId: Types.ObjectId, updateHospitalDto: UpdateHospitalProfileDto): Promise<{
+    updateHospital(ip: string, adminAddress: string, hospitalId: Types.ObjectId, updateHospitalDto: UpdateHospitalProfileDto): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
         updatedHospital?: undefined;
@@ -66,7 +67,7 @@ export declare class HospitalController {
             _id: Types.ObjectId;
         };
     }>;
-    getHospitalById(hospitalId: Types.ObjectId): Promise<{
+    getHospitalById(ip: string, hospitalId: Types.ObjectId): Promise<{
         success: import("../../../shared").ErrorCodes;
         message: string;
         hospital?: undefined;
@@ -74,26 +75,7 @@ export declare class HospitalController {
         success: import("../../../shared").ErrorCodes;
         hospital: {
             regNo: string;
-            _id: Types.ObjectId;
-            __v?: any;
-            $locals: Record<string, unknown>;
-            $op: "remove" | "save" | "validate";
-            $where: Record<string, unknown>;
-            baseModelName?: string;
-            collection: import("mongoose").Collection<import("bson").Document>;
-            db: import("mongoose").Connection;
-            errors?: import("mongoose").Error.ValidationError;
-            id: any;
-            isNew: boolean;
-            schema: import("mongoose").Schema<any, import("mongoose").Model<any, any, any, any, any, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, {
-                [x: string]: unknown;
-            }, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<{
-                [x: string]: unknown;
-            }>> & import("mongoose").FlatRecord<{
-                [x: string]: unknown;
-            }> & Required<{
-                _id: unknown;
-            }>>;
+            id: number;
             name: string;
             admin: string;
             email: string;
@@ -106,60 +88,64 @@ export declare class HospitalController {
             status: string;
             category: string;
             isVerified: boolean;
+            _id: Types.ObjectId;
         };
         message?: undefined;
     }>;
-    getAllHospitals(): Promise<{
+    getAllHospitals(ip: string): Promise<{
         success: import("../../../shared").ErrorCodes;
-        hospitals: (import("mongoose").Document<unknown, {}, import("../schema/hospital.schema").Hospital> & import("../schema/hospital.schema").Hospital & {
-            _id: Types.ObjectId;
-        })[];
+        hospitals: any[];
+        hospital?: undefined;
+    } | {
+        success: import("../../../shared").ErrorCodes;
+        hospital: any;
+        hospitals?: undefined;
     }>;
-    getApprovedHospitals(): Promise<{
+    getApprovedHospitals(ip: string): Promise<{
         success: number;
         hospitals: (import("mongoose").Document<unknown, {}, import("../schema/hospital.schema").Hospital> & import("../schema/hospital.schema").Hospital & {
             _id: Types.ObjectId;
         })[];
     }>;
-    getPendingHospitals(): Promise<{
+    getPendingHospitals(ip: string): Promise<{
         success: number;
         hospitals: (import("mongoose").Document<unknown, {}, import("../schema/hospital.schema").Hospital> & import("../schema/hospital.schema").Hospital & {
             _id: Types.ObjectId;
         })[];
     }>;
-    getApprovedDoctors(hospitalId: Types.ObjectId): Promise<{
+    getApprovedDoctors(ip: string, hospitalId: Types.ObjectId): Promise<{
         success: import("../../../shared").ErrorCodes;
         doctors: import("../interface/hospital.interface").PreviewType[];
         message: string;
     }>;
-    getPendingDoctors(hospitalId: Types.ObjectId): Promise<{
+    getPendingDoctors(ip: string, hospitalId: Types.ObjectId): Promise<{
         success: import("../../../shared").ErrorCodes;
         doctors: import("../interface/hospital.interface").PreviewType[];
         message: string;
     }>;
-    getAllDoctors(hospitalId: Types.ObjectId): Promise<{
+    getAllDoctors(ip: string, hospitalId: Types.ObjectId): Promise<{
         success: import("../../../shared").ErrorCodes;
         doctors: import("../interface/hospital.interface").PreviewType[];
     }>;
-    getApprovedPharmacists(hospitalId: Types.ObjectId): Promise<{
+    getApprovedPharmacists(ip: string, hospitalId: Types.ObjectId): Promise<{
         success: import("../../../shared").ErrorCodes;
         pharmacists: import("../interface/hospital.interface").PreviewType[];
         message: string;
     }>;
-    getPendingPharmacists(hospitalId: Types.ObjectId): Promise<{
+    getPendingPharmacists(ip: string, hospitalId: Types.ObjectId): Promise<{
         success: import("../../../shared").ErrorCodes;
         pharmacists: import("../interface/hospital.interface").PreviewType[];
         message: string;
     }>;
-    getAllPharmacists(hospitalId: Types.ObjectId): Promise<{
+    getAllPharmacists(ip: string, hospitalId: Types.ObjectId): Promise<{
         success: import("../../../shared").ErrorCodes;
         pharmacists: import("../interface/hospital.interface").PreviewType[];
     }>;
-    getAllPractitioners(hospitalId: Types.ObjectId): Promise<{
+    getAllPractitioners(ip: string, hospitalId: Types.ObjectId): Promise<{
         success: import("@nestjs/common").HttpStatus;
         practitioners: import("../interface/hospital.interface").PreviewType[];
     }>;
-    getPractitionerCreatedHospital(walletAddress: string): Promise<{
+    getPractitionerCreatedHospital(ip: string, walletAddress: string): Promise<{
         success: import("@nestjs/common").HttpStatus;
         message: string;
         hospitals?: undefined;

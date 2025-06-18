@@ -23,6 +23,7 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import mongoose, { Types } from 'mongoose';
+import { RoleType } from '@/modules/otp/interface/otp.interface';
 export type InstitutionType = 'general' | 'paediatric' | 'optical' | 'dental' | 'diagnostic' | 'physiotherapy' | 'referrals';
 export interface CreateHospitalType {
     id: number;
@@ -37,6 +38,7 @@ export interface CreateHospitalType {
     regNo: string;
 }
 export interface PreviewType {
+    id: number;
     walletAddress: string;
     profilePicture: string;
     name: string;
@@ -66,4 +68,9 @@ export interface UpdateHospitalProfileType {
     profilePicture?: string;
     regNo?: string;
     type?: InstitutionType;
+}
+export interface IPurgePractitioner {
+    walletAddress: string;
+    hospitalId: Types.ObjectId;
+    role: RoleType;
 }

@@ -23,16 +23,28 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import { Types } from 'mongoose';
+import { Admin } from '@/modules/admin/schema/admin.schema';
 export declare class ApproveHospitalDto {
     hospitalId: Types.ObjectId;
     adminAddress: string;
 }
 export declare class CreateAdminDto {
-    id: number;
     name: string;
     profilePicture?: string;
     email: string;
     walletAddress: string;
+}
+declare const AdminDto_base: import("@nestjs/mapped-types").MappedType<Partial<Admin>>;
+export declare class AdminDto extends AdminDto_base {
+    id: number;
+    name: string;
+    profilePicture: string;
+    email: string;
+    walletAddress: string;
+    category: string;
+    isAuthenticated: boolean;
+    isVerified: boolean;
+    _id: Types.ObjectId;
 }
 export declare class RemoveAdminDto {
     adminAddressToAuthorize: string;
@@ -43,3 +55,4 @@ export declare class UpdateAdminDto {
     profilePicture?: string;
     email?: string;
 }
+export {};

@@ -1,4 +1,5 @@
 import mongoose, { Types } from 'mongoose';
+import { RoleType } from '@/modules/otp/interface/otp.interface';
 
 export type InstitutionType =
   | 'general'
@@ -23,6 +24,7 @@ export interface CreateHospitalType {
 }
 
 export interface PreviewType {
+  id: number;
   walletAddress: string;
   profilePicture: string;
   name: string;
@@ -55,4 +57,10 @@ export interface UpdateHospitalProfileType {
   profilePicture?: string;
   regNo?: string;
   type?: InstitutionType;
+}
+
+export interface IPurgePractitioner {
+  walletAddress: string;
+  hospitalId: Types.ObjectId;
+  role: RoleType;
 }

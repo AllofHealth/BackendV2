@@ -105,11 +105,11 @@ __decorate([
     __metadata("design:type", String)
 ], Hospital.prototype, "description", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: exports.DoctorSchema }] }),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Array)
 ], Hospital.prototype, "doctors", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: exports.PharmacistSchema }] }),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Array)
 ], Hospital.prototype, "pharmacists", void 0);
 __decorate([

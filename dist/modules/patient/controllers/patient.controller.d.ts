@@ -22,138 +22,160 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
+import { HttpStatus } from '@nestjs/common';
 import { PatientService } from '../services/patient.service';
 import { CreateApprovalDto, CreateFamilyMemberApprovalDto, CreateFamilyMemberDto, CreatePatientDto, SharePrescriptionDto, UpdateFamilyMemberDto, UpdatePatientProfileDto } from '../dto/patient.dto';
 import { Types } from 'mongoose';
+import { PatientErrors, PatientSuccess } from '@/modules/patient/data/patient.data';
 export declare class PatientController {
     private readonly patientService;
+    private readonly logger;
     constructor(patientService: PatientService);
-    createNewPatient(createPatientType: CreatePatientDto): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
+    createNewPatient(ip: string, createPatientType: CreatePatientDto): Promise<{
+        success: HttpStatus;
+        message: PatientErrors;
         patient?: undefined;
     } | {
-        success: import("@nestjs/common").HttpStatus;
+        success: HttpStatus;
+        message: PatientSuccess;
         patient: import("mongoose").Document<unknown, {}, import("../schemas/patient.schema").Patient> & import("../schemas/patient.schema").Patient & {
             _id: Types.ObjectId;
         };
-        message: string;
     }>;
-    updatePatient(walletAddress: string, updatePatientDto: UpdatePatientProfileDto): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
+    updatePatient(ip: string, walletAddress: string, updatePatientDto: UpdatePatientProfileDto): Promise<{
+        success: HttpStatus;
+        message: PatientSuccess;
     }>;
-    createFamilyMember(walletAddress: string, createFamilyMemberDto: CreateFamilyMemberDto): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
+    createFamilyMember(ip: string, walletAddress: string, createFamilyMemberDto: CreateFamilyMemberDto): Promise<{
+        success: HttpStatus;
+        message: PatientErrors;
+    } | {
+        success: HttpStatus;
+        message: PatientSuccess;
     }>;
-    updateFamilyMember(walletAddress: string, familyMemberId: number, updateFamilyMemberDto: UpdateFamilyMemberDto): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
+    updateFamilyMember(ip: string, walletAddress: string, familyMemberId: number, updateFamilyMemberDto: UpdateFamilyMemberDto): Promise<{
+        success: HttpStatus;
+        message: PatientErrors;
         familyMember?: undefined;
     } | {
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
+        success: HttpStatus;
+        message: PatientSuccess;
         familyMember: import("mongoose").UpdateWriteOpResult;
     }>;
-    sharePrescription(walletAddress: string, pharmacistAddress: string, sharePrescriptionDto: SharePrescriptionDto): Promise<{
-        success: import("@nestjs/common").HttpStatus;
+    sharePrescription(ip: string, walletAddress: string, pharmacistAddress: string, sharePrescriptionDto: SharePrescriptionDto): Promise<{
+        success: HttpStatus;
         message: string;
     }>;
-    removePrescription(walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
-    }>;
-    approveMedicalRecordAccess(doctorAddress: string, createApprovalDto: CreateApprovalDto): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
-    }>;
-    approveFamilyMemberRecordAccess(doctorAddress: string, createApprovalDto: CreateFamilyMemberApprovalDto): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
-    }>;
-    getAllPatients(): Promise<(import("mongoose").Document<unknown, {}, import("../schemas/patient.schema").Patient> & import("../schemas/patient.schema").Patient & {
-        _id: Types.ObjectId;
-    })[]>;
-    getAllFamilyMembers(walletAddress: string): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
-        members?: undefined;
+    removePrescription(ip: string, walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
+        success: HttpStatus;
+        message: PatientErrors;
     } | {
-        success: import("@nestjs/common").HttpStatus;
-        members: import("../schemas/patient.schema").FamilyMember[];
-        message: string;
+        success: HttpStatus;
+        message: PatientSuccess;
     }>;
-    getFamilyMemberById(walletAddress: string, memberId: number): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
+    approveMedicalRecordAccess(ip: string, walletAddress: string, createApprovalDto: CreateApprovalDto): Promise<{
+        success: HttpStatus;
+        message: PatientErrors;
+    } | {
+        success: HttpStatus;
+        message: PatientSuccess;
+    }>;
+    approveFamilyMemberRecordAccess(ip: string, walletAddress: string, createApprovalDto: CreateFamilyMemberApprovalDto): Promise<{
+        success: HttpStatus;
+        message: PatientErrors;
+    } | {
+        success: HttpStatus;
+        message: PatientSuccess;
+    }>;
+    getAllPatients(ip: string): Promise<{
+        status: HttpStatus;
+        message: PatientErrors;
+        data: any[];
+        patients?: undefined;
+    } | {
+        status: HttpStatus;
+        patients: (import("mongoose").Document<unknown, {}, import("../schemas/patient.schema").Patient> & import("../schemas/patient.schema").Patient & {
+            _id: Types.ObjectId;
+        })[];
+        message?: undefined;
+        data?: undefined;
+    }>;
+    getAllFamilyMembers(ip: string, walletAddress: string): Promise<{
+        success: HttpStatus;
+        message: PatientErrors;
+        members: any[];
+    } | {
+        success: HttpStatus;
+        message: PatientSuccess;
+        members: import("../schemas/patient.schema").FamilyMember[];
+    }>;
+    getFamilyMemberById(ip: string, walletAddress: string, memberId: number): Promise<{
+        success: HttpStatus;
+        message: PatientErrors;
         member?: undefined;
     } | {
-        success: import("@nestjs/common").HttpStatus;
+        success: HttpStatus;
         member: import("../schemas/patient.schema").FamilyMember;
         message?: undefined;
     }>;
-    getPatientByAddress(walletAddress: string): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
+    getPatientByAddress(ip: string, walletAddress: string): Promise<{
+        success: HttpStatus;
+        message: PatientErrors;
         patient?: undefined;
     } | {
-        success: import("../../../shared").ErrorCodes;
+        success: HttpStatus;
         patient: import("mongoose").Document<unknown, {}, import("../schemas/patient.schema").Patient> & import("../schemas/patient.schema").Patient & {
             _id: Types.ObjectId;
         };
         message?: undefined;
     }>;
-    getAllPrescriptions(walletAddress: string): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
-        prescriptions?: undefined;
-    } | {
-        success: import("@nestjs/common").HttpStatus;
+    getAllPrescriptions(ip: string, walletAddress: string): Promise<{
+        success: HttpStatus;
         prescriptions: import("../schemas/patient.schema").Prescriptions[];
-        message?: undefined;
     }>;
-    getPrescription(walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
-        success: import("@nestjs/common").HttpStatus;
+    getPrescription(ip: string, walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
+        success: HttpStatus;
         message: string;
         prescription?: undefined;
     } | {
-        success: import("@nestjs/common").HttpStatus;
+        success: HttpStatus;
         prescription: import("../schemas/patient.schema").Prescriptions;
         message?: undefined;
     }>;
-    getAllMedicalRecords(walletAddress: string): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
-        medicalRecords?: undefined;
-    } | {
-        success: import("@nestjs/common").HttpStatus;
+    getAllMedicalRecords(ip: string, walletAddress: string): Promise<{
+        success: HttpStatus;
         medicalRecords: import("../schemas/patient.schema").MedicalRecordPreviewDocument[];
-        message?: undefined;
     }>;
-    getFamilyMemberMedicalRecords(principalPatientAddress: string, familyMemberId: number): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
+    getFamilyMemberMedicalRecords(ip: string, principalPatientAddress: string, familyMemberId: number): Promise<{
+        success: HttpStatus;
+        message: PatientErrors;
         records?: undefined;
     } | {
-        success: import("@nestjs/common").HttpStatus;
+        success: HttpStatus;
         records: import("../schemas/patient.schema").MedicalRecordPreviewDocument[];
         message?: undefined;
     }>;
-    getMedicalRecord(walletAddress: string, recordId: number): Promise<{
-        success: import("@nestjs/common").HttpStatus;
+    getFamilyMemberRecordById(ip: string, principalPatientAddress: string, familyMemberId: number, recordId: number): Promise<import("../schemas/patient.schema").MedicalRecordPreviewDocument | {
+        success: HttpStatus;
         message: string;
+    }>;
+    getMedicalRecord(ip: string, walletAddress: string, recordId: number): Promise<{
+        success: HttpStatus;
+        message: PatientErrors;
         record?: undefined;
     } | {
-        success: import("@nestjs/common").HttpStatus;
+        success: HttpStatus;
         record: import("../schemas/patient.schema").MedicalRecordPreviewDocument | {
-            success: import("@nestjs/common").HttpStatus;
+            success: HttpStatus;
             message: string;
         };
         message?: undefined;
     }>;
-    deletePatient(walletAddress: string): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
+    deletePatient(ip: string, walletAddress: string): Promise<{
+        success: HttpStatus;
+        message: PatientErrors;
+    } | {
+        success: HttpStatus;
+        message: PatientSuccess;
     }>;
 }

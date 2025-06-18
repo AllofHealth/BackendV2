@@ -1,11 +1,16 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { authenticator } from 'otplib';
 import { OtpDao } from '../dao/otp.dao';
 import { PostmarkService } from '@/modules/postmark/service/postmark.service';
 import { RoleType } from '../interface/otp.interface';
+import { EntityCreatedDto } from '@/shared/dto/shared.dto';
+import { OnEvent } from '@nestjs/event-emitter';
+import { SharedEvents } from '@/shared/events/shared.events';
+import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
 
 @Injectable()
 export class OtpService {
+  private readonly logger = new MyLoggerService(OtpService.name);
   private readonly expirationTime = 1000 * 60 * 5; //5 minutes
 
   constructor(
@@ -141,22 +146,26 @@ export class OtpService {
     }
   }
 
-  async deliverOtp(
-    walletAddress: string,
-    emailAddress: string,
-    role: RoleType,
-  ) {
+  @OnEvent(SharedEvents.ENTITY_CREATED, { async: true })
+  async deliverOtp(args: EntityCreatedDto) {
+    const { walletAddress, email, role } = args;
     try {
+      this.logger.log(`generating otp`);
       const { otp } = await this.generateOtp(walletAddress, role);
-      console.log(otp);
+
+      this.logger.log(`delivering email to ${email}`);
       await this.postmarkService.sendEmail({
-        to: emailAddress,
+        to: email,
         otp,
       });
-      console.log('otp sent successfully');
-    } catch (error) {
-      console.error(error);
-      throw new Error('an error occurred while delivering otp');
+
+      this.logger.log(`otp delivered successfully`);
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        'an error occurred while delivering otp',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -166,24 +175,36 @@ export class OtpService {
       switch (role) {
         case 'patient':
           const patient = await this.otpDao.fetchPatient(walletAddress);
-          await this.deliverOtp(walletAddress, patient.email, 'patient');
+          await this.deliverOtp({
+            walletAddress,
+            email: patient.email,
+            role: 'patient',
+          });
           break;
         case 'doctor':
           const doctor = await this.otpDao.fetchDoctor(walletAddress);
-          await this.deliverOtp(walletAddress, doctor.email, 'doctor');
+          await this.deliverOtp({
+            walletAddress,
+            email: doctor.email,
+            role: 'doctor',
+          });
           break;
         case 'pharmacist':
           const pharmacist = await this.otpDao.fetchPharmacist(walletAddress);
-          await this.deliverOtp(walletAddress, pharmacist.email, 'pharmacist');
+          await this.deliverOtp({
+            walletAddress,
+            email: pharmacist.email,
+            role: 'pharmacist',
+          });
           break;
 
         case 'institution':
           const institution = await this.otpDao.fetchInstitution(walletAddress);
-          await this.deliverOtp(
+          await this.deliverOtp({
             walletAddress,
-            institution.admin,
-            'institution',
-          );
+            email: institution.admin,
+            role: 'institution',
+          });
           break;
       }
 

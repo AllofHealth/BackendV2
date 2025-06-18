@@ -22,141 +22,151 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
+import { HttpStatus } from '@nestjs/common';
 import { PharmacistService } from '../services/pharmacist.service';
-import { AddMedicineDto, CreatePharmacistDto, UpdateMedicineDto, UpdatePharmacistDto } from '../dto/pharmacist.dto';
+import { AddMedicineDto, CreatePharmacistDto, DispenseMedicationDto, UpdateMedicineDto, UpdatePharmacistDto } from '../dto/pharmacist.dto';
 import { Types } from 'mongoose';
 export declare class PharmacistController {
     private readonly pharmacistService;
+    private readonly logger;
     constructor(pharmacistService: PharmacistService);
-    createPharmacist(createPharmacistDto: CreatePharmacistDto): Promise<{
-        success: import("../../../shared").ErrorCodes;
-        message: string;
-        pharmacist?: undefined;
-    } | {
-        success: import("../../../shared").ErrorCodes;
+    createPharmacist(ip: string, createPharmacistDto: CreatePharmacistDto): Promise<{
+        success: HttpStatus;
         pharmacist: import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {
             _id: Types.ObjectId;
         };
         message: string;
     }>;
-    updatePharmacist(walletAddress: string, updatePharmacistDto: UpdatePharmacistDto): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
-        pharmacist?: undefined;
-    } | {
-        success: import("@nestjs/common").HttpStatus;
+    updatePharmacist(ip: string, walletAddress: string, updatePharmacistDto: UpdatePharmacistDto): Promise<{
+        success: HttpStatus;
         message: string;
         pharmacist: import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {
             _id: Types.ObjectId;
         };
     }>;
-    addMedicine(walletAddress: string, medicine: AddMedicineDto): Promise<{
-        success: import("@nestjs/common").HttpStatus;
+    addMedicine(ip: string, walletAddress: string, medicine: AddMedicineDto): Promise<{
+        success: HttpStatus;
         message: string;
     }>;
-    removeMedicine(walletAddress: string, medicineId: Types.ObjectId): Promise<{
-        success: import("@nestjs/common").HttpStatus;
+    removeMedicine(ip: string, walletAddress: string, productId: Types.ObjectId, medicineId: Types.ObjectId): Promise<{
+        success: HttpStatus;
+        message: string;
+        result: import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {
+            _id: Types.ObjectId;
+        };
+    }>;
+    updateMedicine(ip: string, walletAddress: string, medicineId: Types.ObjectId, productId: Types.ObjectId, data: UpdateMedicineDto): Promise<{
+        success: HttpStatus;
         message: string;
     }>;
-    updateMedicine(walletAddress: string, medicineId: Types.ObjectId, medicine: UpdateMedicineDto): Promise<{
-        success: import("@nestjs/common").HttpStatus;
+    dispensePrescription(ip: string, patientAddress: string, walletAddress: string, dispenseDto: DispenseMedicationDto): Promise<{
+        status: HttpStatus;
         message: string;
-        updateMedicine?: undefined;
+        success?: undefined;
+        data?: undefined;
     } | {
-        success: import("@nestjs/common").HttpStatus;
-        updateMedicine: import("../schema/pharmacist.schema").Medicine;
+        success: HttpStatus;
+        message: string;
+        data: {
+            productName: string;
+            quantity: number;
+            price: string;
+        };
+        status?: undefined;
+    }>;
+    removePrescription(ip: string, walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
+        success: HttpStatus;
+        message: string;
+    }>;
+    getPharmacist(ip: string, walletAddress: string): Promise<{
+        success: import("../../../shared").ErrorCodes;
+        message: string;
+        pharmacist?: undefined;
+    } | {
+        success: import("../../../shared").ErrorCodes;
+        pharmacist: {
+            _id: Types.ObjectId;
+            id: number;
+            hospitalIds: number[];
+            numberOfApprovals: number;
+            name: string;
+            email?: string;
+            about?: string;
+            profilePicture: string;
+            location: string;
+            phoneNumber: string;
+            walletAddress: string;
+            status: string;
+            inventory: import("../schema/pharmacist.schema").Inventory;
+            approvalList: import("../schema/pharmacist.schema").ApprovalList[];
+            sharedPrescriptions: import("../../patient/schemas/patient.schema").Prescriptions[];
+            category: string;
+            isVerified: boolean;
+            hospitalName: string;
+        };
         message?: undefined;
     }>;
-    dispensePrescription(walletAddress: string, prescriptionId: Types.ObjectId): Promise<void>;
-    removePrescription(walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
-    }>;
-    getPharmacist(walletAddress: string): Promise<{
-        success: import("../../../shared").ErrorCodes;
-        message: string;
-        pharmacist?: undefined;
-    } | {
-        success: import("../../../shared").ErrorCodes;
-        pharmacist: import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {
-            _id: Types.ObjectId;
-        };
-        message?: undefined;
-    }>;
-    getApprovedPharmacists(): Promise<{
+    getApprovedPharmacists(ip: string): Promise<{
         success: import("../../../shared").ErrorCodes;
         pharmacists: (import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {
             _id: Types.ObjectId;
         })[];
     }>;
-    getPendingPharmacists(): Promise<{
+    getPendingPharmacists(ip: string): Promise<{
         success: import("../../../shared").ErrorCodes;
         pharmacist: (import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {
             _id: Types.ObjectId;
         })[];
     }>;
-    getAllPharmacists(): Promise<{
+    getAllPharmacists(ip: string): Promise<{
         success: import("../../../shared").ErrorCodes;
         pharmacists: any[];
     } | {
-        success: import("@nestjs/common").HttpStatus;
+        success: HttpStatus;
         pharmacists: (import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {
             _id: Types.ObjectId;
         })[];
     }>;
-    deletePharmacistByAddress(walletAddress: string): Promise<{
-        success: import("@nestjs/common").HttpStatus;
+    deletePharmacistByAddress(ip: string, walletAddress: string): Promise<{
+        success: HttpStatus;
         message: string;
     }>;
-    getMedicine(walletAddress: string, medicineId: Types.ObjectId): Promise<{
-        success: import("@nestjs/common").HttpStatus;
+    getMedicine(ip: string, walletAddress: string, productId: Types.ObjectId, medicineId: Types.ObjectId): Promise<import("../schema/pharmacist.schema").Medicine>;
+    fetchProduct(ip: string, walletAddress: string, productId: Types.ObjectId): Promise<{
+        success: HttpStatus;
         message: string;
-        medicine?: undefined;
+        product: import("../schema/pharmacist.schema").Product;
+    }>;
+    getAllProducts(ip: string, walletAddress: string): Promise<{
+        message: string;
+        success: HttpStatus;
+        products?: undefined;
     } | {
-        success: import("@nestjs/common").HttpStatus;
-        medicine: import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Medicine> & import("../schema/pharmacist.schema").Medicine & {
-            _id: Types.ObjectId;
-        };
-        message?: undefined;
-    }>;
-    getAllMedicines(walletAddress: string): Promise<{
-        success: import("@nestjs/common").HttpStatus;
+        success: HttpStatus;
         message: string;
-        medicines?: undefined;
-    } | {
-        success: import("@nestjs/common").HttpStatus;
-        medicines: import("../schema/pharmacist.schema").Medicine[];
-        message?: undefined;
+        products: import("../schema/pharmacist.schema").Product[];
     }>;
-    getInventory(walletAddress: string): Promise<{
-        success: import("@nestjs/common").HttpStatus;
+    getInventory(ip: string, walletAddress: string): Promise<{
+        status: HttpStatus;
         message: string;
+        success?: undefined;
         inventory?: undefined;
     } | {
-        success: import("@nestjs/common").HttpStatus;
-        inventory: {};
-        message?: undefined;
-    } | {
-        success: import("@nestjs/common").HttpStatus;
+        success: HttpStatus;
         inventory: import("../schema/pharmacist.schema").Inventory;
+        status?: undefined;
         message?: undefined;
     }>;
-    getAllSharedPrescriptions(walletAddress: string): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
-        prescriptions?: undefined;
-    } | {
-        success: import("@nestjs/common").HttpStatus;
+    getAllSharedPrescriptions(ip: string, walletAddress: string): Promise<{
+        success: HttpStatus;
         prescriptions: import("../../patient/schemas/patient.schema").Prescriptions[];
-        message?: undefined;
     }>;
-    getSharedPrescription(walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
-        prescription?: undefined;
-    } | {
-        success: import("@nestjs/common").HttpStatus;
+    getSharedPrescription(ip: string, walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
+        success: HttpStatus;
         prescription: import("../../patient/schemas/patient.schema").Prescriptions;
-        message?: undefined;
+    }>;
+    checkProductExist(ip: string, walletAddress: string, category: string, productPrescribed: string): Promise<{
+        success: HttpStatus;
+        data: import("../interface/pharmacist.interface").ReturnMedicationStatus;
     }>;
 }

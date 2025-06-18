@@ -1,19 +1,19 @@
-import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Patient } from '../schemas/patient.schema';
 import {
-  ApprovalInputType,
-  ApprovalType,
-  CreateApprovalInputType,
-  CreateApprovalType,
-  CreatePatientType,
-  FamilyMemberApprovalInputType,
-  FamilyMemberType,
-  SharePrescriptionInterface,
-  UpdateFamilyMemberType,
-  UpdatePatientProfileType,
+  IApprovalInput,
+  ICreateApproval,
+  ICreateApprovalInput,
+  ICreatePatient,
+  IFamilyMember,
+  IFamilyMemberApprovalInput,
+  IFamilyMemberRecord,
+  ISharePrescription,
+  IUpdateFamilyMember,
+  IUpdatePatientProfile,
 } from '../interface/patient.interface';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, MongooseError, Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { PatientDao } from '../dao/patient.dao';
 import { PatientGuard } from '../guards/patient.guard';
 import { PharmacistGuard } from '@/modules/pharmacist/guards/pharmacist.guard';
@@ -21,8 +21,15 @@ import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
 import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
 import { PatientProvider } from '../provider/patient.provider';
 import { PROFILE_PLACEHOLDER } from '@/shared/constants';
-import { OtpService } from '@/modules/otp/services/otp.service';
-import { PatientError, ErrorCodes, ApprovalStatus } from '@/shared';
+import { ApprovalStatus } from '@/shared';
+import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
+import {
+  PatientErrors,
+  PatientSuccess,
+} from '@/modules/patient/data/patient.data';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SharedEvents } from '@/shared/events/shared.events';
+import { EntityCreatedDto } from '@/shared/dto/shared.dto';
 
 /**
  * @file: Patient Service
@@ -30,6 +37,9 @@ import { PatientError, ErrorCodes, ApprovalStatus } from '@/shared';
  */
 @Injectable()
 export class PatientService {
+  private readonly logger = new MyLoggerService(PatientService.name);
+  private provider = PatientProvider.useFactory();
+
   constructor(
     @InjectModel(Patient.name) private patientModel: Model<Patient>,
     private readonly patientDao: PatientDao,
@@ -37,24 +47,10 @@ export class PatientService {
     private readonly pharmacistGuard: PharmacistGuard,
     private readonly pharmacistDao: PharmacistDao,
     private readonly doctorDao: DoctorDao,
-    private readonly otpService: OtpService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  private provider = PatientProvider.useFactory();
-
-  private getApprovalType(approvalType: string): string {
-    const upperCaseType = approvalType.toUpperCase();
-    if (upperCaseType === ApprovalType.FULL) {
-      return ApprovalType.FULL;
-    } else if (upperCaseType === ApprovalType.READ) {
-      return ApprovalType.READ;
-    }
-    throw new PatientError('Invalid approval type');
-  }
-
-  private createApprovalInputs(
-    args: CreateApprovalInputType,
-  ): CreateApprovalType[] {
+  private createApprovalInputs(args: ICreateApprovalInput): ICreateApproval[] {
     const {
       id,
       name,
@@ -95,7 +91,7 @@ export class PatientService {
     }
   }
 
-  async createNewPatient(args: CreatePatientType) {
+  async createNewPatient(args: ICreatePatient) {
     const { walletAddress } = args;
 
     try {
@@ -104,38 +100,39 @@ export class PatientService {
       if (patientExist) {
         return {
           success: HttpStatus.CREATED,
-          message: 'patient already exist',
+          message: PatientErrors.PATIENT_EXISTS,
         };
       }
       const patient = await this.patientDao.createNewPatient(args);
       if (!patient) {
         return {
           success: HttpStatus.BAD_REQUEST,
-          message: 'An error occurred while creating patient',
+          message: PatientErrors.PATIENT_CREATED_ERROR,
         };
       }
 
-      try {
-        await this.otpService.deliverOtp(walletAddress, args.email, 'patient');
-        console.log('Email sent');
-      } catch (error) {
-        console.error(error);
-        throw new Error('An error occurred while creating patient');
-      }
+      this.eventEmitter.emit(
+        SharedEvents.ENTITY_CREATED,
+        new EntityCreatedDto(walletAddress, args.email, 'patient'),
+      );
+
       return {
         success: HttpStatus.OK,
+        message: PatientSuccess.PATIENT_CREATED,
         patient,
-        message: 'Patient created successfully',
       };
-    } catch (error) {
-      Logger.error(error);
-      throw new PatientError('An error occurred while creating patient');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.PATIENT_CREATED_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async addFamilyMember(args: {
     walletAddress: string;
-    familyMember: FamilyMemberType;
+    familyMember: IFamilyMember;
   }) {
     const { walletAddress, familyMember } = args;
     const {
@@ -152,13 +149,6 @@ export class PatientService {
     try {
       const patient =
         await this.patientDao.fetchPatientByAddress(walletAddress);
-
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'patient not found',
-        };
-      }
 
       const sanitizeRelationship = relationship.toLowerCase();
       const sanitizedArgs = {
@@ -180,7 +170,7 @@ export class PatientService {
       if (familyMemberExist) {
         return {
           success: HttpStatus.CONFLICT,
-          message: 'family member already exist',
+          message: PatientErrors.FAMILY_MEMBER_EXIST,
         };
       }
 
@@ -190,11 +180,14 @@ export class PatientService {
       await patient.save();
       return {
         success: HttpStatus.OK,
-        message: 'Family member added successfully',
+        message: PatientSuccess.FAMILY_MEMBER_ADDED,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('An error occurred while adding family member');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.FAMILY_MEMBER_ERROR },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -202,28 +195,25 @@ export class PatientService {
     try {
       const patient =
         await this.patientDao.fetchPatientByAddress(walletAddress);
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'Patient not found',
-        };
-      }
       const familyMembers = patient.familyMembers;
       if (!familyMembers) {
         return {
           success: HttpStatus.FOUND,
+          message: PatientErrors.FAMILY_MEMBER_LIST_ERROR,
           members: [],
-          message: 'No family members added',
         };
       }
       return {
-        success: HttpStatus.FOUND,
+        success: HttpStatus.OK,
+        message: PatientSuccess.FAMILY_MEMBER_FOUND,
         members: familyMembers,
-        message: 'Family members found',
       };
-    } catch (error) {
-      console.error(error);
-      throw new Error('An error occurred while listing family member');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.FAMILY_MEMBER_FETCH_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -235,7 +225,7 @@ export class PatientService {
       if (!patient) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'Patient not found',
+          message: PatientErrors.PATIENT_NOT_FOUND,
         };
       }
       const familyMember = patient.familyMembers;
@@ -243,7 +233,7 @@ export class PatientService {
       if (!member) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'Member not found',
+          message: PatientErrors.FAMILY_MEMBER_LIST_ERROR,
         };
       }
 
@@ -251,28 +241,22 @@ export class PatientService {
         success: HttpStatus.OK,
         member,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('an error occurred while fetching family member');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.FAMILY_MEMBER_FETCH_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async editFamilyMember(args: {
     walletAddress: string;
     familyMemberId: number;
-    updateData: UpdateFamilyMemberType;
+    updateData: IUpdateFamilyMember;
   }) {
     const { walletAddress, familyMemberId, updateData } = args;
     try {
-      const patientExist =
-        await this.patientGuard.validatePatient(walletAddress);
-      if (!patientExist) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'Patient not found',
-        };
-      }
-
       const patient =
         await this.patientDao.fetchPatientByAddress(walletAddress);
 
@@ -283,7 +267,7 @@ export class PatientService {
       if (!familyMemberExists) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'Family member not found',
+          message: PatientErrors.FAMILY_MEMBER_NOT_FOUND,
         };
       }
 
@@ -295,17 +279,40 @@ export class PatientService {
 
       return {
         success: HttpStatus.OK,
-        message: 'Family member updated successfully',
+        message: PatientSuccess.FAMILY_MEMBER_UPDATED,
         familyMember,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('An error occurred while editing family member');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.FAMILY_MEMBER_UPDATE_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async findAllPatients() {
-    return await this.patientModel.find();
+    try {
+      const patients = await this.patientModel.find();
+      if (!patients) {
+        return {
+          status: HttpStatus.NOT_FOUND,
+          message: PatientErrors.PATIENT_NOT_FOUND,
+          data: [],
+        };
+      }
+
+      return {
+        status: HttpStatus.OK,
+        patients,
+      };
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.PATIENT_FETCH_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async fetchPatientByWalletAddress(walletAddress: string) {
@@ -316,43 +323,37 @@ export class PatientService {
       if (!patientExist) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'Patient not found',
+          message: PatientErrors.PATIENT_NOT_FOUND,
         };
       }
       const patient =
         await this.patientDao.fetchPatientByAddress(walletAddress);
       return {
-        success: ErrorCodes.Success,
+        success: HttpStatus.OK,
         patient,
       };
-    } catch (error) {
-      console.error(error);
-      if (error instanceof MongooseError)
-        throw new MongooseError(error.message);
-      throw new PatientError('An error occurred while fetching patient');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.PATIENT_FETCH_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-  async updatePatient(walletAddress: string, args: UpdatePatientProfileType) {
+  async updatePatient(walletAddress: string, args: IUpdatePatientProfile) {
     try {
-      const patientExist =
-        await this.patientGuard.validatePatient(walletAddress);
-      if (!patientExist) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'Patient not found',
-        };
-      }
       await this.patientDao.updatePatient(walletAddress, args);
       return {
         success: HttpStatus.OK,
-        message: 'Patient updated successfully',
+        message: PatientSuccess.PATIENT_UPDATED,
       };
-    } catch (error) {
-      console.error(error);
-      if (error instanceof MongooseError)
-        throw new MongooseError(error.message);
-      throw new PatientError('An error occurred while updating patient');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.PATIENT_UPDATE_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -363,17 +364,20 @@ export class PatientService {
       if (!patientExists) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'Patient not found',
+          message: PatientErrors.PATIENT_NOT_FOUND,
         };
       }
-      await this.patientModel.deleteOne({ walletAddress });
+      await this.patientDao.DeletePatient(walletAddress);
       return {
         success: HttpStatus.OK,
-        message: 'Patient deleted successfully',
+        message: PatientSuccess.PATIENT_DELETED,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('An error occurred while deleting patient');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.PATIENT_DELETE_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -382,22 +386,18 @@ export class PatientService {
       const patient =
         await this.patientDao.fetchPatientByAddress(walletAddress);
 
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'Patient not found',
-        };
-      }
-
       const prescriptions = patient.prescriptions;
 
       return {
         success: HttpStatus.OK,
         prescriptions,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('An error occurred while fetching prescriptions');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.FETCH_PRESCRIPTION_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -406,14 +406,6 @@ export class PatientService {
     prescriptionId: Types.ObjectId,
   ) {
     try {
-      const isPatient = await this.patientGuard.validatePatient(walletAddress);
-      if (!isPatient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'patient not found',
-        };
-      }
-
       const prescription = await this.patientModel.findOne(
         { walletAddress, 'prescriptions._id': prescriptionId },
         { 'prescriptions.$': 1 },
@@ -422,7 +414,7 @@ export class PatientService {
       if (!prescription || !prescription.prescriptions.length) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'prescription not found, invalid id',
+          message: `${PatientErrors.PRESCRIPTION_NOT_FOUND} | ${PatientErrors.INVALID_PRESCRIPTION_ID}`,
         };
       }
 
@@ -430,30 +422,24 @@ export class PatientService {
         success: HttpStatus.OK,
         prescription: prescription.prescriptions[0],
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('An error occurred while fetching prescription');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.FETCH_PRESCRIPTION_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-  async sharePrescription(args: SharePrescriptionInterface) {
+  async sharePrescription(args: ISharePrescription) {
     const { walletAddress, pharmacistAddress, prescriptionId } = args;
     try {
       const isPharmacist =
         await this.pharmacistGuard.validatePharmacistExists(pharmacistAddress);
-      const patient =
-        await this.patientDao.fetchPatientByAddress(walletAddress);
       if (!isPharmacist) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'Pharmacist not found',
-        };
-      }
-
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'Patient not found',
+          message: PatientErrors.PHARMACIST_NOT_FOUND,
         };
       }
 
@@ -465,7 +451,7 @@ export class PatientService {
       if (!prescription || !prescription.prescriptions.length) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'prescription not found, invalid id',
+          message: `${PatientErrors.PRESCRIPTION_NOT_FOUND} | ${PatientErrors.INVALID_PRESCRIPTION_ID}`,
         };
       }
 
@@ -477,17 +463,20 @@ export class PatientService {
       } catch (error) {
         return {
           success: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: 'an error occurred, please try again',
+          message: PatientErrors.SHARE_PRESCRIPTION_ERROR,
         };
       }
 
       return {
         success: HttpStatus.OK,
-        message: 'prescription shared successfully',
+        message: PatientSuccess.PRESCRIPTION_SHARED,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('An error occurred while sharing prescription');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.SHARE_PRESCRIPTION_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -498,12 +487,6 @@ export class PatientService {
     try {
       const patient =
         await this.patientDao.fetchPatientByAddress(walletAddress);
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'patient not found',
-        };
-      }
 
       const prescription = patient.prescriptions.find(
         (prescription) => prescription._id == prescriptionId,
@@ -511,24 +494,28 @@ export class PatientService {
       if (!prescription) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'prescription not found',
+          message: PatientErrors.PRESCRIPTION_NOT_FOUND,
         };
       }
 
       await this.patientDao.pullOnePrescription(prescriptionId, walletAddress);
+      await this.patientDao.deletePrescription(prescriptionId);
       await patient.save();
 
       return {
         success: HttpStatus.OK,
-        message: 'successfully deleted prescription',
+        message: PatientSuccess.PRESCRIPTION_DELETED,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('an error occurred while removing prescription');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.DELETE_PRESCRIPTION_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-  async approveMedicalRecordAccess(args: ApprovalInputType) {
+  async approveMedicalRecordAccess(args: IApprovalInput) {
     const {
       recordId,
       patientAddress,
@@ -540,29 +527,22 @@ export class PatientService {
     try {
       const patient =
         await this.patientDao.fetchPatientByAddress(patientAddress);
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'patient not found',
-        };
-      }
 
       const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
       if (!doctor) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'doctor not found',
+          message: PatientErrors.DOCTOR_NOT_FOUND,
         };
       }
 
       if (doctor.status !== ApprovalStatus.Approved) {
         return {
           success: HttpStatus.UNAUTHORIZED,
-          message: 'doctor is not approved',
+          message: PatientErrors.DOCTOR_NOT_APPROVED,
         };
       }
 
-      const sanitizedApprovalType = this.getApprovalType(approvalType);
       const durationTime = this.provider.returnDuration(approvalDurationInSecs);
 
       const approvalInputs = this.createApprovalInputs({
@@ -570,7 +550,7 @@ export class PatientService {
         name: patient.name,
         recordIds: recordId,
         profilePicture: patient.profilePicture,
-        approvalType: sanitizedApprovalType,
+        approvalType,
         approvalDuration: durationTime,
         recordOwner: patient.walletAddress,
         recordTag: 'patient',
@@ -586,18 +566,19 @@ export class PatientService {
 
       return {
         success: HttpStatus.OK,
-        message: 'approval request sent',
+        message: PatientSuccess.MEDICAL_RECORD_ACCESS_APPROVED,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError(
-        'an error occurred while approving medical record access',
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.APPROVE_MEDICAL_RECORD_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
   async approveMedicalRecordAccessForFamilyMember(
-    args: FamilyMemberApprovalInputType,
+    args: IFamilyMemberApprovalInput,
   ) {
     const {
       recordId,
@@ -608,27 +589,18 @@ export class PatientService {
       approvalDurationInSecs,
     } = args;
     try {
-      const patient =
-        await this.patientDao.fetchPatientByAddress(patientAddress);
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'patient not found',
-        };
-      }
-
       const doctor = await this.doctorDao.fetchDoctorByAddress(doctorAddress);
       if (!doctor) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'doctor not found',
+          message: PatientErrors.DOCTOR_NOT_FOUND,
         };
       }
 
       if (doctor.status !== ApprovalStatus.Approved) {
         return {
           success: HttpStatus.UNAUTHORIZED,
-          message: 'doctor is not approved',
+          message: PatientErrors.DOCTOR_NOT_APPROVED,
         };
       }
 
@@ -640,18 +612,17 @@ export class PatientService {
       if (!familyMember) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'family member not found',
+          message: PatientErrors.FAMILY_MEMBER_NOT_FOUND,
         };
       }
 
       if (familyMember.principalPatient != patientAddress) {
         return {
           success: HttpStatus.UNAUTHORIZED,
-          message: 'invalid principal patient address',
+          message: PatientErrors.INVALID_PRINCIPAL_PATIENT,
         };
       }
 
-      const sanitizedApprovalType = this.getApprovalType(approvalType);
       const durationTime = this.provider.returnDuration(approvalDurationInSecs);
 
       const approvalInputs = this.createApprovalInputs({
@@ -659,7 +630,7 @@ export class PatientService {
         name: familyMember.name,
         recordIds: recordId,
         profilePicture: PROFILE_PLACEHOLDER,
-        approvalType: sanitizedApprovalType,
+        approvalType: approvalType,
         approvalDuration: durationTime,
         recordOwner: familyMember.principalPatient,
         recordTag: 'familyMember',
@@ -675,28 +646,22 @@ export class PatientService {
 
       return {
         success: HttpStatus.OK,
-        message: 'family member approval request sent',
+        message: PatientSuccess.FAMILY_MEDICAL_RECORD_ACCESS_APPROVED,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError(
-        'an error occurred while approving family member medical record access',
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.APPROVE_MEDICAL_RECORD_FAMILY },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
   async fetchAllMedicalRecords(patientAddress: string) {
     try {
-      const patient =
-        await this.patientDao.fetchPatientByAddress(patientAddress);
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'patient not found',
-        };
-      }
+      const patient = await this.fetchPatientByWalletAddress(patientAddress);
 
-      const medicalRecords = patient.medicalRecords;
+      const medicalRecords = patient.patient.medicalRecords;
       if (!medicalRecords) {
         return {
           success: HttpStatus.OK,
@@ -708,10 +673,11 @@ export class PatientService {
         success: HttpStatus.OK,
         medicalRecords,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError(
-        'an error occurred while fetching medical records',
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.FETCH_MEDICAL_RECORD_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -725,12 +691,6 @@ export class PatientService {
       const patient = await this.patientDao.fetchPatientByAddress(
         principalPatientAddress,
       );
-      if (!patient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'patient not found',
-        };
-      }
 
       const familyMember = patient.familyMembers.find(
         (member) => member.id === familyMemberId,
@@ -739,7 +699,7 @@ export class PatientService {
       if (!familyMember) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'family member not found',
+          message: PatientErrors.FAMILY_MEMBER_NOT_FOUND,
         };
       }
 
@@ -749,10 +709,11 @@ export class PatientService {
         success: HttpStatus.OK,
         records,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError(
-        'An error occurred while fetch family member records',
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.FETCH_FAMILY_MEDICAL_RECORD },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -763,14 +724,6 @@ export class PatientService {
   }) {
     const { walletAddress, recordId } = args;
     try {
-      const isPatient = await this.patientGuard.validatePatient(walletAddress);
-      if (!isPatient) {
-        return {
-          success: HttpStatus.NOT_FOUND,
-          message: 'patient not found',
-        };
-      }
-
       const record = await this.patientDao.findOneRecord(
         walletAddress,
         recordId,
@@ -778,7 +731,7 @@ export class PatientService {
       if (!record) {
         return {
           success: HttpStatus.NOT_FOUND,
-          message: 'record not found',
+          message: PatientErrors.RECORD_NOT_FOUND,
         };
       }
 
@@ -786,9 +739,29 @@ export class PatientService {
         success: HttpStatus.OK,
         record,
       };
-    } catch (error) {
-      console.error(error);
-      throw new PatientError('an error occurred while fetching medical record');
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.RECORD_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async fetchFamilyMemberRecordById(args: IFamilyMemberRecord) {
+    const { principalPatientAddress, familyMemberId, recordId } = args;
+    try {
+      return await this.patientDao.findOneFamilyMemberRecord(
+        principalPatientAddress,
+        familyMemberId,
+        recordId,
+      );
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(
+        { message: PatientErrors.FETCH_FAMILY_MEDICAL_RECORD },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

@@ -22,53 +22,67 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
+import { HttpStatus } from '@nestjs/common';
 import { AdminService } from '../services/admin.service';
 import { CreateAdminDto, UpdateAdminDto } from '../dto/admin.dto';
 import { Types } from 'mongoose';
+import { AdminErrors, AdminMessages } from '@/modules/admin/data/admin.data';
 export declare class AdminController {
     private readonly adminService;
+    private readonly logger;
     constructor(adminService: AdminService);
-    getAllAdmins(): Promise<(import("mongoose").Document<unknown, {}, import("../schema/admin.schema").Admin> & import("../schema/admin.schema").Admin & {
-        _id: Types.ObjectId;
-    })[]>;
-    getAdminByAddress(walletAddress: string): Promise<(import("mongoose").Document<unknown, {}, import("../schema/admin.schema").Admin> & import("../schema/admin.schema").Admin & {
+    getAllAdmins(ip: string): Promise<{
+        success: HttpStatus;
+        message: AdminErrors;
+        data: any[];
+    } | {
+        success: HttpStatus;
+        data: (import("mongoose").Document<unknown, {}, import("../schema/admin.schema").Admin> & import("../schema/admin.schema").Admin & {
+            _id: Types.ObjectId;
+        })[];
+        message?: undefined;
+    }>;
+    getAdminByAddress(ip: string, walletAddress: string): Promise<(import("mongoose").Document<unknown, {}, import("../schema/admin.schema").Admin> & import("../schema/admin.schema").Admin & {
         _id: Types.ObjectId;
     }) | {
         success: import("../../../shared").ErrorCodes;
-        message: string;
+        message: AdminErrors;
     }>;
-    getAllPractitioners(): Promise<{
-        success: import("@nestjs/common").HttpStatus;
+    getAllPractitioners(ip: string): Promise<{
+        success: HttpStatus;
         allPractitioners: any[];
     }>;
-    createAdmin(createAdminDto: CreateAdminDto): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
+    createAdmin(ip: string, createAdminDto: CreateAdminDto): Promise<{
+        success: HttpStatus;
+        message: AdminErrors;
         admin?: undefined;
     } | {
-        success: import("../../../shared").ErrorCodes;
+        success: HttpStatus;
+        message: AdminMessages;
         admin: import("mongoose").Document<unknown, {}, import("../schema/admin.schema").Admin> & import("../schema/admin.schema").Admin & {
             _id: Types.ObjectId;
         };
-        message: string;
     }>;
-    updateAdmin(walletAddress: string, updateAdminDto: UpdateAdminDto): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
+    updateAdmin(ip: string, walletAddress: string, updateAdminDto: UpdateAdminDto): Promise<{
+        success: HttpStatus;
+        message: AdminMessages;
     }>;
-    approveHospital(adminAddress: string, hospitalId: Types.ObjectId): Promise<{
+    approveHospital(ip: string, adminAddress: string, hospitalId: Types.ObjectId): Promise<{
         success: number;
         message: string;
     }>;
-    authenticateAdmin(adminAddress: string, walletAddress: string): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
+    authenticateAdmin(ip: string, adminAddress: string, walletAddress: string, id: number): Promise<{
+        success: HttpStatus;
+        message: AdminErrors;
+    } | {
+        success: HttpStatus;
+        message: AdminMessages;
     }>;
-    deleteAdmin(adminAddressToAuthorize: string, adminAddressToRemove: string): Promise<{
-        success: import("@nestjs/common").HttpStatus;
-        message: string;
+    deleteAdmin(ip: string, adminAddressToAuthorize: string, adminAddressToRemove: string): Promise<{
+        success: HttpStatus;
+        message?: undefined;
     } | {
         success: import("../../../shared").ErrorCodes;
-        message: string;
+        message: AdminMessages;
     }>;
 }

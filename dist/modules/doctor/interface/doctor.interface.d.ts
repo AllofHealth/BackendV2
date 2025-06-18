@@ -23,6 +23,7 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import { Types } from 'mongoose';
+import { Approval } from '@/modules/doctor/schema/doctor.schema';
 export type ApprovalType = 'view' | 'full';
 export type RecordOwnerType = 'principal' | 'family member';
 export interface ActiveApprovalType {
@@ -69,9 +70,10 @@ export interface DoctorType {
     phoneNumber: string;
     walletAddress: string;
     numberOfApprovals: number;
-    activeApprovals: ActiveApprovalType[];
     status: string;
     category: string;
+    isVerified: boolean;
+    activeApprovals: Approval[];
 }
 export interface AddPatientPrescription {
     recordId: number;
@@ -82,6 +84,7 @@ export interface AddPatientPrescription {
 export interface AddMedicineType {
     productPrescribed: string;
     productCategory: string;
+    productDosage: string;
     practitionerNote: string;
 }
 export interface ApproveMedicalRecordAccessRequestType {

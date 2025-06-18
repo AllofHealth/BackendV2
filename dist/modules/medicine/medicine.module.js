@@ -11,6 +11,8 @@ const common_1 = require("@nestjs/common");
 const medicine_dao_1 = require("./dao/medicine.dao");
 const mongoose_1 = require("@nestjs/mongoose");
 const medicine_schema_1 = require("./schema/medicine.schema");
+const medicine_service_1 = require("./service/medicine.service");
+const medicine_controller_1 = require("./controller/medicine.controller");
 let MedicineModule = class MedicineModule {
 };
 exports.MedicineModule = MedicineModule;
@@ -18,11 +20,19 @@ exports.MedicineModule = MedicineModule = __decorate([
     (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forFeature([
-                { name: medicine_schema_1.Medicine.name, schema: medicine_schema_1.MedicineSchema },
+                { name: medicine_schema_1.Medication.name, schema: medicine_schema_1.MedicineSchema },
+            ]),
+            mongoose_1.MongooseModule.forFeature([{ name: medicine_schema_1.Receipt.name, schema: medicine_schema_1.ReceiptSchema }]),
+            mongoose_1.MongooseModule.forFeature([
+                { name: medicine_schema_1.Medication.name, schema: medicine_schema_1.MedicineSchema },
+            ]),
+            mongoose_1.MongooseModule.forFeature([
+                { name: medicine_schema_1.MedicineCategories.name, schema: medicine_schema_1.MedicineCategoriesSchema },
             ]),
         ],
-        providers: [medicine_dao_1.MedicineDao],
-        exports: [medicine_dao_1.MedicineDao],
+        providers: [medicine_dao_1.MedicineDao, medicine_service_1.MedicineService],
+        exports: [medicine_dao_1.MedicineDao, medicine_service_1.MedicineService],
+        controllers: [medicine_controller_1.MedicineController],
     })
 ], MedicineModule);
 //# sourceMappingURL=medicine.module.js.map

@@ -16,7 +16,7 @@ const hospital_module_1 = require("../hospital/hospital.module");
 const pharmacist_dao_1 = require("./dao/pharmacist.dao");
 const pharmacist_guard_1 = require("./guards/pharmacist.guard");
 const patient_module_1 = require("../patient/patient.module");
-const otp_module_1 = require("../otp/otp.module");
+const medicine_module_1 = require("../medicine/medicine.module");
 let PharmacistModule = class PharmacistModule {
 };
 exports.PharmacistModule = PharmacistModule;
@@ -32,9 +32,10 @@ exports.PharmacistModule = PharmacistModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: pharmacist_schema_1.Inventory.name, schema: pharmacist_schema_1.InventorySchema },
             ]),
+            mongoose_1.MongooseModule.forFeature([{ name: pharmacist_schema_1.Product.name, schema: pharmacist_schema_1.ProductSchema }]),
             (0, common_1.forwardRef)(() => hospital_module_1.HospitalModule),
             (0, common_1.forwardRef)(() => patient_module_1.PatientModule),
-            (0, common_1.forwardRef)(() => otp_module_1.OtpModule),
+            medicine_module_1.MedicineModule,
         ],
         providers: [pharmacist_service_1.PharmacistService, pharmacist_dao_1.PharmacistDao, pharmacist_guard_1.PharmacistGuard],
         controllers: [pharmacist_controller_1.PharmacistController],

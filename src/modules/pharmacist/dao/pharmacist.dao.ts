@@ -1,14 +1,20 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { Inventory, Medicine, Pharmacist } from '../schema/pharmacist.schema';
+import {
+  Inventory,
+  Medicine,
+  Pharmacist,
+  Product,
+} from '../schema/pharmacist.schema';
 import { Model, Types } from 'mongoose';
 import {
   CreatePharmacistType,
-  InventoryType,
   MedicineType,
+  ProductType,
+  UpdateInventoryType,
   UpdateMedicineType,
   UpdatePharmacistType,
 } from '../interface/pharmacist.interface';
-import { PROFILE_PLACEHOLDER } from '@/shared/constants';
+import { MEDICINE_PLACEHOLDER, PROFILE_PLACEHOLDER } from '@/shared/constants';
 import { ApprovalStatus } from '@/shared';
 
 export class PharmacistDao {
@@ -19,6 +25,8 @@ export class PharmacistDao {
     private readonly medicineModel: Model<Medicine>,
     @InjectModel(Inventory.name)
     private readonly inventoryModel: Model<Inventory>,
+    @InjectModel(Product.name)
+    private readonly productModel: Model<Product>,
   ) {}
   async createNewPharmacist(pharmacist: CreatePharmacistType) {
     return await this.pharmacistModel.create({
@@ -36,25 +44,46 @@ export class PharmacistDao {
     });
   }
 
+  async createProduct(args: ProductType) {
+    return await this.productModel.create({
+      category: args.category,
+      description: args.description ? args.description : 'none',
+      medications: args.medications,
+    });
+  }
+
   async createMedicine(args: MedicineType) {
     return await this.medicineModel.create({
       name: args.name,
       price: args.price,
       quantity: args.quantity,
-      description: args.description,
       sideEffects: args.sideEffects ? args.sideEffects : 'none',
-      image: args.image,
-      medicineGroup: args.medicineGroup,
+      image: args.image ? args.image : MEDICINE_PLACEHOLDER,
     });
   }
 
-  async createInventory(args: InventoryType) {
-    return await this.inventoryModel.create({
-      numberOfMedicine: args.numberOfMedicine,
-      numberOfMedicineGroup: args.numberOfMedicineGroup,
-      numberOfMedicineSold: args.numberOfMedicineSold,
-      medicines: args.medicines,
+  async createInventory() {
+    const inventory = await this.inventoryModel.create({
+      numberOfMedicines: 0,
+      numberOfCategories: 0,
     });
+    return inventory;
+  }
+
+  async fetchProductById(productId: Types.ObjectId, walletAddress: string) {
+    const result = await this.pharmacistModel.findOne(
+      {
+        walletAddress,
+        'inventory.products._id': productId,
+      },
+      { 'inventory.products.$': 1 },
+    );
+
+    if (result && result.inventory.products[0]) {
+      return result.inventory.products[0];
+    }
+
+    return null;
   }
 
   async fetchPharmacist(id: number) {
@@ -97,49 +126,74 @@ export class PharmacistDao {
   async updateMedicine(
     walletAddress: string,
     medicineId: Types.ObjectId,
+    productId: Types.ObjectId,
     updateData: UpdateMedicineType,
   ) {
     const updates = Object.keys(updateData).reduce((acc, key) => {
-      acc[`inventory.medicines.$.${key}`] = updateData[key];
+      acc[
+        `inventory.products.$[productElem].medications.$[medicineElem].${key}`
+      ] = updateData[key];
       return acc;
     }, {});
 
-    const result = await this.pharmacistModel.findOneAndUpdate(
-      { walletAddress, 'inventory.medicines._id': medicineId },
+    const result = await this.pharmacistModel.updateOne(
+      {
+        walletAddress,
+        'inventory.products._id': productId,
+      },
+      { $set: updates },
+      {
+        new: true,
+        runValidators: true,
+        arrayFilters: [
+          { 'productElem._id': productId },
+          { 'medicineElem._id': medicineId },
+        ],
+      },
+    );
+
+    return result;
+  }
+
+  async updateInventory(args: {
+    walletAddress: string;
+    update: UpdateInventoryType;
+  }) {
+    const updates = Object.keys(args.update).reduce((acc, key) => {
+      acc[`inventory.${key}`] = args.update[key];
+      return acc;
+    }, {});
+
+    return await this.pharmacistModel.findOneAndUpdate(
+      { walletAddress: args.walletAddress },
       { $set: updates },
       { new: true, runValidators: true },
     );
+  }
 
-    const medicine = result.inventory.medicines.find(
-      (medicine: MedicineType) =>
-        medicine._id.toString() === medicineId.toString(),
+  async findMedicineById(
+    walletAddress: string,
+    medicineId: Types.ObjectId,
+    productId: Types.ObjectId,
+  ) {
+    const product = await this.fetchProductById(productId, walletAddress);
+
+    return product.medications.find(
+      (med: MedicineType) => med._id.toString() === medicineId.toString(),
     );
-
-    return medicine;
-  }
-
-  async deleteMedicine(medicineId: Types.ObjectId) {
-    return await this.medicineModel.deleteOne({ _id: medicineId });
-  }
-
-  async deleteMedicineById(medicineId: Types.ObjectId) {
-    return await this.medicineModel.deleteOne({ _id: medicineId });
-  }
-
-  async findMedicineById(medicineId: Types.ObjectId) {
-    return await this.medicineModel.findOne({ _id: medicineId });
   }
 
   async pullMedicineById(
     pharmacistAddress: string,
+    productId: Types.ObjectId,
     medicineId: Types.ObjectId,
   ) {
     return await this.pharmacistModel.findOneAndUpdate(
-      { walletAddress: pharmacistAddress },
-      { $pull: { 'inventory.medicines': { _id: medicineId } } },
+      { walletAddress: pharmacistAddress, 'inventory.products._id': productId },
+      { $pull: { 'inventory.products.$.medications': { _id: medicineId } } },
+      { new: true },
     );
   }
-
   async pullOnePrescription(
     pharmacistAddress: string,
     prescriptionId: Types.ObjectId,

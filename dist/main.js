@@ -2,12 +2,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
-const my_logger_service_1 = require("./modules/my-logger/my-logger.service");
+const swagger_1 = require("@nestjs/swagger");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    app.useLogger(app.get(my_logger_service_1.MyLoggerService));
+    const config = new swagger_1.DocumentBuilder()
+        .setTitle('All of Health')
+        .setDescription('Complete API for Server Operations')
+        .setVersion('1.0')
+        .addTag('health')
+        .build();
     app.enableCors();
     app.setGlobalPrefix('api');
+    const document = swagger_1.SwaggerModule.createDocument(app, config);
+    swagger_1.SwaggerModule.setup('api', app, document);
     await app.listen(4000);
 }
 bootstrap();

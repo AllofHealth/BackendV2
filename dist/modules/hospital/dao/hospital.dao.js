@@ -52,6 +52,12 @@ let HospitalDao = class HospitalDao {
     async fetchHospitalWithId(id) {
         return await this.hospitalModel.findOne({ _id: id });
     }
+    async updateDoctorStatus(walletAddress, status) {
+        return await this.hospitalModel.findOneAndUpdate({ 'doctors.walletAddress': walletAddress }, { $set: { 'doctors.$.status': status } }, { new: true });
+    }
+    async updatePharmacistStatus(walletAddress, status) {
+        return await this.hospitalModel.findOneAndUpdate({ 'pharmacists.walletAddress': walletAddress }, { $set: { 'pharmacists.$.status': status } }, { new: true });
+    }
     async fetchHospitalWithPendingStatus() {
         return await this.hospitalModel.find({
             status: shared_1.ApprovalStatus.Pending,

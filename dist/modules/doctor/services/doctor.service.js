@@ -18,17 +18,21 @@ const doctor_guard_1 = require("../guards/doctor.guard");
 const hospital_dao_1 = require("../../hospital/dao/hospital.dao");
 const patient_dao_1 = require("../../patient/dao/patient.dao");
 const patient_guard_1 = require("../../patient/guards/patient.guard");
-const otp_service_1 = require("../../otp/services/otp.service");
 const medicine_dao_1 = require("../../medicine/dao/medicine.dao");
+const my_logger_service_1 = require("../../my-logger/my-logger.service");
+const event_emitter_1 = require("@nestjs/event-emitter");
+const shared_events_1 = require("../../../shared/events/shared.events");
+const shared_dto_1 = require("../../../shared/dto/shared.dto");
 let DoctorService = class DoctorService {
-    constructor(doctorDao, doctorGuard, hospitalDao, patientDao, patientGuard, otpService, medicineDao) {
+    constructor(doctorDao, doctorGuard, hospitalDao, patientDao, patientGuard, medicineDao, eventEmitter) {
         this.doctorDao = doctorDao;
         this.doctorGuard = doctorGuard;
         this.hospitalDao = hospitalDao;
         this.patientDao = patientDao;
         this.patientGuard = patientGuard;
-        this.otpService = otpService;
         this.medicineDao = medicineDao;
+        this.eventEmitter = eventEmitter;
+        this.logger = new my_logger_service_1.MyLoggerService('DoctorService');
     }
     async getPendingDoctors() {
         try {
@@ -96,8 +100,7 @@ let DoctorService = class DoctorService {
                     message: 'Hospital not found',
                 };
             }
-            let doctor = await this.doctorDao.createNewDoctor(args);
-            doctor = await this.doctorDao.fetchDoctorByAddress(args.walletAddress);
+            const doctor = await this.doctorDao.createNewDoctor(args);
             if (args.walletAddress === hospital.admin) {
                 doctor.status = shared_1.ApprovalStatus.Approved;
                 await doctor.save();
@@ -110,6 +113,7 @@ let DoctorService = class DoctorService {
                 throw new Error('Error adding doctor');
             }
             const doctorPreview = {
+                id: doctor.id,
                 walletAddress: doctor.walletAddress,
                 hospitalIds: doctor.hospitalIds,
                 profilePicture: doctor.profilePicture,
@@ -119,7 +123,7 @@ let DoctorService = class DoctorService {
             };
             try {
                 hospital.doctors.push(doctorPreview);
-                await this.otpService.deliverOtp(args.walletAddress, doctor.email, 'doctor');
+                this.eventEmitter.emit(shared_events_1.SharedEvents.ENTITY_CREATED, new shared_dto_1.EntityCreatedDto(args.walletAddress, doctor.email, 'doctor'));
             }
             catch (error) {
                 await this.doctorDao.deleteDoctor(args.walletAddress);
@@ -156,9 +160,33 @@ let DoctorService = class DoctorService {
                     message: "Doctor doesn't exist",
                 };
             }
+            const hospitalName = await this.hospitalDao
+                .fetchHospitalWithBlockchainId(doctor.hospitalIds[0])
+                .then((hospital) => hospital.name);
+            const doctorData = {
+                _id: doctor._id,
+                id: doctor.id,
+                hospitalIds: doctor.hospitalIds,
+                name: doctor.name,
+                email: doctor.email,
+                profilePicture: doctor.profilePicture,
+                specialty: doctor.specialty,
+                location: doctor.location,
+                phoneNumber: doctor.phoneNumber,
+                walletAddress: doctor.walletAddress,
+                numberOfApprovals: doctor.numberOfApprovals,
+                status: doctor.status,
+                category: doctor.category,
+                isVerified: doctor.isVerified,
+                activeApprovals: doctor.activeApprovals,
+            };
+            const data = {
+                hospitalName,
+                ...doctorData,
+            };
             return {
                 success: common_1.HttpStatus.OK,
-                doctor,
+                doctor: data,
             };
         }
         catch (error) {
@@ -268,11 +296,11 @@ let DoctorService = class DoctorService {
                     message: 'Hospital not found',
                 };
             }
-            const medication = [];
-            medicine.forEach(async (medicine) => {
-                const newMedicine = await this.addMedication(medicine);
-                medication.push(newMedicine);
+            const medicationPromises = medicine.map(async (med) => {
+                return await this.addMedication(med);
             });
+            const medication = await Promise.all(medicationPromises);
+            console.log(medication);
             const newPrescriptionArgs = {
                 recordId: recordId,
                 doctorName: doctor.name,
@@ -282,6 +310,7 @@ let DoctorService = class DoctorService {
                 patientAddress: patientAddress,
                 medicine: medication,
             };
+            this.logger.log(medication);
             const prescription = await this.patientDao.createPrescription(newPrescriptionArgs);
             patient.prescriptions.push(prescription);
             await patient.save();
@@ -518,6 +547,21 @@ let DoctorService = class DoctorService {
             throw new shared_1.DoctorError('An error occurred while deleting all approval requests');
         }
     }
+    async swapId(walletAddress, id) {
+        try {
+            const doctor = await this.doctorDao.fetchDoctorByAddress(walletAddress);
+            doctor.id = id;
+            await doctor.save();
+            return {
+                success: common_1.HttpStatus.OK,
+                message: 'swapped id successfully',
+            };
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new common_1.HttpException('an error occurred while swapping id', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 };
 exports.DoctorService = DoctorService;
 exports.DoctorService = DoctorService = __decorate([
@@ -527,7 +571,7 @@ exports.DoctorService = DoctorService = __decorate([
         hospital_dao_1.HospitalDao,
         patient_dao_1.PatientDao,
         patient_guard_1.PatientGuard,
-        otp_service_1.OtpService,
-        medicine_dao_1.MedicineDao])
+        medicine_dao_1.MedicineDao,
+        event_emitter_1.EventEmitter2])
 ], DoctorService);
 //# sourceMappingURL=doctor.service.js.map

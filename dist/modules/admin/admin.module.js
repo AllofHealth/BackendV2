@@ -17,7 +17,6 @@ const mongoose_1 = require("@nestjs/mongoose");
 const hospital_module_1 = require("../hospital/hospital.module");
 const doctor_module_1 = require("../doctor/doctor.module");
 const pharmacist_module_1 = require("../pharmacist/pharmacist.module");
-const otp_module_1 = require("../otp/otp.module");
 let AdminModule = class AdminModule {
 };
 exports.AdminModule = AdminModule;
@@ -28,7 +27,6 @@ exports.AdminModule = AdminModule = __decorate([
             (0, common_1.forwardRef)(() => hospital_module_1.HospitalModule),
             (0, common_1.forwardRef)(() => doctor_module_1.DoctorModule),
             (0, common_1.forwardRef)(() => pharmacist_module_1.PharmacistModule),
-            (0, common_1.forwardRef)(() => otp_module_1.OtpModule),
         ],
         providers: [admin_service_1.AdminService, admin_dao_1.AdminDao, admin_guard_1.AdminGuard],
         controllers: [admin_controller_1.AdminController],

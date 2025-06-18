@@ -43,6 +43,12 @@ export declare class HospitalDao {
     fetchHospitalWithId(id: Types.ObjectId): Promise<import("mongoose").Document<unknown, {}, Hospital> & Hospital & {
         _id: Types.ObjectId;
     }>;
+    updateDoctorStatus(walletAddress: string, status: string): Promise<import("mongoose").Document<unknown, {}, Hospital> & Hospital & {
+        _id: Types.ObjectId;
+    }>;
+    updatePharmacistStatus(walletAddress: string, status: string): Promise<import("mongoose").Document<unknown, {}, Hospital> & Hospital & {
+        _id: Types.ObjectId;
+    }>;
     fetchHospitalWithPendingStatus(): Promise<(import("mongoose").Document<unknown, {}, Hospital> & Hospital & {
         _id: Types.ObjectId;
     })[]>;

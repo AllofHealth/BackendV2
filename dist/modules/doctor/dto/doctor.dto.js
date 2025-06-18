@@ -9,8 +9,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateMedicalRecordDto = exports.CreatePrescriptionDto = exports.UpdateDoctorDto = exports.CreateDoctorDto = void 0;
+exports.CreateMedicalRecordDto = exports.CreatePrescriptionDto = exports.UpdateDoctorDto = exports.DoctorDto = exports.CreateDoctorDto = void 0;
 const class_validator_1 = require("class-validator");
+const mongoose_1 = require("@nestjs/mongoose");
+const doctor_schema_1 = require("../schema/doctor.schema");
+const swagger_1 = require("@nestjs/swagger");
+const mongoose_2 = require("mongoose");
 class CreateDoctorDto {
 }
 exports.CreateDoctorDto = CreateDoctorDto;
@@ -66,6 +70,88 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateDoctorDto.prototype, "status", void 0);
+class DoctorDto {
+}
+exports.DoctorDto = DoctorDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Number }),
+    (0, mongoose_1.Prop)({ required: true, unique: true, sparse: true }),
+    __metadata("design:type", Number)
+], DoctorDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: [Number] }),
+    (0, mongoose_1.Prop)([Number]),
+    __metadata("design:type", Array)
+], DoctorDto.prototype, "hospitalIds", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String }),
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
+], DoctorDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String }),
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], DoctorDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ type: String }),
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], DoctorDto.prototype, "about", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String }),
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
+], DoctorDto.prototype, "profilePicture", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String }),
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
+], DoctorDto.prototype, "specialty", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String }),
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
+], DoctorDto.prototype, "location", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String }),
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
+], DoctorDto.prototype, "phoneNumber", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String }),
+    (0, mongoose_1.Prop)({ required: true, unique: true }),
+    __metadata("design:type", String)
+], DoctorDto.prototype, "walletAddress", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Number, default: 0 }),
+    (0, mongoose_1.Prop)({ default: 0 }),
+    __metadata("design:type", Number)
+], DoctorDto.prototype, "numberOfApprovals", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: [doctor_schema_1.ApprovalSchema] }),
+    (0, mongoose_1.Prop)({ type: [{ type: doctor_schema_1.ApprovalSchema, unique: true }] }),
+    __metadata("design:type", Array)
+], DoctorDto.prototype, "activeApprovals", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Number, default: 'pending' }),
+    (0, mongoose_1.Prop)({ default: 'pending', required: true }),
+    __metadata("design:type", String)
+], DoctorDto.prototype, "status", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Number, default: 'doctor' }),
+    (0, mongoose_1.Prop)({ default: 'doctor', required: true }),
+    __metadata("design:type", String)
+], DoctorDto.prototype, "category", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Boolean, default: false }),
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", Boolean)
+], DoctorDto.prototype, "isVerified", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: mongoose_2.Types.ObjectId }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], DoctorDto.prototype, "_id", void 0);
 class UpdateDoctorDto {
 }
 exports.UpdateDoctorDto = UpdateDoctorDto;
@@ -113,16 +199,6 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Number)
 ], CreatePrescriptionDto.prototype, "recordId", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], CreatePrescriptionDto.prototype, "patientAddress", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], CreatePrescriptionDto.prototype, "doctorAddress", void 0);
 __decorate([
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),

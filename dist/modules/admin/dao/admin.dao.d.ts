@@ -26,7 +26,7 @@ import { Admin } from '../schema/admin.schema';
 import { Model } from 'mongoose';
 import { CreateAdminType, UpdateAdminProfileType } from '../interface/admin.interface';
 export declare class AdminDao {
-    private adminModel;
+    private readonly adminModel;
     constructor(adminModel: Model<Admin>);
     createAdmin(admin: CreateAdminType): Promise<import("mongoose").Document<unknown, {}, Admin> & Admin & {
         _id: import("mongoose").Types.ObjectId;

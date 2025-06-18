@@ -48,6 +48,22 @@ export class HospitalDao {
     return await this.hospitalModel.findOne({ _id: id });
   }
 
+  async updateDoctorStatus(walletAddress: string, status: string) {
+    return await this.hospitalModel.findOneAndUpdate(
+      { 'doctors.walletAddress': walletAddress },
+      { $set: { 'doctors.$.status': status } },
+      { new: true },
+    );
+  }
+
+  async updatePharmacistStatus(walletAddress: string, status: string) {
+    return await this.hospitalModel.findOneAndUpdate(
+      { 'pharmacists.walletAddress': walletAddress },
+      { $set: { 'pharmacists.$.status': status } },
+      { new: true },
+    );
+  }
+
   async fetchHospitalWithPendingStatus() {
     return await this.hospitalModel.find({
       status: ApprovalStatus.Pending,

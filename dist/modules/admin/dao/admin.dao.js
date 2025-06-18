@@ -24,7 +24,6 @@ let AdminDao = class AdminDao {
     }
     async createAdmin(admin) {
         return await this.adminModel.create({
-            id: admin.id,
             name: admin.name,
             profilePicture: admin.profilePicture
                 ? admin.profilePicture

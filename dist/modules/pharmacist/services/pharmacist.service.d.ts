@@ -24,26 +24,26 @@
 /// <reference types="mongoose/types/inferschematype" />
 import { HttpStatus } from '@nestjs/common';
 import { PharmacistDao } from '../dao/pharmacist.dao';
-import { CreatePharmacistType, MedicineType, UpdateMedicineType, UpdatePharmacistType } from '../interface/pharmacist.interface';
+import { CreatePharmacistType, DeleteMedicineInterface, DispenseHelper, DispenseMedicineInterface, FetchMedicineInterface, MedicineType, ReturnMedicationStatus, UpdateMedicineType, UpdatePharmacistType } from '../interface/pharmacist.interface';
 import { PharmacistGuard } from '../guards/pharmacist.guard';
 import { ErrorCodes } from '@/shared';
 import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
 import { Types } from 'mongoose';
 import { PatientDao } from '@/modules/patient/dao/patient.dao';
-import { OtpService } from '@/modules/otp/services/otp.service';
+import { MedicineService } from '@/modules/medicine/service/medicine.service';
+import { Prescriptions } from '@/modules/patient/schemas/patient.schema';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 export declare class PharmacistService {
     private readonly pharmacistDao;
     private readonly pharmacistGuard;
     private readonly hospitalDao;
     private readonly patientDao;
-    private readonly otpService;
-    constructor(pharmacistDao: PharmacistDao, pharmacistGuard: PharmacistGuard, hospitalDao: HospitalDao, patientDao: PatientDao, otpService: OtpService);
+    private readonly medicineService;
+    private readonly eventEmitter;
+    private logger;
+    constructor(pharmacistDao: PharmacistDao, pharmacistGuard: PharmacistGuard, hospitalDao: HospitalDao, patientDao: PatientDao, medicineService: MedicineService, eventEmitter: EventEmitter2);
     createPharmacist(args: CreatePharmacistType): Promise<{
-        success: ErrorCodes;
-        message: string;
-        pharmacist?: undefined;
-    } | {
-        success: ErrorCodes;
+        success: HttpStatus;
         pharmacist: import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {
             _id: Types.ObjectId;
         };
@@ -67,8 +67,25 @@ export declare class PharmacistService {
         pharmacist?: undefined;
     } | {
         success: ErrorCodes;
-        pharmacist: import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {
+        pharmacist: {
             _id: Types.ObjectId;
+            id: number;
+            hospitalIds: number[];
+            numberOfApprovals: number;
+            name: string;
+            email?: string;
+            about?: string;
+            profilePicture: string;
+            location: string;
+            phoneNumber: string;
+            walletAddress: string;
+            status: string;
+            inventory: import("../schema/pharmacist.schema").Inventory;
+            approvalList: import("../schema/pharmacist.schema").ApprovalList[];
+            sharedPrescriptions: Prescriptions[];
+            category: string;
+            isVerified: boolean;
+            hospitalName: string;
         };
         message?: undefined;
     }>;
@@ -84,10 +101,6 @@ export declare class PharmacistService {
     updatePharmacist(walletAddress: string, args: UpdatePharmacistType): Promise<{
         success: HttpStatus;
         message: string;
-        pharmacist?: undefined;
-    } | {
-        success: HttpStatus;
-        message: string;
         pharmacist: import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {
             _id: Types.ObjectId;
         };
@@ -96,81 +109,88 @@ export declare class PharmacistService {
         success: HttpStatus;
         message: string;
     }>;
-    addMedicine(walletAddress: string, args: MedicineType): Promise<{
+    private fetchClassDescription;
+    private capitalizeFirstLetter;
+    private initMedication;
+    private initInventory;
+    private handleNoInventoryCreated;
+    private handleInventoryUpdate;
+    private handleMedicineAvailability;
+    private handlePatientPrescriptionUpdate;
+    addMedicine(walletAddress: string, category: string, args: MedicineType): Promise<{
         success: HttpStatus;
         message: string;
     }>;
-    deleteMedicine(walletAddress: string, medicineId: Types.ObjectId): Promise<{
+    deleteMedicine(args: DeleteMedicineInterface): Promise<{
         success: HttpStatus;
         message: string;
-    }>;
-    fetchMedicine(walletAddress: string, medicineId: Types.ObjectId): Promise<{
-        success: HttpStatus;
-        message: string;
-        medicine?: undefined;
-    } | {
-        success: HttpStatus;
-        medicine: import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Medicine> & import("../schema/pharmacist.schema").Medicine & {
+        result: import("mongoose").Document<unknown, {}, import("../schema/pharmacist.schema").Pharmacist> & import("../schema/pharmacist.schema").Pharmacist & {
             _id: Types.ObjectId;
         };
-        message?: undefined;
     }>;
-    fetchAllMedicine(walletAddress: string): Promise<{
-        success: HttpStatus;
+    fetchMedicine(args: FetchMedicineInterface): Promise<import("../schema/pharmacist.schema").Medicine>;
+    fetchAllProducts(walletAddress: string): Promise<{
         message: string;
-        medicines?: undefined;
+        success: HttpStatus;
+        products?: undefined;
     } | {
         success: HttpStatus;
-        medicines: import("../schema/pharmacist.schema").Medicine[];
-        message?: undefined;
+        message: string;
+        products: import("../schema/pharmacist.schema").Product[];
     }>;
-    fetchInventory(walletAddress: string): Promise<{
+    fetchProduct(args: {
+        walletAddress: string;
+        productId: Types.ObjectId;
+    }): Promise<{
         success: HttpStatus;
         message: string;
+        product: import("../schema/pharmacist.schema").Product;
+    }>;
+    fetchInventory(walletAddress: string): Promise<{
+        status: HttpStatus;
+        message: string;
+        success?: undefined;
         inventory?: undefined;
     } | {
         success: HttpStatus;
-        inventory: {};
-        message?: undefined;
-    } | {
-        success: HttpStatus;
         inventory: import("../schema/pharmacist.schema").Inventory;
+        status?: undefined;
         message?: undefined;
     }>;
-    updateMedicine(walletAddress: string, medicineId: Types.ObjectId, args: UpdateMedicineType): Promise<{
+    updateMedicine(args: FetchMedicineInterface, update: UpdateMedicineType): Promise<{
         success: HttpStatus;
         message: string;
-        updateMedicine?: undefined;
-    } | {
+    }>;
+    checkMedicineExist(args: DispenseHelper): Promise<{
         success: HttpStatus;
-        updateMedicine: import("../schema/pharmacist.schema").Medicine;
-        message?: undefined;
+        data: ReturnMedicationStatus;
     }>;
     fetchAllSharedPrescriptions(walletAddress: string): Promise<{
         success: HttpStatus;
-        message: string;
-        prescriptions?: undefined;
-    } | {
-        success: HttpStatus;
-        prescriptions: import("../../patient/schemas/patient.schema").Prescriptions[];
-        message?: undefined;
+        prescriptions: Prescriptions[];
     }>;
     fetchPrescriptionById(args: {
         walletAddress: string;
         prescriptionId: Types.ObjectId;
     }): Promise<{
         success: HttpStatus;
+        prescription: Prescriptions;
+    }>;
+    dispensePrescription(args: DispenseMedicineInterface): Promise<{
+        status: HttpStatus;
         message: string;
-        prescription?: undefined;
+        success?: undefined;
+        data?: undefined;
     } | {
         success: HttpStatus;
-        prescription: import("../../patient/schemas/patient.schema").Prescriptions;
-        message?: undefined;
+        message: string;
+        data: {
+            productName: string;
+            quantity: number;
+            price: string;
+        };
+        status?: undefined;
     }>;
-    dispensePrescription(args: {
-        walletAddress: string;
-        prescriptionId: Types.ObjectId;
-    }): Promise<void>;
     removePrescription(args: {
         walletAddress: string;
         prescriptionId: Types.ObjectId;

@@ -1,4 +1,30 @@
+/// <reference types="mongoose/types/aggregate" />
+/// <reference types="mongoose/types/callback" />
+/// <reference types="mongoose/types/collection" />
+/// <reference types="mongoose/types/connection" />
+/// <reference types="mongoose/types/cursor" />
+/// <reference types="mongoose/types/document" />
+/// <reference types="mongoose/types/error" />
+/// <reference types="mongoose/types/expressions" />
+/// <reference types="mongoose/types/helpers" />
+/// <reference types="mongoose/types/middlewares" />
+/// <reference types="mongoose/types/indexes" />
+/// <reference types="mongoose/types/models" />
+/// <reference types="mongoose/types/mongooseoptions" />
+/// <reference types="mongoose/types/pipelinestage" />
+/// <reference types="mongoose/types/populate" />
+/// <reference types="mongoose/types/query" />
+/// <reference types="mongoose/types/schemaoptions" />
+/// <reference types="mongoose/types/schematypes" />
+/// <reference types="mongoose/types/session" />
+/// <reference types="mongoose/types/types" />
+/// <reference types="mongoose/types/utility" />
+/// <reference types="mongoose/types/validation" />
+/// <reference types="mongoose/types/virtuals" />
+/// <reference types="mongoose/types/inferschematype" />
 import { AddMedicineType } from '../interface/doctor.interface';
+import { Approval } from '@/modules/doctor/schema/doctor.schema';
+import { Types } from 'mongoose';
 export declare class CreateDoctorDto {
     id: number;
     hospitalIds: number;
@@ -11,6 +37,24 @@ export declare class CreateDoctorDto {
     walletAddress: string;
     status: string;
 }
+export declare class DoctorDto {
+    id: number;
+    hospitalIds: number[];
+    name: string;
+    email: string;
+    about: string;
+    profilePicture: string;
+    specialty: string;
+    location: string;
+    phoneNumber: string;
+    walletAddress: string;
+    numberOfApprovals: number;
+    activeApprovals: Approval[];
+    status: string;
+    category: string;
+    isVerified: boolean;
+    _id: Types.ObjectId;
+}
 export declare class UpdateDoctorDto {
     name: string;
     email: string;
@@ -22,8 +66,6 @@ export declare class UpdateDoctorDto {
 }
 export declare class CreatePrescriptionDto {
     recordId: number;
-    patientAddress: string;
-    doctorAddress: string;
     medicine: AddMedicineType[];
 }
 export declare class CreateMedicalRecordDto {

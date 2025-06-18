@@ -9,10 +9,12 @@ import {
 } from '../interface/admin.interface';
 
 export class AdminDao {
-  constructor(@InjectModel(Admin.name) private adminModel: Model<Admin>) {}
+  constructor(
+    @InjectModel(Admin.name) private readonly adminModel: Model<Admin>,
+  ) {}
+
   async createAdmin(admin: CreateAdminType) {
     return await this.adminModel.create({
-      id: admin.id,
       name: admin.name,
       profilePicture: admin.profilePicture
         ? admin.profilePicture

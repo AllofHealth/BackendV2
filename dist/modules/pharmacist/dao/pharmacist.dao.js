@@ -19,10 +19,11 @@ const mongoose_2 = require("mongoose");
 const constants_1 = require("../../../shared/constants");
 const shared_1 = require("../../../shared");
 let PharmacistDao = class PharmacistDao {
-    constructor(pharmacistModel, medicineModel, inventoryModel) {
+    constructor(pharmacistModel, medicineModel, inventoryModel, productModel) {
         this.pharmacistModel = pharmacistModel;
         this.medicineModel = medicineModel;
         this.inventoryModel = inventoryModel;
+        this.productModel = productModel;
     }
     async createNewPharmacist(pharmacist) {
         return await this.pharmacistModel.create({
@@ -39,24 +40,38 @@ let PharmacistDao = class PharmacistDao {
             isVerified: false,
         });
     }
+    async createProduct(args) {
+        return await this.productModel.create({
+            category: args.category,
+            description: args.description ? args.description : 'none',
+            medications: args.medications,
+        });
+    }
     async createMedicine(args) {
         return await this.medicineModel.create({
             name: args.name,
             price: args.price,
             quantity: args.quantity,
-            description: args.description,
             sideEffects: args.sideEffects ? args.sideEffects : 'none',
-            image: args.image,
-            medicineGroup: args.medicineGroup,
+            image: args.image ? args.image : constants_1.MEDICINE_PLACEHOLDER,
         });
     }
-    async createInventory(args) {
-        return await this.inventoryModel.create({
-            numberOfMedicine: args.numberOfMedicine,
-            numberOfMedicineGroup: args.numberOfMedicineGroup,
-            numberOfMedicineSold: args.numberOfMedicineSold,
-            medicines: args.medicines,
+    async createInventory() {
+        const inventory = await this.inventoryModel.create({
+            numberOfMedicines: 0,
+            numberOfCategories: 0,
         });
+        return inventory;
+    }
+    async fetchProductById(productId, walletAddress) {
+        const result = await this.pharmacistModel.findOne({
+            walletAddress,
+            'inventory.products._id': productId,
+        }, { 'inventory.products.$': 1 });
+        if (result && result.inventory.products[0]) {
+            return result.inventory.products[0];
+        }
+        return null;
     }
     async fetchPharmacist(id) {
         return await this.pharmacistModel.findOne({ id });
@@ -83,26 +98,37 @@ let PharmacistDao = class PharmacistDao {
         const result = await this.pharmacistModel.findOneAndUpdate({ walletAddress: address }, { $set: updates }, { new: true, runValidators: true });
         return result;
     }
-    async updateMedicine(walletAddress, medicineId, updateData) {
+    async updateMedicine(walletAddress, medicineId, productId, updateData) {
         const updates = Object.keys(updateData).reduce((acc, key) => {
-            acc[`inventory.medicines.$.${key}`] = updateData[key];
+            acc[`inventory.products.$[productElem].medications.$[medicineElem].${key}`] = updateData[key];
             return acc;
         }, {});
-        const result = await this.pharmacistModel.findOneAndUpdate({ walletAddress, 'inventory.medicines._id': medicineId }, { $set: updates }, { new: true, runValidators: true });
-        const medicine = result.inventory.medicines.find((medicine) => medicine._id.toString() === medicineId.toString());
-        return medicine;
+        const result = await this.pharmacistModel.updateOne({
+            walletAddress,
+            'inventory.products._id': productId,
+        }, { $set: updates }, {
+            new: true,
+            runValidators: true,
+            arrayFilters: [
+                { 'productElem._id': productId },
+                { 'medicineElem._id': medicineId },
+            ],
+        });
+        return result;
     }
-    async deleteMedicine(medicineId) {
-        return await this.medicineModel.deleteOne({ _id: medicineId });
+    async updateInventory(args) {
+        const updates = Object.keys(args.update).reduce((acc, key) => {
+            acc[`inventory.${key}`] = args.update[key];
+            return acc;
+        }, {});
+        return await this.pharmacistModel.findOneAndUpdate({ walletAddress: args.walletAddress }, { $set: updates }, { new: true, runValidators: true });
     }
-    async deleteMedicineById(medicineId) {
-        return await this.medicineModel.deleteOne({ _id: medicineId });
+    async findMedicineById(walletAddress, medicineId, productId) {
+        const product = await this.fetchProductById(productId, walletAddress);
+        return product.medications.find((med) => med._id.toString() === medicineId.toString());
     }
-    async findMedicineById(medicineId) {
-        return await this.medicineModel.findOne({ _id: medicineId });
-    }
-    async pullMedicineById(pharmacistAddress, medicineId) {
-        return await this.pharmacistModel.findOneAndUpdate({ walletAddress: pharmacistAddress }, { $pull: { 'inventory.medicines': { _id: medicineId } } });
+    async pullMedicineById(pharmacistAddress, productId, medicineId) {
+        return await this.pharmacistModel.findOneAndUpdate({ walletAddress: pharmacistAddress, 'inventory.products._id': productId }, { $pull: { 'inventory.products.$.medications': { _id: medicineId } } }, { new: true });
     }
     async pullOnePrescription(pharmacistAddress, prescriptionId) {
         return await this.pharmacistModel.findOneAndUpdate({ walletAddress: pharmacistAddress }, { $pull: { sharedPrescriptions: { _id: prescriptionId } } });
@@ -116,7 +142,9 @@ exports.PharmacistDao = PharmacistDao = __decorate([
     __param(0, (0, mongoose_1.InjectModel)(pharmacist_schema_1.Pharmacist.name)),
     __param(1, (0, mongoose_1.InjectModel)(pharmacist_schema_1.Medicine.name)),
     __param(2, (0, mongoose_1.InjectModel)(pharmacist_schema_1.Inventory.name)),
+    __param(3, (0, mongoose_1.InjectModel)(pharmacist_schema_1.Product.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model,
         mongoose_2.Model,
         mongoose_2.Model])
 ], PharmacistDao);

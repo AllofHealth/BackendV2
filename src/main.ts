@@ -1,13 +1,23 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { MyLoggerService } from './modules/my-logger/my-logger.service';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useLogger(app.get(MyLoggerService));
+  const config = new DocumentBuilder()
+    .setTitle('All of Health')
+    .setDescription('Complete API for Server Operations')
+    .setVersion('1.0')
+    .addTag('health')
+    .build();
+
   app.enableCors();
   app.setGlobalPrefix('api');
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
   await app.listen(4000);
 }
+
 bootstrap();

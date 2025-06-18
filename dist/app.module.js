@@ -11,7 +11,6 @@ const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const mongoose_1 = require("@nestjs/mongoose");
-const constants_1 = require("./shared/constants");
 const throttler_1 = require("@nestjs/throttler");
 const core_1 = require("@nestjs/core");
 const my_logger_module_1 = require("./modules/my-logger/my-logger.module");
@@ -25,12 +24,21 @@ const termill_module_1 = require("./modules/termill/termill.module");
 const postmark_module_1 = require("./modules/postmark/postmark.module");
 const configify_1 = require("@itgorillaz/configify");
 const encryption_module_1 = require("./shared/utils/encryption/encryption.module");
+const config_1 = require("@nestjs/config");
+const config_2 = require("./shared/config/config");
+const event_emitter_1 = require("@nestjs/event-emitter");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            event_emitter_1.EventEmitterModule.forRoot(),
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+                cache: true,
+                load: [config_2.default],
+            }),
             throttler_1.ThrottlerModule.forRoot([
                 {
                     name: 'short',
@@ -43,8 +51,13 @@ exports.AppModule = AppModule = __decorate([
                     limit: 100,
                 },
             ]),
-            mongoose_1.MongooseModule.forRoot(constants_1.MONGODB_URI, {
-                dbName: 'Pharmalink',
+            mongoose_1.MongooseModule.forRootAsync({
+                imports: [config_1.ConfigModule],
+                useFactory: async (config) => ({
+                    uri: config.get('database.mongodb_uri'),
+                    dbName: config.get('database.dbName'),
+                }),
+                inject: [config_1.ConfigService],
             }),
             my_logger_module_1.MyLoggerModule,
             patient_module_1.PatientModule,

@@ -24,15 +24,15 @@
 /// <reference types="mongoose/types/inferschematype" />
 import { HttpStatus } from '@nestjs/common';
 import { Patient } from '../schemas/patient.schema';
-import { ApprovalInputType, CreatePatientType, FamilyMemberApprovalInputType, FamilyMemberType, SharePrescriptionInterface, UpdateFamilyMemberType, UpdatePatientProfileType } from '../interface/patient.interface';
+import { IApprovalInput, ICreatePatient, IFamilyMember, IFamilyMemberApprovalInput, IFamilyMemberRecord, ISharePrescription, IUpdateFamilyMember, IUpdatePatientProfile } from '../interface/patient.interface';
 import { Model, Types } from 'mongoose';
 import { PatientDao } from '../dao/patient.dao';
 import { PatientGuard } from '../guards/patient.guard';
 import { PharmacistGuard } from '@/modules/pharmacist/guards/pharmacist.guard';
 import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
 import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
-import { OtpService } from '@/modules/otp/services/otp.service';
-import { ErrorCodes } from '@/shared';
+import { PatientErrors, PatientSuccess } from '@/modules/patient/data/patient.data';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 export declare class PatientService {
     private patientModel;
     private readonly patientDao;
@@ -40,44 +40,47 @@ export declare class PatientService {
     private readonly pharmacistGuard;
     private readonly pharmacistDao;
     private readonly doctorDao;
-    private readonly otpService;
-    constructor(patientModel: Model<Patient>, patientDao: PatientDao, patientGuard: PatientGuard, pharmacistGuard: PharmacistGuard, pharmacistDao: PharmacistDao, doctorDao: DoctorDao, otpService: OtpService);
+    private readonly eventEmitter;
+    private readonly logger;
     private provider;
-    private getApprovalType;
+    constructor(patientModel: Model<Patient>, patientDao: PatientDao, patientGuard: PatientGuard, pharmacistGuard: PharmacistGuard, pharmacistDao: PharmacistDao, doctorDao: DoctorDao, eventEmitter: EventEmitter2);
     private createApprovalInputs;
-    createNewPatient(args: CreatePatientType): Promise<{
+    createNewPatient(args: ICreatePatient): Promise<{
         success: HttpStatus;
-        message: string;
+        message: PatientErrors;
         patient?: undefined;
     } | {
         success: HttpStatus;
+        message: PatientSuccess;
         patient: import("mongoose").Document<unknown, {}, Patient> & Patient & {
             _id: Types.ObjectId;
         };
-        message: string;
     }>;
     addFamilyMember(args: {
         walletAddress: string;
-        familyMember: FamilyMemberType;
+        familyMember: IFamilyMember;
     }): Promise<{
         success: HttpStatus;
-        message: string;
+        message: PatientErrors;
+    } | {
+        success: HttpStatus;
+        message: PatientSuccess;
     }>;
     listFamilyMember(walletAddress: string): Promise<{
         success: HttpStatus;
-        message: string;
-        members?: undefined;
+        message: PatientErrors;
+        members: any[];
     } | {
         success: HttpStatus;
+        message: PatientSuccess;
         members: import("../schemas/patient.schema").FamilyMember[];
-        message: string;
     }>;
     getFamilyMemberById(args: {
         walletAddress: string;
         memberId: number;
     }): Promise<{
         success: HttpStatus;
-        message: string;
+        message: PatientErrors;
         member?: undefined;
     } | {
         success: HttpStatus;
@@ -87,46 +90,54 @@ export declare class PatientService {
     editFamilyMember(args: {
         walletAddress: string;
         familyMemberId: number;
-        updateData: UpdateFamilyMemberType;
+        updateData: IUpdateFamilyMember;
     }): Promise<{
         success: HttpStatus;
-        message: string;
+        message: PatientErrors;
         familyMember?: undefined;
     } | {
         success: HttpStatus;
-        message: string;
+        message: PatientSuccess;
         familyMember: import("mongoose").UpdateWriteOpResult;
     }>;
-    findAllPatients(): Promise<(import("mongoose").Document<unknown, {}, Patient> & Patient & {
-        _id: Types.ObjectId;
-    })[]>;
+    findAllPatients(): Promise<{
+        status: HttpStatus;
+        message: PatientErrors;
+        data: any[];
+        patients?: undefined;
+    } | {
+        status: HttpStatus;
+        patients: (import("mongoose").Document<unknown, {}, Patient> & Patient & {
+            _id: Types.ObjectId;
+        })[];
+        message?: undefined;
+        data?: undefined;
+    }>;
     fetchPatientByWalletAddress(walletAddress: string): Promise<{
         success: HttpStatus;
-        message: string;
+        message: PatientErrors;
         patient?: undefined;
     } | {
-        success: ErrorCodes;
+        success: HttpStatus;
         patient: import("mongoose").Document<unknown, {}, Patient> & Patient & {
             _id: Types.ObjectId;
         };
         message?: undefined;
     }>;
-    updatePatient(walletAddress: string, args: UpdatePatientProfileType): Promise<{
+    updatePatient(walletAddress: string, args: IUpdatePatientProfile): Promise<{
         success: HttpStatus;
-        message: string;
+        message: PatientSuccess;
     }>;
     deletePatientByAddress(walletAddress: string): Promise<{
         success: HttpStatus;
-        message: string;
+        message: PatientErrors;
+    } | {
+        success: HttpStatus;
+        message: PatientSuccess;
     }>;
     fetchAllPrescriptions(walletAddress: string): Promise<{
         success: HttpStatus;
-        message: string;
-        prescriptions?: undefined;
-    } | {
-        success: HttpStatus;
         prescriptions: import("../schemas/patient.schema").Prescriptions[];
-        message?: undefined;
     }>;
     fetchPrescription(walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
         success: HttpStatus;
@@ -137,37 +148,41 @@ export declare class PatientService {
         prescription: import("../schemas/patient.schema").Prescriptions;
         message?: undefined;
     }>;
-    sharePrescription(args: SharePrescriptionInterface): Promise<{
+    sharePrescription(args: ISharePrescription): Promise<{
         success: HttpStatus;
         message: string;
     }>;
     removePrescriptions(walletAddress: string, prescriptionId: Types.ObjectId): Promise<{
         success: HttpStatus;
-        message: string;
-    }>;
-    approveMedicalRecordAccess(args: ApprovalInputType): Promise<{
+        message: PatientErrors;
+    } | {
         success: HttpStatus;
-        message: string;
+        message: PatientSuccess;
     }>;
-    approveMedicalRecordAccessForFamilyMember(args: FamilyMemberApprovalInputType): Promise<{
+    approveMedicalRecordAccess(args: IApprovalInput): Promise<{
         success: HttpStatus;
-        message: string;
+        message: PatientErrors;
+    } | {
+        success: HttpStatus;
+        message: PatientSuccess;
+    }>;
+    approveMedicalRecordAccessForFamilyMember(args: IFamilyMemberApprovalInput): Promise<{
+        success: HttpStatus;
+        message: PatientErrors;
+    } | {
+        success: HttpStatus;
+        message: PatientSuccess;
     }>;
     fetchAllMedicalRecords(patientAddress: string): Promise<{
         success: HttpStatus;
-        message: string;
-        medicalRecords?: undefined;
-    } | {
-        success: HttpStatus;
         medicalRecords: import("../schemas/patient.schema").MedicalRecordPreviewDocument[];
-        message?: undefined;
     }>;
     fetchAllMedicalRecordsForFamilyMember(args: {
         principalPatientAddress: string;
         familyMemberId: number;
     }): Promise<{
         success: HttpStatus;
-        message: string;
+        message: PatientErrors;
         records?: undefined;
     } | {
         success: HttpStatus;
@@ -179,7 +194,7 @@ export declare class PatientService {
         recordId: number;
     }): Promise<{
         success: HttpStatus;
-        message: string;
+        message: PatientErrors;
         record?: undefined;
     } | {
         success: HttpStatus;
@@ -188,5 +203,9 @@ export declare class PatientService {
             message: string;
         };
         message?: undefined;
+    }>;
+    fetchFamilyMemberRecordById(args: IFamilyMemberRecord): Promise<import("../schemas/patient.schema").MedicalRecordPreviewDocument | {
+        success: HttpStatus;
+        message: string;
     }>;
 }

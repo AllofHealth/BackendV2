@@ -43,21 +43,29 @@ export declare class Medicine {
     name: string;
     price: number;
     quantity: number;
-    description: string;
     sideEffects?: string;
     image?: string;
-    medicineGroup: string;
 }
 export declare const MedicineSchema: import("mongoose").Schema<Medicine, import("mongoose").Model<Medicine, any, any, any, import("mongoose").Document<unknown, any, Medicine> & Medicine & {
     _id: import("mongoose").Types.ObjectId;
 }, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Medicine, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<Medicine>> & import("mongoose").FlatRecord<Medicine> & {
     _id: import("mongoose").Types.ObjectId;
 }>;
+export declare class Product {
+    category: string;
+    description?: string;
+    medications: Medicine[];
+}
+export declare const ProductSchema: import("mongoose").Schema<Product, import("mongoose").Model<Product, any, any, any, import("mongoose").Document<unknown, any, Product> & Product & {
+    _id: import("mongoose").Types.ObjectId;
+}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Product, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<Product>> & import("mongoose").FlatRecord<Product> & {
+    _id: import("mongoose").Types.ObjectId;
+}>;
 export declare class Inventory {
     numberOfMedicine?: number;
-    numberOfMedicineGroup?: number;
+    numberOfCategories?: number;
     numberOfMedicineSold?: number;
-    medicines: Medicine[];
+    products?: Product[];
 }
 export declare const InventorySchema: import("mongoose").Schema<Inventory, import("mongoose").Model<Inventory, any, any, any, import("mongoose").Document<unknown, any, Inventory> & Inventory & {
     _id: import("mongoose").Types.ObjectId;

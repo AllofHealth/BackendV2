@@ -22,23 +22,28 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import { Inventory, Medicine, Pharmacist } from '../schema/pharmacist.schema';
+import { Inventory, Medicine, Pharmacist, Product } from '../schema/pharmacist.schema';
 import { Model, Types } from 'mongoose';
-import { CreatePharmacistType, InventoryType, MedicineType, UpdateMedicineType, UpdatePharmacistType } from '../interface/pharmacist.interface';
+import { CreatePharmacistType, MedicineType, ProductType, UpdateInventoryType, UpdateMedicineType, UpdatePharmacistType } from '../interface/pharmacist.interface';
 export declare class PharmacistDao {
     private readonly pharmacistModel;
     private readonly medicineModel;
     private readonly inventoryModel;
-    constructor(pharmacistModel: Model<Pharmacist>, medicineModel: Model<Medicine>, inventoryModel: Model<Inventory>);
+    private readonly productModel;
+    constructor(pharmacistModel: Model<Pharmacist>, medicineModel: Model<Medicine>, inventoryModel: Model<Inventory>, productModel: Model<Product>);
     createNewPharmacist(pharmacist: CreatePharmacistType): Promise<import("mongoose").Document<unknown, {}, Pharmacist> & Pharmacist & {
+        _id: Types.ObjectId;
+    }>;
+    createProduct(args: ProductType): Promise<import("mongoose").Document<unknown, {}, Product> & Product & {
         _id: Types.ObjectId;
     }>;
     createMedicine(args: MedicineType): Promise<import("mongoose").Document<unknown, {}, Medicine> & Medicine & {
         _id: Types.ObjectId;
     }>;
-    createInventory(args: InventoryType): Promise<import("mongoose").Document<unknown, {}, Inventory> & Inventory & {
+    createInventory(): Promise<import("mongoose").Document<unknown, {}, Inventory> & Inventory & {
         _id: Types.ObjectId;
     }>;
+    fetchProductById(productId: Types.ObjectId, walletAddress: string): Promise<Product>;
     fetchPharmacist(id: number): Promise<import("mongoose").Document<unknown, {}, Pharmacist> & Pharmacist & {
         _id: Types.ObjectId;
     }>;
@@ -57,13 +62,15 @@ export declare class PharmacistDao {
     updatePharmacist(address: string, updateData: UpdatePharmacistType): Promise<import("mongoose").Document<unknown, {}, Pharmacist> & Pharmacist & {
         _id: Types.ObjectId;
     }>;
-    updateMedicine(walletAddress: string, medicineId: Types.ObjectId, updateData: UpdateMedicineType): Promise<Medicine>;
-    deleteMedicine(medicineId: Types.ObjectId): Promise<import("mongodb").DeleteResult>;
-    deleteMedicineById(medicineId: Types.ObjectId): Promise<import("mongodb").DeleteResult>;
-    findMedicineById(medicineId: Types.ObjectId): Promise<import("mongoose").Document<unknown, {}, Medicine> & Medicine & {
+    updateMedicine(walletAddress: string, medicineId: Types.ObjectId, productId: Types.ObjectId, updateData: UpdateMedicineType): Promise<import("mongoose").UpdateWriteOpResult>;
+    updateInventory(args: {
+        walletAddress: string;
+        update: UpdateInventoryType;
+    }): Promise<import("mongoose").Document<unknown, {}, Pharmacist> & Pharmacist & {
         _id: Types.ObjectId;
     }>;
-    pullMedicineById(pharmacistAddress: string, medicineId: Types.ObjectId): Promise<import("mongoose").Document<unknown, {}, Pharmacist> & Pharmacist & {
+    findMedicineById(walletAddress: string, medicineId: Types.ObjectId, productId: Types.ObjectId): Promise<Medicine>;
+    pullMedicineById(pharmacistAddress: string, productId: Types.ObjectId, medicineId: Types.ObjectId): Promise<import("mongoose").Document<unknown, {}, Pharmacist> & Pharmacist & {
         _id: Types.ObjectId;
     }>;
     pullOnePrescription(pharmacistAddress: string, prescriptionId: Types.ObjectId): Promise<import("mongoose").Document<unknown, {}, Pharmacist> & Pharmacist & {

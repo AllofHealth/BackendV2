@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var AdminService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminService = void 0;
 const common_1 = require("@nestjs/common");
@@ -24,17 +25,20 @@ const admin_guard_1 = require("../guards/admin.guard");
 const hospital_dao_1 = require("../../hospital/dao/hospital.dao");
 const doctor_dao_1 = require("../../doctor/dao/doctor.dao");
 const pharmacist_dao_1 = require("../../pharmacist/dao/pharmacist.dao");
-const otp_service_1 = require("../../otp/services/otp.service");
-let AdminService = class AdminService {
-    constructor(adminModel, adminDao, adminGuard, hospitalDao, doctorDao, pharmacistDao, otpService) {
+const admin_data_1 = require("../data/admin.data");
+const event_emitter_1 = require("@nestjs/event-emitter");
+const shared_events_1 = require("../../../shared/events/shared.events");
+const shared_dto_1 = require("../../../shared/dto/shared.dto");
+let AdminService = AdminService_1 = class AdminService {
+    constructor(adminModel, adminDao, adminGuard, hospitalDao, doctorDao, pharmacistDao, eventEmitter) {
         this.adminModel = adminModel;
         this.adminDao = adminDao;
         this.adminGuard = adminGuard;
         this.hospitalDao = hospitalDao;
         this.doctorDao = doctorDao;
         this.pharmacistDao = pharmacistDao;
-        this.otpService = otpService;
-        this.logger = new my_logger_service_1.MyLoggerService('AdminService');
+        this.eventEmitter = eventEmitter;
+        this.logger = new my_logger_service_1.MyLoggerService(AdminService_1.name);
     }
     async fetchAdminByAddress(walletAddress) {
         try {
@@ -42,17 +46,14 @@ let AdminService = class AdminService {
             if (!admin) {
                 return {
                     success: shared_1.ErrorCodes.NotFound,
-                    message: 'Admin not found',
+                    message: admin_data_1.AdminErrors.NOT_FOUND,
                 };
             }
             return admin;
         }
-        catch (error) {
-            console.error(error);
-            if (error instanceof mongoose_2.MongooseError) {
-                throw new mongoose_2.MongooseError(error.message);
-            }
-            throw new Error('An error occurred while fetching admin');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: admin_data_1.AdminErrors.FETCHING_ADMIN }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async isAdminAuthenticated(walletAddress) {
@@ -62,7 +63,7 @@ let AdminService = class AdminService {
             if (!admin) {
                 return {
                     success: shared_1.ErrorCodes.NotFound,
-                    message: 'Admin not found',
+                    message: admin_data_1.AdminErrors.NOT_FOUND,
                 };
             }
             if (admin.isAuthenticated) {
@@ -70,66 +71,83 @@ let AdminService = class AdminService {
             }
             return isAuthenticated;
         }
-        catch (error) {
-            console.error(error);
-            if (error instanceof mongoose_2.MongooseError) {
-                throw new common_1.HttpException({ message: error.message }, common_1.HttpStatus.BAD_REQUEST);
-            }
-            throw new common_1.HttpException({ message: 'An error occurred while fetching admin' }, common_1.HttpStatus.BAD_REQUEST);
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: admin_data_1.AdminErrors.AUTH_CHECK_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async fetchAllAdmins() {
-        return await this.adminModel.find();
+        try {
+            const admins = await this.adminModel.find();
+            if (!admins) {
+                return {
+                    success: common_1.HttpStatus.NOT_FOUND,
+                    message: admin_data_1.AdminErrors.NOT_FOUND,
+                    data: [],
+                };
+            }
+            return {
+                success: common_1.HttpStatus.OK,
+                data: admins,
+            };
+        }
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: admin_data_1.AdminErrors.FETCHING_ADMIN }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-    async authenticateAdmin(addressToAuthenticate) {
+    async authenticateAdmin(args) {
+        const { addressToAuthenticate, blockchainId } = args;
         try {
             const admin = await this.adminDao.fetchAdminByAddress(addressToAuthenticate);
             if (!admin) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'admin not found',
+                    message: admin_data_1.AdminErrors.NOT_FOUND,
                 };
             }
             admin.isAuthenticated = true;
+            admin.id = blockchainId;
             await admin.save();
             return {
                 success: common_1.HttpStatus.OK,
-                message: 'admin successfully authenticated',
+                message: admin_data_1.AdminMessages.AUTH_SUCCESSFUL,
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new common_1.HttpException({ message: error.message }, common_1.HttpStatus.BAD_REQUEST);
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: admin_data_1.AdminErrors.AUTH_ERROR }, common_1.HttpStatus.BAD_REQUEST);
         }
     }
     async createNewAdmin(args) {
         if (await this.adminDao.validateAdminExists(args.walletAddress)) {
             return {
-                success: common_1.HttpStatus.CREATED,
-                message: 'admin already exists',
+                success: common_1.HttpStatus.CONFLICT,
+                message: admin_data_1.AdminErrors.ADMIN_EXIST,
             };
         }
         try {
             const admin = await this.adminDao.createAdmin(args);
             try {
-                await this.otpService.deliverOtp(args.walletAddress, args.email, 'admin');
+                this.eventEmitter.emit(shared_events_1.SharedEvents.ENTITY_CREATED, new shared_dto_1.EntityCreatedDto(args.walletAddress, admin.email, 'admin'));
             }
-            catch (error) {
+            catch (e) {
+                this.logger.error(e.message);
                 await this.adminDao.removeAdminByAddress(args.walletAddress);
                 return {
                     success: common_1.HttpStatus.BAD_REQUEST,
-                    message: 'An error occurred while creating an admin',
+                    message: admin_data_1.AdminErrors.CREATE_ADMIN,
                 };
             }
             return {
-                success: shared_1.ErrorCodes.Success,
+                success: common_1.HttpStatus.OK,
+                message: admin_data_1.AdminMessages.CREATE_ADMIN,
                 admin,
-                message: 'admin created successfully',
             };
         }
-        catch (error) {
-            this.logger.info('Error creating admin');
-            throw new shared_1.AdminError('Error creating admin');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: admin_data_1.AdminErrors.CREATE_ADMIN }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async removeAdmin(args) {
@@ -137,19 +155,18 @@ let AdminService = class AdminService {
         if (!(await this.adminGuard.validateAdmin(adminAddressToRemove))) {
             return {
                 success: common_1.HttpStatus.UNAUTHORIZED,
-                message: 'Unauthorized',
             };
         }
         try {
             await this.adminDao.removeAdminByAddress(adminAddressToRemove);
             return {
                 success: shared_1.ErrorCodes.Success,
-                message: 'admin removed successfully',
+                message: admin_data_1.AdminMessages.ADMIN_REMOVED,
             };
         }
-        catch (error) {
-            this.logger.info('Error removing admin');
-            throw new shared_1.AdminError('Error removing admin');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: admin_data_1.AdminErrors.ADMIN_REMOVED_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async approveHospital(args) {
@@ -159,14 +176,14 @@ let AdminService = class AdminService {
             if (!hospital) {
                 return {
                     success: common_1.HttpStatus.NOT_FOUND,
-                    message: 'Hospital not found',
+                    message: admin_data_1.AdminErrors.HOSPITAL_NOT_FOUND,
                 };
             }
             switch (hospital.status) {
                 case shared_1.ApprovalStatus.Approved:
                     return {
-                        success: common_1.HttpStatus.CREATED,
-                        message: 'hospital already approved',
+                        success: common_1.HttpStatus.CONFLICT,
+                        message: admin_data_1.AdminErrors.HOSPITAL_APPROVED_ALREADY,
                     };
                 case shared_1.ApprovalStatus.Pending:
                     hospital.status = shared_1.ApprovalStatus.Approved;
@@ -175,38 +192,31 @@ let AdminService = class AdminService {
                 default:
                     return {
                         success: common_1.HttpStatus.BAD_REQUEST,
-                        message: 'hospital status is invalid',
+                        message: admin_data_1.AdminErrors.INVALID_STATUS,
                     };
             }
             return {
-                success: shared_1.ErrorCodes.Success,
-                message: 'Hospital approved successfully',
+                success: common_1.HttpStatus.OK,
+                message: admin_data_1.AdminMessages.HOSPITAL_APPROVED,
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.AdminError('Error approving hospital');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: admin_data_1.AdminErrors.HOSPITAL_APPROVE_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async updateAdmin(args) {
         const { walletAddress, data } = args;
         try {
-            const isAdmin = await this.adminGuard.validateAdmin(walletAddress);
-            if (!isAdmin) {
-                return {
-                    success: common_1.HttpStatus.UNAUTHORIZED,
-                    message: 'not authorized',
-                };
-            }
             await this.adminDao.updateAdmin(walletAddress, data);
             return {
                 success: common_1.HttpStatus.OK,
-                message: 'Admin updated successfully',
+                message: admin_data_1.AdminMessages.ADMIN_UPDATED,
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.AdminError('Error updating admin');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: admin_data_1.AdminErrors.ADMIN_UPDATE_ERROR }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async fetchAllPractitioners() {
@@ -225,14 +235,14 @@ let AdminService = class AdminService {
                 allPractitioners: fullList,
             };
         }
-        catch (error) {
-            console.error(error);
-            throw new shared_1.AdminError('Error fetching practitioners');
+        catch (e) {
+            this.logger.error(e.message);
+            throw new common_1.HttpException({ message: admin_data_1.AdminErrors.FETCHING_PRACTITIONERS }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };
 exports.AdminService = AdminService;
-exports.AdminService = AdminService = __decorate([
+exports.AdminService = AdminService = AdminService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(admin_schema_1.Admin.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
@@ -241,6 +251,6 @@ exports.AdminService = AdminService = __decorate([
         hospital_dao_1.HospitalDao,
         doctor_dao_1.DoctorDao,
         pharmacist_dao_1.PharmacistDao,
-        otp_service_1.OtpService])
+        event_emitter_1.EventEmitter2])
 ], AdminService);
 //# sourceMappingURL=admin.service.js.map

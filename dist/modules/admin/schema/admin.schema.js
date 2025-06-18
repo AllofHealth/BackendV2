@@ -15,7 +15,7 @@ let Admin = class Admin {
 };
 exports.Admin = Admin;
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, unique: true }),
+    (0, mongoose_1.Prop)({ sparse: true }),
     __metadata("design:type", Number)
 ], Admin.prototype, "id", void 0);
 __decorate([

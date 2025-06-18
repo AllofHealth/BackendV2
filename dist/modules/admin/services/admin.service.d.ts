@@ -24,7 +24,7 @@
 /// <reference types="mongoose/types/inferschematype" />
 import { HttpStatus } from '@nestjs/common';
 import { Admin } from '../schema/admin.schema';
-import { CreateAdminType, RemoveAdminType, UpdateAdminProfileType } from '../interface/admin.interface';
+import { AuthenticateAdminInterface, CreateAdminType, RemoveAdminType, UpdateAdminProfileType } from '../interface/admin.interface';
 import { Model, Types } from 'mongoose';
 import { ErrorCodes } from '@/shared';
 import { AdminDao } from '../dao/admin.dao';
@@ -32,7 +32,8 @@ import { AdminGuard } from '../guards/admin.guard';
 import { HospitalDao } from '@/modules/hospital/dao/hospital.dao';
 import { DoctorDao } from '@/modules/doctor/dao/doctor.dao';
 import { PharmacistDao } from '@/modules/pharmacist/dao/pharmacist.dao';
-import { OtpService } from '@/modules/otp/services/otp.service';
+import { AdminErrors, AdminMessages } from '@/modules/admin/data/admin.data';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 export declare class AdminService {
     private adminModel;
     private readonly adminDao;
@@ -40,43 +41,54 @@ export declare class AdminService {
     private readonly hospitalDao;
     private readonly doctorDao;
     private readonly pharmacistDao;
-    private readonly otpService;
+    private readonly eventEmitter;
     private logger;
-    constructor(adminModel: Model<Admin>, adminDao: AdminDao, adminGuard: AdminGuard, hospitalDao: HospitalDao, doctorDao: DoctorDao, pharmacistDao: PharmacistDao, otpService: OtpService);
+    constructor(adminModel: Model<Admin>, adminDao: AdminDao, adminGuard: AdminGuard, hospitalDao: HospitalDao, doctorDao: DoctorDao, pharmacistDao: PharmacistDao, eventEmitter: EventEmitter2);
     fetchAdminByAddress(walletAddress: string): Promise<(import("mongoose").Document<unknown, {}, Admin> & Admin & {
         _id: Types.ObjectId;
     }) | {
         success: ErrorCodes;
-        message: string;
+        message: AdminErrors;
     }>;
     isAdminAuthenticated(walletAddress: string): Promise<boolean | {
         success: ErrorCodes;
-        message: string;
+        message: AdminErrors;
     }>;
-    fetchAllAdmins(): Promise<(import("mongoose").Document<unknown, {}, Admin> & Admin & {
-        _id: Types.ObjectId;
-    })[]>;
-    authenticateAdmin(addressToAuthenticate: string): Promise<{
+    fetchAllAdmins(): Promise<{
         success: HttpStatus;
-        message: string;
+        message: AdminErrors;
+        data: any[];
+    } | {
+        success: HttpStatus;
+        data: (import("mongoose").Document<unknown, {}, Admin> & Admin & {
+            _id: Types.ObjectId;
+        })[];
+        message?: undefined;
+    }>;
+    authenticateAdmin(args: AuthenticateAdminInterface): Promise<{
+        success: HttpStatus;
+        message: AdminErrors;
+    } | {
+        success: HttpStatus;
+        message: AdminMessages;
     }>;
     createNewAdmin(args: CreateAdminType): Promise<{
         success: HttpStatus;
-        message: string;
+        message: AdminErrors;
         admin?: undefined;
     } | {
-        success: ErrorCodes;
+        success: HttpStatus;
+        message: AdminMessages;
         admin: import("mongoose").Document<unknown, {}, Admin> & Admin & {
             _id: Types.ObjectId;
         };
-        message: string;
     }>;
     removeAdmin(args: RemoveAdminType): Promise<{
         success: HttpStatus;
-        message: string;
+        message?: undefined;
     } | {
         success: ErrorCodes;
-        message: string;
+        message: AdminMessages;
     }>;
     approveHospital(args: {
         hospitalId: Types.ObjectId;
@@ -89,7 +101,7 @@ export declare class AdminService {
         data: UpdateAdminProfileType;
     }): Promise<{
         success: HttpStatus;
-        message: string;
+        message: AdminMessages;
     }>;
     fetchAllPractitioners(): Promise<{
         success: HttpStatus;

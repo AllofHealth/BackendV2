@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, HydratedDocument } from 'mongoose';
 import {
-  Medicine,
+  Medication,
   MedicineSchema,
 } from '../../medicine/schema/medicine.schema';
 
@@ -55,7 +55,7 @@ export class Prescriptions extends Document {
   patientAddress: string;
 
   @Prop({ type: [{ type: MedicineSchema }] })
-  medicine: Medicine[];
+  medicine: Medication[];
 
   @Prop({ default: Date.now() })
   date: Date;
