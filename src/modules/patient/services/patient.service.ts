@@ -28,8 +28,8 @@ import {
   PatientSuccess,
 } from '@/modules/patient/data/patient.data';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { SharedEvents } from '@/shared/events/shared.events';
-import { EntityCreatedDto } from '@/shared/dto/shared.dto';
+// import { SharedEvents } from '@/shared/events/shared.events';
+// import { EntityCreatedDto } from '@/shared/dto/shared.dto';
 
 /**
  * @file: Patient Service
@@ -111,10 +111,14 @@ export class PatientService {
         };
       }
 
-      this.eventEmitter.emit(
-        SharedEvents.ENTITY_CREATED,
-        new EntityCreatedDto(walletAddress, args.email, 'patient'),
-      );
+      /**
+       * @dev this was commented out to by-pass otp verification for demo sake. it should be reverted
+       */
+
+      // this.eventEmitter.emit(
+      //   SharedEvents.ENTITY_CREATED,
+      //   new EntityCreatedDto(walletAddress, args.email, 'patient'),
+      // );
 
       return {
         success: HttpStatus.OK,

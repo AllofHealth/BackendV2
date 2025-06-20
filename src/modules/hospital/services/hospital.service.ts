@@ -28,7 +28,7 @@ import { PharmacistGuard } from '@/modules/pharmacist/guards/pharmacist.guard';
 import { EncryptionService } from '@/shared/utils/encryption/service/encryption.service';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { SharedEvents } from '@/shared/events/shared.events';
-import { EntityCreatedDto } from '@/shared/dto/shared.dto';
+// import { EntityCreatedDto } from '@/shared/dto/shared.dto';
 
 @Injectable()
 export class HospitalService {
@@ -72,10 +72,13 @@ export class HospitalService {
       }
 
       try {
-        this.eventEmitter.emit(
-          SharedEvents.ENTITY_CREATED,
-          new EntityCreatedDto(args.admin, hospital.email, 'institution'),
-        );
+        /**
+         * @dev this was commented out to by-pass otp verification for demo sake. it should be reverted
+         */
+        // this.eventEmitter.emit(
+        //   SharedEvents.ENTITY_CREATED,
+        //   new EntityCreatedDto(args.admin, hospital.email, 'institution'),
+        // );
       } catch (error) {
         await this.hospitalDao.removeHospitalById(hospital._id);
         return {

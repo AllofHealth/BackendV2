@@ -57,7 +57,7 @@ export class PatientDao {
       genotype: patient.genotype,
       walletAddress: patient.walletAddress,
       category: Category.Patient,
-      isVerified: false,
+      isVerified: true,
     });
   }
 

@@ -28,7 +28,7 @@ export class HospitalDao {
       status: ApprovalStatus.Pending,
       category: institution.type ? institution.type : Category.General,
       regNo: institution.regNo,
-      isVerified: false,
+      isVerified: true,
     });
   }
 

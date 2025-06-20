@@ -30,8 +30,8 @@ import { Prescriptions } from '@/modules/patient/schemas/patient.schema';
 import { Medication } from '@/modules/medicine/schema/medicine.schema';
 import { PreviewType } from '@/modules/hospital/interface/hospital.interface';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { SharedEvents } from '@/shared/events/shared.events';
-import { EntityCreatedDto } from '@/shared/dto/shared.dto';
+// import { SharedEvents } from '@/shared/events/shared.events';
+// import { EntityCreatedDto } from '@/shared/dto/shared.dto';
 import { MyLoggerService } from '@/modules/my-logger/my-logger.service';
 
 @Injectable()
@@ -99,14 +99,17 @@ export class PharmacistService {
 
       try {
         hospital.pharmacists.push(pharmacistPreview);
-        this.eventEmitter.emit(
-          SharedEvents.ENTITY_CREATED,
-          new EntityCreatedDto(
-            args.walletAddress,
-            pharmacist.email,
-            'pharmacist',
-          ),
-        );
+        /**
+         * @dev this was commented out to by-pass otp verification for demo sake. it should be reverted
+         */
+        // this.eventEmitter.emit(
+        //   SharedEvents.ENTITY_CREATED,
+        //   new EntityCreatedDto(
+        //     args.walletAddress,
+        //     pharmacist.email,
+        //     'pharmacist',
+        //   ),
+        // );
       } catch (error) {
         await this.pharmacistDao.deletePharmacist(pharmacist.walletAddress);
 
