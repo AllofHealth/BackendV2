@@ -1,23 +1,23 @@
+import config from '@/shared/config/config';
+import { ConfigifyModule } from '@itgorillaz/configify';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
-import { MyLoggerModule } from './modules/my-logger/my-logger.module';
-import { PatientModule } from './modules/patient/patient.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { AdminModule } from './modules/admin/admin.module';
-import { HospitalModule } from './modules/hospital/hospital.module';
 import { DoctorModule } from './modules/doctor/doctor.module';
-import { PharmacistModule } from './modules/pharmacist/pharmacist.module';
+import { HospitalModule } from './modules/hospital/hospital.module';
+import { MyLoggerModule } from './modules/my-logger/my-logger.module';
 import { OtpModule } from './modules/otp/otp.module';
-import { TermillModule } from './modules/termill/termill.module';
+import { PatientModule } from './modules/patient/patient.module';
+import { PharmacistModule } from './modules/pharmacist/pharmacist.module';
 import { PostmarkModule } from './modules/postmark/postmark.module';
-import { ConfigifyModule } from '@itgorillaz/configify';
+import { TermillModule } from './modules/termill/termill.module';
 import { EncryptionModule } from './shared/utils/encryption/encryption.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import config from '@/shared/config/config';
-import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -40,21 +40,20 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
         limit: 100,
       },
     ]),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (config: ConfigService) => ({
+        uri: config.get('database.mongodb_uri'),
+        dbName: config.get('database.dbName'),
+      }),
+      inject: [ConfigService],
+    }),
     MyLoggerModule,
     PatientModule,
     AdminModule,
     HospitalModule,
     DoctorModule,
     PharmacistModule,
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (config) => ({
-        uri: config.get('database.mongodb_uri'),
-        dbName: config.get('database.dbName'),
-      }),
-      inject: [ConfigService],
-    }),
-
     OtpModule,
     TermillModule,
     PostmarkModule,
