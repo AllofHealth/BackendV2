@@ -11,7 +11,7 @@ export class PostmarkService {
     try {
       const client = this.postmarkDao.provideClient();
       const result = await client.sendEmailWithTemplate({
-        From: 'support@allofhealth.xyz',
+        From: 'support@allofhealth.africa',
         To: to,
         TemplateAlias: 'otp-1',
         TemplateModel: {
