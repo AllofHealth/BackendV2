@@ -25,8 +25,8 @@ jobs:
       - name: Copy Environment Variables
         run: echo "${{ secrets.ENV_FILE }}" > .env.production && echo "${{ secrets.ENV_FILE }}" > .env
 
-    #   - name: Build Application
-    #     run: npm run build
+      - name: Build Application
+        run: npm run build
 
       - name: Clean Server Directory
         uses: appleboy/ssh-action@master
@@ -58,5 +58,6 @@ jobs:
           script: |
             cd ~/BackendV2
             npm install --production
-            pm2 restart 1
+            #PORT=4000 pm2 start dist/main.js --name BackendV2 --env production
+            pm2 restart 4
             sudo systemctl restart nginx 
